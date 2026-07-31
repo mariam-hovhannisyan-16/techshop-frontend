@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { forkJoin, map, Observable } from 'rxjs';
 import { Auth } from './auth';
 import { OrderItemResponse, OrderResponse } from './order';
+import { environment } from '../../environments/environment';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -46,8 +47,8 @@ export interface AdminStatsSummary {
   providedIn: 'root'
 })
 export class AdminStatsService {
-  private ordersUrl = 'http://localhost:8083/api/orders';
-  private usersUrl = 'http://localhost:8081/api/users';
+  private ordersUrl = `${environment.orderApiUrl}/api/orders`;
+  private usersUrl = `${environment.usersApiUrl}/api/users`;
 
   constructor(private http: HttpClient, private authService: Auth) {}
 

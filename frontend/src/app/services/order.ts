@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { Auth } from './auth';
 import { CartService } from './cart';
+import { environment } from '../../environments/environment';
 
 export interface AddressPayload {
   fullName: string;
@@ -79,7 +80,7 @@ const LOCAL_ORDERS_KEY_PREFIX = 'local_orders_';
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:8083/api/orders';
+  private apiUrl = `${environment.orderApiUrl}/api/orders`;
 
   constructor(
     private http: HttpClient,

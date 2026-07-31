@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { Auth } from './auth';
 import { Product } from './product';
+import { environment } from '../../environments/environment';
 
 export interface WishlistItemResponse {
   productId: number;
@@ -23,7 +24,7 @@ const LOCAL_WISHLIST_KEY_PREFIX = 'local_wishlist_';
   providedIn: 'root'
 })
 export class WishlistService {
-  private apiUrl = 'http://localhost:8085/api/v1/wishlist';
+  private apiUrl = `${environment.wishlistApiUrl}/api/v1/wishlist`;
 
   private readonly productIds = signal<Set<number>>(new Set());
   readonly count = computed(() => this.productIds().size);

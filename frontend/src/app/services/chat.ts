@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import { Auth } from './auth';
+import { environment } from '../../environments/environment';
 
 export type MessageSender = 'CUSTOMER' | 'SUPPORT' | 'BOT';
 export type ConversationStatus = 'OPEN' | 'CLOSED';
@@ -46,7 +47,7 @@ interface LocalChatState {
   providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:8087/api/chat';
+  private apiUrl = `${environment.chatApiUrl}/api/chat`;
 
   constructor(
     private http: HttpClient,

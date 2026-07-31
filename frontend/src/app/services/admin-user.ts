@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { Auth } from './auth';
+import { environment } from '../../environments/environment';
 
 export interface AdminUser {
   id: number;
@@ -24,7 +25,7 @@ const ROLE_OVERRIDES_KEY = 'admin_user_role_overrides';
   providedIn: 'root'
 })
 export class AdminUserService {
-  private apiUrl = 'http://localhost:8081/api/users';
+  private apiUrl = `${environment.usersApiUrl}/api/users`;
 
   constructor(private http: HttpClient, private authService: Auth) {}
 

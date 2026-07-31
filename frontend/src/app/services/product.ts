@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { Auth } from './auth';
+import { environment } from '../../environments/environment';
 
 export interface ProductResponse {
   id: number;
@@ -352,7 +353,7 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   providedIn: 'root'
 })
 export class Product {
-  private apiUrl = 'http://localhost:8084/api/products';
+  private apiUrl = `${environment.productApiUrl}/api/products`;
 
   constructor(private http: HttpClient, private authService: Auth) {}
 

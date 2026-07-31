@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { Auth } from './auth';
 import { SoundService } from './sound';
+import { environment } from '../../environments/environment';
 
 export interface NotificationResponse {
   id: number;
@@ -26,7 +27,7 @@ const POLL_INTERVAL_MS = 20000;
   providedIn: 'root'
 })
 export class NotificationService {
-  private apiUrl = 'http://localhost:8085/api/notifications';
+  private apiUrl = `${environment.notificationApiUrl}/api/notifications`;
 
   private readonly notifications = signal<NotificationResponse[]>([]);
   readonly items = this.notifications.asReadonly();

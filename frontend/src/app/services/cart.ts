@@ -4,6 +4,7 @@ import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxj
 import { Auth } from './auth';
 import { Product } from './product';
 import { SoundService } from './sound';
+import { environment } from '../../environments/environment';
 
 export interface CartItemResponse {
   productId: number;
@@ -38,7 +39,7 @@ const LOCAL_CART_KEY_PREFIX = 'local_cart_';
   providedIn: 'root'
 })
 export class CartService {
-  private apiUrl = 'http://localhost:8082/api/cart';
+  private apiUrl = `${environment.cartApiUrl}/api/cart`;
 
   private readonly itemCountSignal = signal<number>(0);
   readonly itemCount = this.itemCountSignal.asReadonly();

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Auth } from './auth';
 import { ConversationResponse, MessageResponse } from './chat';
+import { environment } from '../../environments/environment';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -16,7 +17,7 @@ const LAST_SEEN_KEY_PREFIX = 'admin_chat_last_seen_';
   providedIn: 'root'
 })
 export class AdminChatService {
-  private apiUrl = 'http://localhost:8087/api/chat';
+  private apiUrl = `${environment.chatApiUrl}/api/chat`;
   // Listing every conversation only ever made sense as an admin operation —
   // it used to also exist on the customer-facing ChatController as a
   // leftover duplicate, but that copy was removed in a backend cleanup, so
@@ -26,7 +27,7 @@ export class AdminChatService {
   // Per-conversation messages/reply below are unaffected by that cleanup —
   // confirmed directly they still work fine at the original /api/chat path
   // for an admin token, so only the list endpoint moved.
-  private adminApiUrl = 'http://localhost:8087/api/admin/chat';
+  private adminApiUrl = `${environment.chatApiUrl}/api/admin/chat`;
 
   constructor(private http: HttpClient, private authService: Auth) {}
 

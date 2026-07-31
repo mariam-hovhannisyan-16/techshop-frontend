@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, Observable, of, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface LoginRequest {
   email: string;
@@ -41,7 +42,7 @@ const USER_STORAGE_KEY = 'user';
   providedIn: 'root'
 })
 export class Auth {
-  private apiUrl = 'http://localhost:8081/api/users';
+  private apiUrl = `${environment.usersApiUrl}/api/users`;
 
   constructor(
     private http: HttpClient,
