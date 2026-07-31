@@ -1,0 +1,45 @@
+<div class="verify-email-container">
+  <div class="verify-email-card">
+    @switch (state) {
+      @case ('loading') {
+        <div class="spinner"></div>
+        <h2>{{ 'VERIFYING_EMAIL' | translate }}</h2>
+      }
+      @case ('success') {
+        <div class="status-icon success"><app-icon name="check-circle" /></div>
+        <h2>{{ 'EMAIL_VERIFIED_TITLE' | translate }}</h2>
+        <p>{{ 'EMAIL_VERIFIED_MESSAGE' | translate }}</p>
+        <div class="actions">
+          <button class="primary-btn" (click)="goHome()">{{ 'GO_HOME' | translate }}</button>
+          <button class="secondary-btn" (click)="openLogin()">{{ 'LOGIN' | translate }}</button>
+        </div>
+      }
+      @case ('error') {
+        <div class="status-icon error"><app-icon name="warning" /></div>
+        <h2>{{ 'EMAIL_VERIFICATION_FAILED_TITLE' | translate }}</h2>
+        <p>{{ (tokenMissing ? 'MISSING_VERIFICATION_TOKEN' : 'EMAIL_VERIFICATION_FAILED_MESSAGE') | translate }}</p>
+
+        <form class="resend-form" (ngSubmit)="resendVerification()">
+          <label for="resend-email">{{ 'RESEND_VERIFICATION_PROMPT' | translate }}</label>
+          <input
+            id="resend-email"
+            type="email"
+            name="resendEmail"
+            [(ngModel)]="resendEmail"
+            [placeholder]="'EMAIL_OR_PHONE' | translate"
+            required
+          >
+          <button type="submit" class="primary-btn" [disabled]="resendSubmitting || !resendEmail.trim()">
+            {{ 'RESEND_VERIFICATION_BUTTON' | translate }}
+          </button>
+        </form>
+
+        <div class="actions">
+          <button class="secondary-btn" (click)="goHome()">{{ 'GO_HOME' | translate }}</button>
+        </div>
+      }
+    }
+  </div>
+
+  <app-toast />
+</div>

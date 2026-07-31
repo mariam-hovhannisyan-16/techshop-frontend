@@ -1,0 +1,11 @@
+@if (!isAdmin) {
+  <button
+    type="button"
+    class="wishlist-btn"
+    [class.active]="isActive"
+    [attr.aria-label]="(isActive ? 'REMOVE_FROM_WISHLIST' : 'ADD_TO_WISHLIST') | translate"
+    (click)="toggle($event)"
+  >
+    <app-icon name="heart" [filled]="isActive" />
+  </button>
+}

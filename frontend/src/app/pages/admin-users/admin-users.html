@@ -1,0 +1,72 @@
+<div class="admin-users-container">
+  <app-header [subtitle]="'ADMIN_PANEL' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="admin-users-content">
+    <div class="admin-tabs">
+      <button type="button" (click)="router.navigate(['/admin/products'])">{{ 'ADMIN_PRODUCTS_NAV' | translate }}</button>
+      <button type="button" class="active">{{ 'ADMIN_USERS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/chat'])">{{ 'ADMIN_CHAT_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/stats'])">{{ 'ADMIN_STATS_NAV' | translate }}</button>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadUsers()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>{{ 'NAME' | translate }}</th>
+              <th>{{ 'EMAIL' | translate }}</th>
+              <th>{{ 'ROLE' | translate }}</th>
+              <th class="actions-col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users; track user.id) {
+              <tr>
+                <td class="name-cell">{{ user.name }}</td>
+                <td class="email-cell">{{ user.email }}</td>
+                <td>
+                  <span class="role-badge" [class.admin]="isAdminRole(user.role)">
+                    {{ (isAdminRole(user.role) ? 'ADMIN_PANEL' : 'ROLE_CUSTOMER') | translate }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  @if (isSelf(user)) {
+                    <span class="muted">{{ 'ADMIN_SELF_NOTE' | translate }}</span>
+                  } @else {
+                    <button
+                      type="button"
+                      class="role-toggle-btn"
+                      [class.demote]="isAdminRole(user.role)"
+                      [disabled]="savingId === user.id"
+                      (click)="toggleRole(user)"
+                    >
+                      {{ (isAdminRole(user.role) ? 'ADMIN_MAKE_CUSTOMER_BTN' : 'ADMIN_MAKE_ADMIN_BTN') | translate }}
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

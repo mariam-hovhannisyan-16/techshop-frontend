@@ -1,0 +1,9 @@
+<button type="button" class="header-action-btn" (click)="goToWishlist()">
+  <span class="icon-wrap">
+    <span class="icon" [class.active]="count > 0"><app-icon name="heart" [filled]="count > 0" /></span>
+    @if (count > 0) {
+      <span class="badge">{{ count }}</span>
+    }
+  </span>
+  <span class="label">{{ 'WISHLIST' | translate }}</span>
+</button>

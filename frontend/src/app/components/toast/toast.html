@@ -1,0 +1,6 @@
+@if (toastService.toast(); as t) {
+  <div class="toast" [class.error]="t.type === 'error'" [class.success]="t.type === 'success'">
+    <span class="toast-icon"><app-icon [name]="t.type === 'success' ? 'check-circle' : 'warning'" /></span>
+    <span class="toast-message">{{ t.message }}</span>
+  </div>
+}

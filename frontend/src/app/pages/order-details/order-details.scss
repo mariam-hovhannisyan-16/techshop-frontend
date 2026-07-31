@@ -1,0 +1,174 @@
+.order-details-container {
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', sans-serif;
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .back-btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--border);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+    }
+
+    .logout-btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid var(--danger-border-soft);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { background: var(--danger-soft-hover); }
+    }
+  }
+
+  .order-details-content {
+    padding: 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .loading-state,
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    gap: 1rem;
+    text-align: center;
+
+    p { color: var(--text-secondary); }
+
+    button {
+      padding: 0.7rem 1.6rem;
+      background: var(--border);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { border-color: var(--accent); }
+    }
+  }
+
+  .loading-state .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .error-state .error-icon { font-size: 3rem; }
+
+  .order-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+
+      .order-id {
+        .label { color: var(--text-secondary); font-size: 0.75rem; }
+        h2 { font-size: 1.4rem; font-weight: 700; margin: 0.2rem 0 0; }
+      }
+
+      .order-status {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: capitalize;
+        background: var(--border);
+        color: var(--text-secondary);
+
+        &.pending, &.processing, &.shipped {
+          background: var(--accent-soft);
+          color: var(--accent);
+          border: 1px solid var(--accent-border-soft);
+        }
+
+        &.paid, &.delivered {
+          background: var(--success-soft);
+          color: var(--success);
+          border: 1px solid var(--success-border-soft);
+        }
+
+        &.cancelled, &.refunded {
+          background: var(--danger-soft-strong);
+          color: var(--danger);
+          border: 1px solid var(--danger-border-soft);
+        }
+      }
+    }
+
+    .order-meta {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+
+        .label { color: var(--text-secondary); font-size: 0.75rem; }
+        strong { color: var(--accent); font-size: 1.1rem; }
+        span { color: var(--text-primary); }
+      }
+    }
+
+    .tracking-section {
+      h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin: 0 0 1.2rem;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .order-details-container {
+    .order-details-content {
+      padding: 1rem;
+    }
+
+    .order-card {
+      padding: 1.25rem;
+
+      .order-header {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+    }
+  }
+}

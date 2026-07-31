@@ -1,0 +1,45 @@
+<div class="notifications-menu">
+  <button type="button" class="header-action-btn" (click)="toggle()" [attr.aria-expanded]="open">
+    <span class="icon-wrap">
+      <span class="icon"><app-icon name="bell" /></span>
+      @if (count > 0) {
+        <span class="badge">{{ count }}</span>
+      }
+    </span>
+    <span class="label">{{ 'NOTIFICATIONS' | translate }}</span>
+  </button>
+
+  @if (open) {
+    <div class="notifications-dropdown">
+      <div class="notifications-header">
+        <h3>{{ 'NOTIFICATIONS' | translate }}</h3>
+        @if (notifications.length > 0) {
+          <div class="header-links">
+            @if (count > 0) {
+              <a class="header-link" (click)="markAllAsRead($event)">{{ 'MARK_ALL_READ' | translate }}</a>
+            }
+            <a class="header-link danger" (click)="clearNotifications($event)">{{ 'CLEAR_NOTIFICATIONS' | translate }}</a>
+          </div>
+        }
+      </div>
+
+      @if (notifications.length === 0) {
+        <p class="empty-text">{{ 'NO_NOTIFICATIONS' | translate }}</p>
+      } @else {
+        <div class="notifications-list">
+          @for (n of notifications; track n.id) {
+            <button type="button" class="notification-item" [class.unread]="!n.read" (click)="select(n)">
+              <span class="dot" [class.hidden]="n.read"></span>
+              <span class="notification-text">
+                <span class="message">{{ displayMessage(n.message) }}</span>
+                @if (n.createdAt) {
+                  <span class="time">{{ n.createdAt | date:'short' }}</span>
+                }
+              </span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

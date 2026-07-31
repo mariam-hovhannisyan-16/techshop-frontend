@@ -1,0 +1,151 @@
+@if (authDrawerService.isOpen() || closing) {
+  <div class="auth-modal-overlay" [class.closing]="closing" (click)="close()"></div>
+
+  <div class="auth-modal" [class.closing]="closing" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h2>{{ (authDrawerService.mode() === 'register' ? 'REGISTER' : forgotView ? 'FORGOT_PASSWORD_TITLE' : 'LOGIN') | translate }}</h2>
+      <button type="button" class="close-btn" (click)="close()" [attr.aria-label]="'CLOSE' | translate">
+        <app-icon name="close" />
+      </button>
+    </div>
+
+    @if (authDrawerService.mode() === 'login' && forgotView) {
+      @if (!forgotSubmitted) {
+        <p class="forgot-instructions">{{ 'FORGOT_PASSWORD_INSTRUCTIONS' | translate }}</p>
+
+        <form (ngSubmit)="submitForgotPassword()" autocomplete="off">
+          <div class="input-field">
+            <app-icon name="mail" />
+            <input
+              type="email"
+              name="forgotEmail"
+              [placeholder]="'AUTH_TAB_EMAIL' | translate"
+              [(ngModel)]="forgotEmail"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="primary-btn" [disabled]="forgotSubmitting">{{ 'FORGOT_PASSWORD_SEND' | translate }}</button>
+          </div>
+        </form>
+      } @else {
+        <p class="forgot-instructions">{{ 'FORGOT_PASSWORD_CONFIRMATION' | translate }}</p>
+      }
+
+      <a class="forgot-link" (click)="backToLogin()">{{ 'BACK_TO_LOGIN' | translate }}</a>
+    } @else if (authDrawerService.mode() === 'login') {
+      <div class="identifier-tabs">
+        <button type="button" [class.active]="loginIdentifierType === 'email'" (click)="setIdentifierType('email')">
+          {{ 'AUTH_TAB_EMAIL' | translate }}
+        </button>
+        <button type="button" [class.active]="loginIdentifierType === 'phone'" (click)="setIdentifierType('phone')">
+          {{ 'AUTH_TAB_PHONE' | translate }}
+        </button>
+      </div>
+
+      @if (loginError) {
+        <p class="form-error">{{ loginError }}</p>
+      }
+
+      <form (ngSubmit)="submitLogin()" autocomplete="off">
+        <div class="input-field">
+          <app-icon [name]="loginIdentifierType === 'email' ? 'mail' : 'phone'" />
+          <input
+            [type]="loginIdentifierType === 'email' ? 'email' : 'tel'"
+            name="loginIdentifier"
+            [placeholder]="(loginIdentifierType === 'email' ? 'AUTH_TAB_EMAIL' : 'AUTH_TAB_PHONE') | translate"
+            [(ngModel)]="loginEmail"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="input-field password-field">
+          <app-icon name="lock" />
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            name="loginPassword"
+            [placeholder]="'PASSWORD' | translate"
+            [(ngModel)]="loginPassword"
+            autocomplete="current-password"
+            required
+          >
+          <button
+            type="button"
+            class="eye-toggle"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="(showPassword ? 'HIDE_PASSWORD' : 'SHOW_PASSWORD') | translate"
+          >
+            <app-icon [name]="showPassword ? 'eye-off' : 'eye'" />
+          </button>
+        </div>
+
+        <a class="forgot-link" (click)="onForgotPassword()">{{ 'FORGOT_PASSWORD' | translate }}</a>
+
+        <div class="modal-actions">
+          <button type="submit" class="primary-btn" [disabled]="loginSubmitting">{{ 'LOGIN' | translate }}</button>
+          <button type="button" class="secondary-btn" (click)="switchMode('register')">{{ 'REGISTER_CTA' | translate }}</button>
+        </div>
+      </form>
+    } @else {
+      @if (registerError) {
+        <p class="form-error">{{ registerError }}</p>
+      }
+
+      <form (ngSubmit)="submitRegister()" autocomplete="off">
+        <div class="input-field">
+          <app-icon name="user" />
+          <input type="text" name="registerName" [placeholder]="'NAME' | translate" [(ngModel)]="registerName" required>
+        </div>
+
+        <div class="input-field">
+          <app-icon name="mail" />
+          <input
+            type="text"
+            name="registerEmail"
+            [placeholder]="'EMAIL_OR_PHONE' | translate"
+            [(ngModel)]="registerEmail"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="input-field password-field">
+          <app-icon name="lock" />
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            name="registerPassword"
+            [placeholder]="'PASSWORD' | translate"
+            [(ngModel)]="registerPassword"
+            autocomplete="new-password"
+            required
+          >
+          <button
+            type="button"
+            class="eye-toggle"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="(showPassword ? 'HIDE_PASSWORD' : 'SHOW_PASSWORD') | translate"
+          >
+            <app-icon [name]="showPassword ? 'eye-off' : 'eye'" />
+          </button>
+        </div>
+
+        <div class="role-tabs">
+          <button type="button" [class.active]="registerRole === 'CUSTOMER'" (click)="setRegisterRole('CUSTOMER')">
+            {{ 'REGISTER_AS_USER' | translate }}
+          </button>
+          <button type="button" [class.active]="registerRole === 'ADMIN'" (click)="setRegisterRole('ADMIN')">
+            {{ 'REGISTER_AS_ADMIN' | translate }}
+          </button>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="primary-btn" [disabled]="registerSubmitting">{{ 'REGISTER' | translate }}</button>
+          <button type="button" class="secondary-btn" (click)="switchMode('login')">{{ 'LOGIN' | translate }}</button>
+        </div>
+      </form>
+    }
+  </div>
+}

@@ -1,0 +1,34 @@
+<section class="promo-banner">
+  <div class="promo-lineup-bg"></div>
+
+  <div class="promo-copy">
+    <h2>{{ activeSlide.titleKey | translate }}</h2>
+    <p>{{ activeSlide.subtitleKey | translate }}</p>
+    <button type="button" class="promo-cta" (click)="onCtaClick()">{{ activeSlide.ctaKey | translate }}</button>
+  </div>
+
+  <div class="product-lineup">
+    @for (photo of activeSlide.lineup; track photo.src) {
+      @if (!isPhotoFailed(photo.src)) {
+        <img [src]="photo.src" [alt]="photo.altKey | translate" class="lineup-photo" (error)="onPhotoError(photo.src)">
+      }
+    }
+  </div>
+
+  @if (slides.length > 1) {
+    <button type="button" class="promo-arrow prev" (click)="prev()" [attr.aria-label]="'PREVIOUS' | translate">‹</button>
+    <button type="button" class="promo-arrow next" (click)="next()" [attr.aria-label]="'NEXT' | translate">›</button>
+
+    <div class="promo-dots">
+      @for (slide of slides; track $index) {
+        <button
+          type="button"
+          class="promo-dot"
+          [class.active]="$index === activeIndex"
+          (click)="goTo($index)"
+          [attr.aria-label]="'GO_TO_SLIDE' | translate"
+        ></button>
+      }
+    </div>
+  }
+</section>

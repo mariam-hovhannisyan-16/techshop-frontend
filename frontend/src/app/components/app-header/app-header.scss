@@ -1,0 +1,129 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    .brand-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      background: var(--accent);
+      color: var(--text-on-accent);
+      border-radius: 12px;
+      font-size: 1.3rem;
+    }
+
+    h1 { font-size: 1.2rem; font-weight: 700; margin: 0; }
+    p { font-size: 0.75rem; color: var(--text-secondary); margin: 0; }
+  }
+
+  .header-search {
+    flex: 1;
+    max-width: 560px;
+
+    &:empty { display: none; }
+  }
+
+  .header-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    background: var(--border);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    cursor: pointer;
+
+    span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--text-primary);
+    }
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .admin-panel-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover { background: var(--accent-hover); }
+  }
+}
+
+@media (max-width: 860px) {
+  .app-header {
+    flex-wrap: wrap;
+
+    .header-search {
+      order: 3;
+      flex-basis: 100%;
+      max-width: none;
+    }
+
+    .hamburger-btn {
+      display: flex;
+    }
+
+    .nav-actions {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 1rem;
+      left: 1rem;
+      margin-top: 0.5rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 1rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+      z-index: 100;
+      box-shadow: 0 8px 24px var(--overlay);
+
+      &.open { display: flex; }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', sans-serif;
+  padding: 1rem;
+}
+
+.not-found-card {
+  text-align: center;
+  max-width: 420px;
+
+  .not-found-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 0;
+    line-height: 1;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0.75rem 0 0.5rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin: 0 0 1.5rem;
+  }
+
+  button {
+    padding: 0.8rem 2rem;
+    background: var(--accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover { background: var(--accent-hover); }
+  }
+}

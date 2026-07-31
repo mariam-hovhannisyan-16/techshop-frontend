@@ -1,0 +1,70 @@
+<div class="admin-stats-container">
+  <app-header [subtitle]="'ADMIN_PANEL' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="admin-stats-content">
+    <div class="admin-tabs">
+      <button type="button" (click)="router.navigate(['/admin/products'])">{{ 'ADMIN_PRODUCTS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/users'])">{{ 'ADMIN_USERS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/chat'])">{{ 'ADMIN_CHAT_NAV' | translate }}</button>
+      <button type="button" class="active">{{ 'ADMIN_STATS_NAV' | translate }}</button>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadStats()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else if (stats) {
+      <div class="stats-row">
+        <div class="stat-tile">
+          <div class="stat-icon"><app-icon name="box" /></div>
+          <strong>{{ stats.totalOrders }}</strong>
+          <span class="stat-underline"></span>
+          <span class="stat-label">{{ 'ADMIN_STATS_TOTAL_ORDERS' | translate }}</span>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-icon"><app-icon name="cash" /></div>
+          <strong>{{ stats.totalRevenue | price }}</strong>
+          <span class="stat-underline"></span>
+          <span class="stat-label">{{ 'ADMIN_STATS_TOTAL_REVENUE' | translate }}</span>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-icon"><app-icon name="user" /></div>
+          <strong>{{ stats.totalUsers }}</strong>
+          <span class="stat-underline"></span>
+          <span class="stat-label">{{ 'ADMIN_STATS_TOTAL_USERS' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="top-products-card">
+        <h2><app-icon name="flame" /> {{ 'ADMIN_STATS_TOP_PRODUCTS' | translate }}</h2>
+
+        @if (stats.topProducts.length === 0) {
+          <p class="empty-note">{{ 'ADMIN_STATS_NO_SALES' | translate }}</p>
+        } @else {
+          <ol class="top-products-list">
+            @for (product of stats.topProducts; track product.productId) {
+              <li>
+                <span class="rank">{{ $index + 1 }}</span>
+                <span class="product-name">{{ product.productName }}</span>
+                <span class="quantity">{{ 'ADMIN_STATS_UNITS_SOLD' | translate:{ count: product.quantitySold } }}</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

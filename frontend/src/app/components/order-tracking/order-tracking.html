@@ -1,0 +1,18 @@
+<div class="tracking">
+  @for (stage of stages; track stage.labelKey; let last = $last) {
+    <div class="stage" [class.complete]="stage.state === 'complete'" [class.cancelled]="stage.state === 'cancelled'">
+      <div class="stage-marker">
+        <span class="dot"></span>
+        @if (!last) {
+          <span class="line"></span>
+        }
+      </div>
+      <div class="stage-info">
+        <span class="stage-label">{{ stage.labelKey | translate }}</span>
+        @if (stage.timestamp) {
+          <span class="stage-date">{{ stage.timestamp | date:'dd.MM.yyyy HH:mm' }}</span>
+        }
+      </div>
+    </div>
+  }
+</div>

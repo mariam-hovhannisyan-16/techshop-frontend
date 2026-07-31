@@ -1,0 +1,46 @@
+<div class="app-header-wrapper">
+  <app-top-bar />
+
+  <div class="app-header">
+    <div class="brand" (click)="goToBrand()">
+      <div class="brand-icon"><app-icon name="bolt" /></div>
+      <div>
+        <h1>TechShop AM</h1>
+        <p>{{ subtitle }}</p>
+      </div>
+    </div>
+
+    <div class="header-search">
+      <ng-content select="[header-search]" />
+    </div>
+
+    <div class="header-actions-group">
+      <app-theme-toggle />
+
+      <button
+        type="button"
+        class="hamburger-btn"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen"
+        [attr.aria-label]="'TOGGLE_MENU' | translate"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav-actions" [class.open]="menuOpen">
+        <ng-content select="[header-actions]" />
+        @if (isAdmin) {
+          <button type="button" class="admin-panel-btn" (click)="goToAdmin()">
+            <app-icon name="shield-check" />
+            <span>{{ 'ADMIN_PANEL' | translate }}</span>
+          </button>
+        } @else {
+          <app-wishlist-badge />
+          <app-cart-badge />
+        }
+        <app-account-menu />
+        <app-notifications-badge />
+      </div>
+    </div>
+  </div>
+</div>

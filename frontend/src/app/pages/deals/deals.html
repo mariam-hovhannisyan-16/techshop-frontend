@@ -1,0 +1,35 @@
+<div class="deals-container">
+  <app-header [subtitle]="'DISCOUNTS' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="deals-content">
+    <h1><app-icon name="flame" /> {{ 'DISCOUNTS' | translate }}</h1>
+
+    @if (loading) {
+      <app-skeleton [count]="4" />
+    } @else if (hasError) {
+      <app-empty-state icon="warning" [message]="'FAILED_TO_LOAD_PRODUCTS' | translate">
+        <button (click)="loadDeals()">{{ 'RETRY' | translate }}</button>
+      </app-empty-state>
+    } @else if (deals.length === 0) {
+      <app-empty-state icon="flame" [message]="'NO_DEALS' | translate">
+        <button (click)="router.navigate(['/products'])">{{ 'CONTINUE_SHOPPING' | translate }}</button>
+      </app-empty-state>
+    } @else {
+      <div class="deals-grid">
+        @for (product of deals; track product.id) {
+          <app-product-card
+            [product]="product"
+            (view)="viewProduct($event)"
+            (addToCart)="addToCart($event)"
+          />
+        }
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

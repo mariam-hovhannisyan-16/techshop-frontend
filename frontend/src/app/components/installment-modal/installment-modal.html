@@ -1,0 +1,91 @@
+@if (isOpen()) {
+  <div class="installment-overlay" [class.closing]="closing()" (click)="close()"></div>
+
+  <div class="installment-modal" [class.closing]="closing()" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h2>{{ 'INSTALLMENT_MODAL_TITLE' | translate: { price: formatNumber(price) } }}</h2>
+      <button type="button" class="close-btn" (click)="close()" [attr.aria-label]="'CLOSE' | translate">
+        <app-icon name="close" />
+      </button>
+    </div>
+
+    <form (ngSubmit)="calculate()" autocomplete="off">
+      <div class="form-grid">
+        <label class="form-field">
+          <span>{{ 'INSTALLMENT_ANNUAL_RATE' | translate }}</span>
+          <input type="number" name="annualRate" min="0" max="100" step="0.1" [(ngModel)]="annualRate" required>
+        </label>
+
+        <label class="form-field">
+          <span>{{ 'INSTALLMENT_DURATION' | translate }}</span>
+          <select name="durationMonths" [(ngModel)]="durationMonths" required>
+            @for (opt of durationOptions; track opt) {
+              <option [ngValue]="opt">{{ opt }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>{{ 'INSTALLMENT_BANK' | translate }}</span>
+          <select name="bank" [(ngModel)]="bank" required>
+            @for (opt of bankOptions; track opt) {
+              <option [ngValue]="opt">{{ opt }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>{{ 'INSTALLMENT_DOWN_PAYMENT' | translate }}</span>
+          <input type="number" name="downPayment" min="0" [max]="price" step="1000" [(ngModel)]="downPayment" placeholder="0">
+        </label>
+      </div>
+
+      @if (isDownPaymentTooHigh) {
+        <p class="form-error">{{ 'INSTALLMENT_DOWN_PAYMENT_TOO_HIGH' | translate }}</p>
+      }
+
+      <div class="modal-actions">
+        <button type="submit" class="primary-btn" [disabled]="isDownPaymentTooHigh">{{ 'INSTALLMENT_CALCULATE' | translate }}</button>
+      </div>
+    </form>
+
+    @if (calculated && schedule.length > 0) {
+      <div class="schedule-wrapper">
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>{{ 'INSTALLMENT_COL_MONTH' | translate }}</th>
+              <th>{{ 'INSTALLMENT_COL_INTEREST' | translate }}</th>
+              <th>{{ 'INSTALLMENT_COL_PRINCIPAL' | translate }}</th>
+              <th>{{ 'INSTALLMENT_COL_TOTAL' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of schedule; track row.month) {
+              <tr>
+                <td>{{ row.month }}</td>
+                <td>{{ formatNumber(row.interest) }}</td>
+                <td>{{ formatNumber(row.principal) }}</td>
+                <td>{{ formatNumber(row.totalPayment) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>{{ 'INSTALLMENT_TOTAL_ROW' | translate }}</td>
+              <td>{{ formatNumber(totals.interest) }}</td>
+              <td>{{ formatNumber(totals.principal) }}</td>
+              <td>{{ formatNumber(totals.total) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="primary-btn proceed-btn" [disabled]="proceeding" (click)="proceedWithInstallment()">
+          {{ 'INSTALLMENT_PROCEED' | translate }}
+        </button>
+      </div>
+    }
+  </div>
+}

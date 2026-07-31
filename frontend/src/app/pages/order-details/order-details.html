@@ -1,0 +1,58 @@
+<div class="order-details-container">
+  <app-header [subtitle]="('ORDER' | translate) + ' #' + orderId">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/orders'])">← {{ 'BACK_TO_ORDERS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="order-details-content">
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadOrder()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else if (notFound) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="search" /></div>
+        <p>{{ 'ORDER_NOT_FOUND' | translate }}</p>
+        <button (click)="router.navigate(['/orders'])">{{ 'BACK_TO_ORDERS' | translate }}</button>
+      </div>
+    } @else if (order) {
+      <div class="order-card">
+        <div class="order-header">
+          <div class="order-id">
+            <span class="label">{{ 'ORDER' | translate }}</span>
+            <h2>#{{ order.id }}</h2>
+          </div>
+          <div class="order-status" [class]="order.status.toLowerCase()">
+            {{ ('STATUS_' + order.status) | translate }}
+          </div>
+        </div>
+
+        <div class="order-meta">
+          <div class="meta-item">
+            <span class="label">{{ 'TOTAL' | translate }}</span>
+            <strong>{{ order.totalPrice | price }}</strong>
+          </div>
+          <div class="meta-item">
+            <span class="label">{{ 'DATE' | translate }}</span>
+            <span>{{ order.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+        </div>
+
+        <div class="tracking-section">
+          <h3>{{ 'ORDER_TRACKING' | translate }}</h3>
+          <app-order-tracking [status]="order.status" [createdAt]="order.createdAt" />
+        </div>
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

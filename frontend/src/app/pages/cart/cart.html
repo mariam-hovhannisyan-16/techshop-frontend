@@ -1,0 +1,59 @@
+<div class="cart-container">
+  <app-header [subtitle]="'CART' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  @if (errorMessage) {
+    <div class="error">
+      <p>{{ errorMessage | translate }}</p>
+      <button (click)="loadCart()">{{ 'RETRY' | translate }}</button>
+    </div>
+  }
+
+  <div class="cart-content">
+    @if (cart && cart.items.length > 0) {
+      <div class="cart-items">
+        @for (item of cart.items; track item.productId) {
+          <div class="cart-item">
+            @if (imageSrc(item); as src) {
+              <img class="item-image" [src]="src" [alt]="item.productName" (error)="onImageError(item.productId)">
+            } @else {
+              <div class="item-icon"><app-icon name="box" /></div>
+            }
+            <div class="item-info">
+              <h3>{{ item.productName }}</h3>
+              <p>{{ item.productPrice | price }} × {{ item.quantity }}</p>
+            </div>
+            <div class="item-total">
+              <span>{{ item.totalPrice | price }}</span>
+            </div>
+            <button class="remove-btn" (click)="removeItem(item.productId)">✕</button>
+          </div>
+        }
+      </div>
+
+      <div class="cart-summary">
+        <div class="summary-card">
+          <h3>{{ 'ORDER_SUMMARY' | translate }}</h3>
+          <div class="summary-row">
+            <span>{{ 'TOTAL' | translate }}</span>
+            <strong>{{ cart.totalPrice | price }}</strong>
+          </div>
+          <button class="order-btn" (click)="goToCheckout()">
+            <app-icon name="cart" /> {{ 'PROCEED_TO_CHECKOUT' | translate }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-cart">
+        <div class="empty-icon"><app-icon name="cart" /></div>
+        <h3>{{ 'CART_EMPTY' | translate }}</h3>
+        <button (click)="router.navigate(['/products'])">{{ 'CONTINUE_SHOPPING' | translate }}</button>
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

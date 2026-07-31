@@ -1,0 +1,61 @@
+<div class="chat-widget">
+  @if (open) {
+    <div class="chat-panel">
+      <div class="chat-header">
+        <span class="chat-title">{{ 'CHAT_TITLE' | translate }}</span>
+        <button type="button" class="close-btn" (click)="close()" [attr.aria-label]="'CHAT_CLOSE' | translate">
+          <app-icon name="close" />
+        </button>
+      </div>
+
+      <div class="chat-messages" #messageList>
+        @if (loading) {
+          <div class="chat-loading">
+            <div class="spinner"></div>
+          </div>
+        } @else if (messages.length === 0) {
+          <p class="chat-empty">{{ 'CHAT_EMPTY' | translate }}</p>
+        } @else {
+          @for (message of messages; track message.id) {
+            <div
+              class="chat-message"
+              [class.customer]="message.sender === 'CUSTOMER'"
+              [class.support]="message.sender === 'SUPPORT'"
+              [class.bot]="message.sender === 'BOT'"
+            >
+              @if (message.sender === 'BOT') {
+                <span class="sender-label"><app-icon name="sparkle" /> {{ 'CHAT_BOT_LABEL' | translate }}</span>
+              }
+              <div class="bubble">{{ message.text }}</div>
+            </div>
+          }
+        }
+      </div>
+
+      <form class="chat-input-row" (ngSubmit)="send()">
+        <input
+          type="text"
+          name="chatDraft"
+          [(ngModel)]="draft"
+          [placeholder]="'CHAT_INPUT_PLACEHOLDER' | translate"
+          autocomplete="off"
+        >
+        <button type="submit" class="send-btn" [disabled]="!draft.trim() || sending" [attr.aria-label]="'CHAT_SEND' | translate">
+          <app-icon name="send" />
+        </button>
+      </form>
+    </div>
+  }
+
+  <button
+    type="button"
+    class="chat-toggle-btn"
+    (click)="toggle()"
+    [attr.aria-label]="(open ? 'CHAT_CLOSE' : 'CHAT_OPEN') | translate"
+  >
+    <app-icon [name]="open ? 'close' : 'message-circle'" />
+    @if (hasUnread && !open) {
+      <span class="unread-dot"></span>
+    }
+  </button>
+</div>

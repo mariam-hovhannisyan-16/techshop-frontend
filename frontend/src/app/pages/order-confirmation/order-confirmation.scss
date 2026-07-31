@@ -1,0 +1,151 @@
+.confirmation-container {
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', sans-serif;
+
+  .confirmation-content {
+    padding: 2rem;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .result-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+
+    h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin: 0 0 1.5rem;
+    }
+  }
+
+  .result-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+
+    &.success { color: var(--accent); }
+    &.failed { color: var(--danger); }
+  }
+
+  .order-recap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem;
+
+    span { color: var(--text-secondary); }
+    strong { color: var(--accent); font-size: 1.1rem; white-space: nowrap; }
+  }
+
+  app-order-tracking {
+    display: block;
+    margin: 1.5rem 0;
+    text-align: left;
+  }
+
+  .inline-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 0 0.5rem;
+
+    h2 { margin: 0.5rem 0 0; }
+    p { margin: 0 0 0.5rem; }
+
+    .secondary-btn {
+      padding: 0.6rem 1.4rem;
+      background: var(--border);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+
+      &:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+    }
+  }
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .step-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+
+    .primary-btn {
+      padding: 0.8rem 1.8rem;
+      background: var(--accent);
+      color: var(--text-on-accent);
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { background: var(--accent-hover); }
+    }
+
+    .secondary-btn {
+      padding: 0.8rem 1.8rem;
+      background: var(--border);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .confirmation-container {
+    .confirmation-content {
+      padding: 1rem;
+    }
+
+    .result-panel {
+      padding: 1.25rem;
+    }
+
+    .step-actions {
+      flex-direction: column-reverse;
+
+      button { width: 100%; }
+    }
+  }
+}

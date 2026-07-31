@@ -1,0 +1,156 @@
+<div class="admin-products-container">
+  <app-header [subtitle]="'ADMIN_PANEL' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="admin-products-content">
+    <div class="admin-tabs">
+      <button type="button" class="active">{{ 'ADMIN_PRODUCTS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/users'])">{{ 'ADMIN_USERS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/chat'])">{{ 'ADMIN_CHAT_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/stats'])">{{ 'ADMIN_STATS_NAV' | translate }}</button>
+    </div>
+
+    @if (!loading && !errorMessage) {
+      <div class="add-product-bar">
+        <button type="button" class="add-product-toggle-btn" (click)="toggleAddForm()">
+          <app-icon [name]="showAddForm ? 'close' : 'plus'" /> {{ 'ADMIN_ADD_PRODUCT_BTN' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (showAddForm) {
+      <form class="add-product-form" (ngSubmit)="submitAddProduct()">
+        <div class="form-row">
+          <label>
+            <span>{{ 'ADMIN_FIELD_PRODUCT_NAME' | translate }}</span>
+            <input type="text" name="addName" [(ngModel)]="addForm.name" required>
+          </label>
+          <label>
+            <span>{{ 'ADMIN_COL_CATEGORY' | translate }}</span>
+            <select name="addCategory" [(ngModel)]="addForm.category" required>
+              <option value="" disabled>{{ 'ADMIN_SELECT_CATEGORY_PLACEHOLDER' | translate }}</option>
+              @for (option of categoryOptions; track option.id) {
+                <option [value]="option.id">{{ option.labelKey | translate }}</option>
+              }
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            <span>{{ 'ADMIN_COL_PRICE' | translate }}</span>
+            <input type="number" name="addPrice" min="1" step="1" [(ngModel)]="addForm.price" required>
+          </label>
+          <label>
+            <span>{{ 'ADMIN_FIELD_IMAGE_URL' | translate }}</span>
+            <input type="url" name="addImageUrl" [(ngModel)]="addForm.imageUrl" placeholder="https://..." required>
+          </label>
+        </div>
+        <label class="spec-label">
+          <span>{{ 'ADMIN_FIELD_SPEC' | translate }}</span>
+          <input type="text" name="addSpec" [(ngModel)]="addForm.spec">
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="save-btn" [disabled]="adding">{{ 'ADMIN_ADD_PRODUCT_SUBMIT' | translate }}</button>
+          <button type="button" class="cancel-btn" [disabled]="adding" (click)="toggleAddForm()">{{ 'CANCEL' | translate }}</button>
+        </div>
+      </form>
+    }
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadProducts()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>{{ 'ADMIN_COL_NAME' | translate }}</th>
+              <th>{{ 'ADMIN_COL_CATEGORY' | translate }}</th>
+              <th>{{ 'ADMIN_COL_PRICE' | translate }}</th>
+              <th>{{ 'ADMIN_COL_DISCOUNT' | translate }}</th>
+              <th class="actions-col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of products; track product.id) {
+              <tr [class.editing]="editingId === product.id">
+                <td class="name-cell">{{ product.name }}</td>
+                <td class="category-cell">
+                  @if (categoryLabelKey(product); as labelKey) {
+                    {{ labelKey | translate }}
+                  } @else {
+                    <span class="muted">—</span>
+                  }
+                </td>
+
+                @if (editingId === product.id) {
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      class="edit-input"
+                      [(ngModel)]="editState.price"
+                      [attr.aria-label]="'ADMIN_COL_PRICE' | translate"
+                    >
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      max="90"
+                      step="1"
+                      class="edit-input discount-input"
+                      placeholder="0"
+                      [(ngModel)]="editState.discountPercent"
+                      [attr.aria-label]="'ADMIN_COL_DISCOUNT' | translate"
+                    >
+                    <span class="percent-sign">%</span>
+                  </td>
+                  <td class="actions-cell">
+                    <button type="button" class="save-btn" [disabled]="saving" (click)="saveEdit(product)">
+                      {{ 'SAVE' | translate }}
+                    </button>
+                    <button type="button" class="cancel-btn" [disabled]="saving" (click)="cancelEdit()">
+                      {{ 'CANCEL' | translate }}
+                    </button>
+                  </td>
+                } @else {
+                  <td class="price-cell">{{ product.price | price }}</td>
+                  <td class="discount-cell">
+                    @if (discountPercentOf(product); as discount) {
+                      <span class="discount-badge">-{{ discount }}%</span>
+                    } @else {
+                      <span class="muted">—</span>
+                    }
+                  </td>
+                  <td class="actions-cell">
+                    <button type="button" class="edit-btn" (click)="startEdit(product)">
+                      <app-icon name="edit" /> {{ 'EDIT' | translate }}
+                    </button>
+                    <button type="button" class="delete-btn" [disabled]="deletingId === product.id" (click)="deleteProduct(product)">
+                      <app-icon name="trash" /> {{ 'ADMIN_DELETE_BTN' | translate }}
+                    </button>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

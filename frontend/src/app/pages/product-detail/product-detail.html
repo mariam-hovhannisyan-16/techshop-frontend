@@ -1,0 +1,154 @@
+<div class="product-detail-container">
+  <app-header [subtitle]="'STORE_TAGLINE' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="product-detail-content">
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (notFound) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="search" /></div>
+        <p>{{ 'PRODUCT_NOT_FOUND' | translate }}</p>
+        <button (click)="router.navigate(['/products'])">{{ 'BACK_TO_PRODUCTS' | translate }}</button>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadProduct()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else if (product) {
+      <div class="breadcrumb">
+        <a (click)="router.navigate(['/products'])">{{ 'HOME' | translate }}</a>
+        @if (inferredCategory) {
+          <span class="sep">/</span>
+          <a (click)="router.navigate(['/products'], { queryParams: { category: inferredCategory } })">
+            {{ inferredCategory.toUpperCase() | translate }}
+          </a>
+        }
+        <span class="sep">/</span>
+        <span class="current">{{ product.name }}</span>
+      </div>
+
+      <div class="product-panel">
+        <div class="product-media">
+          <app-wishlist-button [productId]="product.id" />
+          @if (galleryImages.length > 0) {
+            <div class="gallery">
+              @if (mainImageSrc; as src) {
+                <img [src]="src" [alt]="product.name" class="gallery-main" (error)="onImageError(src)">
+              } @else {
+                <div class="product-icon-large"><app-icon name="box" /></div>
+              }
+              @if (galleryImages.length > 1) {
+                <div class="gallery-thumbs">
+                  @for (img of galleryImages; track $index) {
+                    @if (!isImageFailed(img)) {
+                      <img [src]="img" [class.active]="$index === activeImageIndex" (click)="selectImage($index)" [alt]="product.name" (error)="onImageError(img)">
+                    }
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="product-icon-large"><app-icon name="box" /></div>
+          }
+        </div>
+        <div class="product-info">
+          <h1>{{ product.name }}</h1>
+          <app-star-rating [rating]="averageRating" [count]="reviews.length" />
+          <p class="description">{{ product.description }}</p>
+
+          <div class="price-row">
+            @if (hasDiscount) {
+              <span class="discount-badge">-{{ discountPercent }}% {{ 'SALE' | translate }}</span>
+              <span class="original-price">{{ product.originalPrice | price }}</span>
+            }
+            <span class="price">{{ product.price | price }}</span>
+          </div>
+
+          @if (!isAdmin) {
+            <button
+              type="button"
+              class="installment-link"
+              (click)="installmentModal.open()"
+            >
+              <app-icon name="calculator" />
+              {{ 'INSTALLMENT_PRICE_LINK' | translate }}
+            </button>
+          }
+
+          <p class="availability" [class.out]="product.quantity <= 0">
+            {{ product.quantity > 0 ? ('IN_STOCK' | translate) : ('OUT_OF_STOCK' | translate) }}
+          </p>
+
+          @if (!isAdmin) {
+            <div class="qty-selector">
+              <button (click)="decrementQuantity()">−</button>
+              <span>{{ quantity }}</span>
+              <button (click)="incrementQuantity()">+</button>
+            </div>
+
+            <button class="add-btn" [disabled]="product.quantity <= 0" (click)="addToCart()">
+              <app-icon name="cart" /> {{ 'ADD_TO_CART' | translate }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="reviews-section">
+        <h2>{{ 'REVIEWS' | translate }}</h2>
+        @if (reviewsLoading) {
+          <app-skeleton variant="row" [count]="2" />
+        } @else if (reviews.length === 0) {
+          <p class="no-reviews">{{ 'NO_REVIEWS' | translate }}</p>
+        } @else {
+          <div class="review-list">
+            @for (review of reviews; track review.id) {
+              <div class="review-item">
+                <div class="review-header">
+                  <strong>{{ review.author }}</strong>
+                  <app-star-rating [rating]="review.rating" />
+                </div>
+                <p class="review-date">{{ review.createdAt | date:'dd.MM.yyyy' }}</p>
+                <p class="review-comment">{{ review.comment }}</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (relatedProducts.length > 0) {
+        <div class="mini-section">
+          <h2>{{ 'RELATED_PRODUCTS' | translate }}</h2>
+          <div class="mini-grid">
+            @for (rp of relatedProducts; track rp.id) {
+              <app-product-card [product]="rp" (view)="goToProduct($event)" (addToCart)="quickAddToCart($event)" />
+            }
+          </div>
+        </div>
+      }
+
+      @if (recentlyViewedOthers.length > 0) {
+        <div class="mini-section">
+          <h2>{{ 'RECENTLY_VIEWED' | translate }}</h2>
+          <div class="mini-grid">
+            @for (rv of recentlyViewedOthers; track rv.id) {
+              <app-product-card [product]="rv" (view)="goToProduct($event)" (addToCart)="quickAddToCart($event)" />
+            }
+          </div>
+        </div>
+      }
+
+      <app-installment-modal #installmentModal [price]="product.price" [productId]="product.id" />
+    }
+  </div>
+
+  <app-toast />
+</div>

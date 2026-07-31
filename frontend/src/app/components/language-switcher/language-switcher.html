@@ -1,0 +1,51 @@
+<ng-template #flag let-code="code">
+  @switch (code) {
+    @case ('hy') {
+      <svg class="flag-svg" viewBox="0 0 20 14" aria-hidden="true">
+        <rect width="20" height="4.67" y="0" fill="#D90012" />
+        <rect width="20" height="4.67" y="4.67" fill="#0033A0" />
+        <rect width="20" height="4.66" y="9.34" fill="#F2A800" />
+      </svg>
+    }
+    @case ('ru') {
+      <svg class="flag-svg" viewBox="0 0 20 14" aria-hidden="true">
+        <rect width="20" height="4.67" y="0" fill="#ffffff" />
+        <rect width="20" height="4.67" y="4.67" fill="#0039A6" />
+        <rect width="20" height="4.66" y="9.34" fill="#D52B1E" />
+      </svg>
+    }
+    @case ('en') {
+      <svg class="flag-svg" viewBox="0 0 20 14" aria-hidden="true">
+        <rect width="20" height="14" fill="#00247d" />
+        <path d="M0,0 L20,14 M20,0 L0,14" stroke="#ffffff" stroke-width="2.2" />
+        <path d="M0,0 L20,14 M20,0 L0,14" stroke="#cf142b" stroke-width="0.9" />
+        <path d="M10,0 V14 M0,7 H20" stroke="#ffffff" stroke-width="4" />
+        <path d="M10,0 V14 M0,7 H20" stroke="#cf142b" stroke-width="2.2" />
+      </svg>
+    }
+  }
+</ng-template>
+
+<div class="lang-switcher">
+  <button type="button" class="header-action-btn" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen">
+    <span class="icon-wrap">
+      <span class="flag-icon">
+        <ng-container *ngTemplateOutlet="flag; context: { code: currentOption.code }" />
+      </span>
+    </span>
+    <span class="label">{{ currentOption.shortLabel }}</span>
+  </button>
+
+  @if (menuOpen) {
+    <div class="lang-dropdown">
+      @for (option of options; track option.code) {
+        <button type="button" [class.active]="option.code === current" (click)="select(option.code)">
+          <span class="flag-icon">
+            <ng-container *ngTemplateOutlet="flag; context: { code: option.code }" />
+          </span>
+          {{ option.fullLabelKey | translate }}
+        </button>
+      }
+    </div>
+  }
+</div>

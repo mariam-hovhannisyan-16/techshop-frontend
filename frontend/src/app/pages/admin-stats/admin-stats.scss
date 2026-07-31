@@ -1,0 +1,221 @@
+.admin-stats-container {
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', sans-serif;
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .back-btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--border);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+    }
+  }
+
+  .admin-stats-content {
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .admin-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    button {
+      padding: 0.6rem 1.4rem;
+      background: var(--bg-panel);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+      &.active {
+        background: var(--accent);
+        color: var(--text-on-accent);
+        border-color: var(--accent);
+      }
+    }
+  }
+
+  .loading-state,
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    gap: 1rem;
+    text-align: center;
+
+    p { color: var(--text-secondary); }
+
+    button {
+      padding: 0.7rem 1.6rem;
+      background: var(--border);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { border-color: var(--accent); }
+    }
+  }
+
+  .loading-state .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: admin-stats-spin 0.8s linear infinite;
+  }
+
+  .error-state .error-icon { font-size: 3rem; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--accent-border-soft);
+      box-shadow: 0 8px 20px -10px var(--accent-soft-strong);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--accent-soft-weak);
+      color: var(--accent);
+      font-size: 1.3rem;
+      margin-bottom: 0.3rem;
+    }
+
+    strong { font-size: 2rem; font-weight: 800; line-height: 1; }
+
+    .stat-underline {
+      display: block;
+      width: 28px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--accent);
+      margin: 0.5rem 0 0.3rem;
+    }
+
+    .stat-label { color: var(--text-secondary); font-size: 0.8rem; }
+  }
+
+  .top-products-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.05rem;
+      margin: 0 0 1rem;
+    }
+
+    .empty-note {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      padding: 1rem 0;
+    }
+  }
+
+  .top-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.8rem 0.9rem;
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .rank {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent-soft-weak);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .product-name {
+      flex: 1;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .quantity {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+  }
+}
+
+@keyframes admin-stats-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .admin-stats-container {
+    .admin-stats-content { padding: 1rem; }
+    .stats-row { grid-template-columns: 1fr; }
+  }
+}

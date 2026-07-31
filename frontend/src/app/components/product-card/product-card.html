@@ -1,0 +1,117 @@
+<div
+  class="product-card"
+  [id]="'product-' + product.id"
+  [class.highlighted]="highlighted"
+  [class.size-large]="size === 'large'"
+  (click)="onView()"
+>
+  <div class="card-media">
+    @if (imageSrc; as src) {
+      <img [src]="src" [alt]="product.name" (error)="onImageError()">
+    } @else {
+      <div class="card-media-fallback"><app-icon name="box" /></div>
+    }
+
+    @if (hasDiscount || product.badge) {
+      <div class="badge-stack">
+        @if (hasDiscount) {
+          <span class="tile-badge discount">{{ 'BADGE_DISCOUNT' | translate }}</span>
+        }
+        @if (product.badge) {
+          <span class="tile-badge" [class]="product.badge">{{ badgeLabelKey(product.badge) | translate }}</span>
+        }
+      </div>
+    }
+
+    <div class="warranty-badge">
+      <app-icon name="shield-check" />
+      {{ 'WARRANTY_YEARS' | translate: { years: warrantyYears } }}
+    </div>
+
+    @if (showWishlistButton) {
+      <app-wishlist-button [productId]="product.id" />
+    }
+    @if (showRemoveButton) {
+      <div class="remove-actions">
+        <button type="button" class="remove-heart-btn" [attr.aria-label]="'REMOVE' | translate" (click)="onRemove($event)">
+          <app-icon name="heart" [filled]="true" />
+        </button>
+        <button type="button" class="remove-btn" [attr.aria-label]="'REMOVE' | translate" (click)="onRemove($event)">✕</button>
+      </div>
+    }
+  </div>
+
+  <div class="card-body">
+    @if (product.quantity !== undefined) {
+      <p class="availability" [class.out]="product.quantity <= 0">
+        <app-icon [name]="product.quantity > 0 ? 'check-circle' : 'close'" />
+        {{ (product.quantity > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK') | translate }}
+      </p>
+    }
+
+    @if (categoryId; as cat) {
+      <p class="card-category">{{ cat.toUpperCase() | translate }}</p>
+    }
+    <h3>{{ product.name }}</h3>
+    @if (product.spec) {
+      <p class="card-spec">{{ product.spec }}</p>
+    } @else if (product.description) {
+      <p class="card-spec">{{ product.description }}</p>
+    }
+    @if (product.rating) {
+      <app-star-rating [rating]="product.rating" [count]="product.reviewCount ?? null" [showValue]="true" />
+    }
+
+    <div class="price-row">
+      <div class="price-block">
+        @if (hasDiscount && product.originalPrice) {
+          <span class="original-price">{{ product.originalPrice | price }}</span>
+        }
+        <div class="current-price-line">
+          <span class="price">{{ product.price | price }}</span>
+          <button
+            type="button"
+            class="info-icon-btn"
+            [attr.aria-label]="'PRICE_INFO_TOOLTIP' | translate"
+            [attr.title]="'PRICE_INFO_TOOLTIP' | translate"
+            (click)="$event.stopPropagation()"
+          >
+            <app-icon name="info" />
+          </button>
+        </div>
+        @if (!isAdmin) {
+          <button
+            type="button"
+            class="installment-link"
+            (click)="$event.stopPropagation(); installmentModal.open()"
+          >
+            <app-icon name="calculator" />
+            {{ 'INSTALLMENT_PRICE_LINK' | translate }}
+          </button>
+        }
+      </div>
+
+      <div class="price-actions">
+        @if (showAddToCart && !isAdmin) {
+          <button
+            type="button"
+            class="cart-icon-btn"
+            [disabled]="addToCartDisabled"
+            [attr.aria-label]="addToCartLabelKey | translate"
+            [attr.title]="addToCartLabelKey | translate"
+            (click)="onAddToCart($event)"
+          >
+            <app-icon name="cart" />
+          </button>
+        }
+        @if (showViewButton) {
+          <button type="button" class="view-btn" (click)="onViewButtonClick($event)">
+            {{ 'VIEW_PRODUCT' | translate }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-installment-modal #installmentModal [price]="product.price" [productId]="product.id" />

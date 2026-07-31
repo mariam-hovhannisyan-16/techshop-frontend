@@ -1,0 +1,49 @@
+<footer class="app-footer">
+  <div class="footer-columns">
+    <div class="footer-col brand-col">
+      <div class="footer-brand">
+        <span class="footer-brand-icon"><app-icon name="bolt" /></span>
+        <span class="footer-brand-name">TechShop AM</span>
+      </div>
+      <p class="footer-description">{{ 'FOOTER_DESCRIPTION' | translate }}</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>{{ 'FOOTER_SHOP' | translate }}</h3>
+      <ul>
+        @for (link of shopLinks; track link.id) {
+          <li><a (click)="goToCategory(link.id)">{{ link.labelKey | translate }}</a></li>
+        }
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>{{ 'FOOTER_SUPPORT' | translate }}</h3>
+      <ul>
+        <li><a (click)="goToOrders()">{{ 'FOOTER_TRACK_ORDER' | translate }}</a></li>
+        @for (key of supportLinkKeys; track key) {
+          <li><a>{{ key | translate }}</a></li>
+        }
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>{{ 'FOOTER_COMPANY' | translate }}</h3>
+      <ul>
+        @for (key of companyLinkKeys; track key) {
+          <li><a>{{ key | translate }}</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <div class="footer-bottom">
+    <span class="footer-copyright">{{ 'FOOTER_COPYRIGHT' | translate:{ year: currentYear } }}</span>
+    <span class="footer-location">
+      <app-icon name="pin" />
+      {{ 'FOOTER_LOCATION' | translate }} 🇦🇲
+    </span>
+  </div>
+</footer>

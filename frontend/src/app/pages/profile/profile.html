@@ -1,0 +1,200 @@
+<div class="profile-container">
+  <app-header [subtitle]="'MY_PROFILE' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="dashboard-layout">
+    <div class="dashboard-main">
+      @switch (section) {
+        @case ('overview') {
+          <div class="welcome-banner">
+            <div class="welcome-header">
+              <div class="welcome-avatar" aria-hidden="true">{{ userInitial }}</div>
+              <div class="welcome-text">
+                <h1>{{ 'WELCOME_BACK' | translate:{ name: user?.name ?? '' } }}</h1>
+                <p>{{ 'DASHBOARD_SUBTITLE' | translate }}</p>
+                <div class="info-chips">
+                  <span class="chip"><app-icon name="mail" /> {{ user?.email }}</span>
+                  <span class="chip"><app-icon name="phone" /> {{ phone || '—' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="welcome-actions">
+              <button type="button" class="edit-info-btn" (click)="toggleEditInfo()">
+                <app-icon name="edit" /> {{ 'EDIT_INFO' | translate }}
+              </button>
+              <button type="button" class="logout-btn" (click)="logout()">
+                <app-icon name="logout" /> {{ 'LOGOUT' | translate }}
+              </button>
+            </div>
+          </div>
+
+          @if (editingInfo) {
+            <div class="profile-card edit-info-card">
+              <div class="form-row">
+                <label>{{ 'PHONE' | translate }}</label>
+                <div class="inline-form">
+                  <input type="tel" [(ngModel)]="phone" name="phone">
+                  <button type="button" (click)="savePhone()">{{ 'SAVE' | translate }}</button>
+                </div>
+              </div>
+              <p class="saved-note"><app-icon name="save" /> {{ 'SAVED_ON_DEVICE_NOTE' | translate }}</p>
+            </div>
+          }
+
+          <div class="stats-row">
+            <div class="stat-tile">
+              <div class="stat-icon"><app-icon name="box" /></div>
+              <strong>{{ orders.length }}</strong>
+              <span class="stat-underline"></span>
+              <span class="stat-label">{{ 'ORDERS' | translate }}</span>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-icon"><app-icon name="heart" /></div>
+              <strong>{{ wishlistService.count() }}</strong>
+              <span class="stat-underline"></span>
+              <span class="stat-label">{{ 'WISHLIST' | translate }}</span>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-icon"><app-icon name="pin" /></div>
+              <strong>{{ addressCount }}</strong>
+              <span class="stat-underline"></span>
+              <span class="stat-label">{{ 'ADDRESSES' | translate }}</span>
+            </div>
+          </div>
+
+          <div class="quick-actions-grid">
+            @for (action of quickActions; track action.titleKey) {
+              <button type="button" class="quick-action-card" (click)="action.action()">
+                <div class="qa-icon"><app-icon [name]="action.icon" /></div>
+                <h3>{{ action.titleKey | translate }}</h3>
+                <p>{{ action.descriptionKey | translate }}</p>
+              </button>
+            }
+          </div>
+
+          <div class="profile-card recent-orders-card">
+            <div class="card-header">
+              <h2>{{ 'RECENT_ORDERS' | translate }}</h2>
+              <a class="view-all-link" (click)="router.navigate(['/orders'])">{{ 'VIEW_ALL_ORDERS' | translate }}</a>
+            </div>
+
+            @if (ordersLoading) {
+              <div class="inline-loading"><div class="spinner"></div></div>
+            } @else if (recentOrders.length === 0) {
+              <div class="no-orders">
+                <div class="no-orders-icon"><app-icon name="box" /></div>
+                <p>{{ 'NO_ORDERS' | translate }}</p>
+              </div>
+            } @else {
+              <div class="recent-order-list">
+                @for (order of recentOrders; track order.id) {
+                  <div class="recent-order-item" (click)="router.navigate(['/orders', order.id])">
+                    <div class="order-id">
+                      <span class="label">{{ 'ORDER' | translate }}</span>
+                      <strong>#{{ order.id }}</strong>
+                    </div>
+                    <span class="order-status" [class]="order.status.toLowerCase()">{{ ('STATUS_' + order.status) | translate }}</span>
+                    <span class="order-date">{{ order.createdAt | date:'dd.MM.yyyy' }}</span>
+                    <strong class="order-total">{{ order.totalPrice | price }}</strong>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @case ('addresses') {
+          <div class="profile-card">
+            <div class="card-header">
+              <h2>{{ 'SAVED_ADDRESSES' | translate }}</h2>
+              <button type="button" class="add-btn" (click)="toggleAddressForm()">+ {{ 'ADD_ADDRESS' | translate }}</button>
+            </div>
+
+            @if (showAddressForm) {
+              <div class="address-form">
+                <input type="text" [placeholder]="'ADDRESS_LABEL' | translate" [(ngModel)]="newAddress.label" name="label">
+                <input type="text" [placeholder]="'FULL_NAME' | translate" [(ngModel)]="newAddress.fullName" name="fullName">
+                <input type="tel" [placeholder]="'PHONE' | translate" [(ngModel)]="newAddress.phone" name="addrPhone">
+                <input type="text" [placeholder]="'ADDRESS_LINE' | translate" [(ngModel)]="newAddress.addressLine" name="addressLine">
+                <div class="form-grid">
+                  <input type="text" [placeholder]="'CITY' | translate" [(ngModel)]="newAddress.city" name="city">
+                  <input type="text" [placeholder]="'POSTAL_CODE' | translate" [(ngModel)]="newAddress.postalCode" name="postalCode">
+                </div>
+                <input type="text" [placeholder]="'COUNTRY' | translate" [(ngModel)]="newAddress.country" name="country">
+                <button type="button" class="save-address-btn" [disabled]="!isNewAddressValid" (click)="addAddress()">{{ 'SAVE' | translate }}</button>
+              </div>
+            }
+
+            @if (addresses.length === 0) {
+              <p class="no-addresses">{{ 'NO_ADDRESSES' | translate }}</p>
+            } @else {
+              <div class="address-list">
+                @for (address of addresses; track address.id) {
+                  <div class="address-item">
+                    <div class="address-info">
+                      <strong>{{ address.label }}</strong>
+                      <p>{{ address.fullName }} · {{ address.phone }}</p>
+                      <p>{{ address.addressLine }}, {{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
+                    </div>
+                    <button type="button" class="remove-btn" (click)="removeAddress(address.id)"><app-icon name="close" /></button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @case ('change-password') {
+          <div class="profile-card change-password-card">
+            <div class="change-password-icon"><app-icon name="lock" /></div>
+            <h2>{{ 'CHANGE_PASSWORD' | translate }}</h2>
+            <p>{{ 'FEATURE_NOT_AVAILABLE' | translate }}</p>
+          </div>
+        }
+
+        @case ('delete-account') {
+          <div class="profile-card delete-account-card">
+            <div class="delete-account-icon"><app-icon name="warning" /></div>
+            <h2>{{ 'DELETE_ACCOUNT' | translate }}</h2>
+            <p>{{ 'FEATURE_NOT_AVAILABLE' | translate }}</p>
+          </div>
+        }
+      }
+    </div>
+
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <button type="button" class="sidebar-item" [class.active]="section === 'overview'" (click)="goToSection('overview')">
+          <app-icon name="user" /> {{ 'SIDEBAR_MY_INFO' | translate }}
+        </button>
+        <button type="button" class="sidebar-item" (click)="router.navigate(['/orders'])">
+          <app-icon name="box" /> {{ 'ORDER_HISTORY' | translate }}
+        </button>
+        @if (!isAdmin) {
+          <button type="button" class="sidebar-item" (click)="router.navigate(['/wishlist'])">
+            <app-icon name="heart" /> {{ 'WISHLIST' | translate }}
+          </button>
+        }
+        <button type="button" class="sidebar-item" [class.active]="section === 'addresses'" (click)="goToSection('addresses')">
+          <app-icon name="pin" /> {{ 'ADDRESS_BOOK' | translate }}
+        </button>
+        <button type="button" class="sidebar-item" [class.active]="section === 'change-password'" (click)="goToSection('change-password')">
+          <app-icon name="lock" /> {{ 'CHANGE_PASSWORD' | translate }}
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-item danger" [class.active]="section === 'delete-account'" (click)="goToSection('delete-account')">
+          <app-icon name="warning" /> {{ 'DELETE_ACCOUNT' | translate }}
+        </button>
+        <button type="button" class="sidebar-item logout" (click)="logout()">
+          <app-icon name="logout" /> {{ 'LOGOUT' | translate }}
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <app-toast />
+</div>

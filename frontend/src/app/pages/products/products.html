@@ -1,0 +1,89 @@
+<div class="products-container">
+  <app-header [subtitle]="'STORE_TAGLINE' | translate" brandRoute="/">
+    <form header-search class="search-bar" (ngSubmit)="onSearch(searchQuery)">
+      <input type="text" name="search" [placeholder]="'SEARCH' | translate"
+             [value]="searchQuery"
+             (input)="onSearch($any($event.target).value)">
+      <button type="submit" class="search-submit-btn"><app-icon name="search" /> {{ 'SEARCH_ACTION' | translate }}</button>
+    </form>
+  </app-header>
+
+  <div class="tabs-row">
+    <button type="button" class="tab-item active" (click)="viewAllProducts()"><app-icon name="grid" /> {{ 'ALL_PRODUCTS' | translate }}</button>
+    <button type="button" class="tab-item" (click)="router.navigate(['/deals'])"><app-icon name="flame" /> {{ 'DISCOUNTS' | translate }}</button>
+  </div>
+
+  <div class="promo-banner-wrap">
+    <app-promo-banner (ctaClick)="onPromoCtaClick($event)" />
+  </div>
+
+  <div class="category-pills">
+    @for (pill of categoryPills; track pill.id) {
+      <button
+        type="button"
+        class="pill"
+        [class.active]="selectedCategory === pill.id"
+        (click)="selectCategory(pill.id)"
+      >
+        <span class="pill-icon"><app-icon [name]="pill.icon" /></span>
+        {{ pill.labelKey | translate }}
+      </button>
+    }
+  </div>
+
+  <div class="marketing-sections">
+    <app-trust-badges />
+  </div>
+
+  <div class="main-content">
+    <div class="products-section" id="products-section">
+      <div class="breadcrumb">
+        <a (click)="selectCategory('all')">{{ 'HOME' | translate }}</a>
+        @if (selectedCategory !== 'all') {
+          <span class="sep">/</span>
+          <span class="current">{{ selectedCategory.toUpperCase() | translate }}</span>
+        }
+      </div>
+
+      <div class="section-header">
+        <h2>{{ currentViewTitleKey | translate }}</h2>
+        <p>{{ filteredProducts.length }} {{ 'PRODUCTS_COUNT' | translate }}</p>
+      </div>
+
+      @if (loading) {
+        <app-skeleton [count]="8" />
+      } @else if (hasError) {
+        <app-empty-state icon="warning" [message]="'FAILED_TO_LOAD_PRODUCTS' | translate">
+          <button (click)="retryLoad()">{{ 'RETRY' | translate }}</button>
+        </app-empty-state>
+      } @else if (filteredProducts.length === 0) {
+        <app-empty-state icon="search" [message]="'NO_RESULTS' | translate">
+          <button (click)="clearFilters()">{{ 'CLEAR_FILTERS' | translate }}</button>
+        </app-empty-state>
+      } @else {
+        <div class="products-grid">
+          @for (product of pagedProducts; track product.id + '_' + $index) {
+            <app-product-card
+              [product]="product"
+              [highlighted]="highlightedProductId === product.id"
+              (view)="viewProduct($event)"
+              (addToCart)="addToCart($event)"
+            />
+          }
+        </div>
+
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">←</button>
+            @for (page of pageNumbers; track page) {
+              <button [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+            }
+            <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">→</button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <app-toast />
+</div>

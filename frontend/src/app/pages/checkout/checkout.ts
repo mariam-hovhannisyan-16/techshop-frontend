@@ -1,0 +1,216 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { CartService, CartResponse } from '../../services/cart';
+import { OrderService, AddressPayload, CheckoutRequest } from '../../services/order';
+import { CheckoutService, CheckoutAddress, PaymentMethod } from '../../services/checkout';
+import { InstallmentCheckoutService, PendingInstallmentPlan } from '../../services/installment-checkout';
+import { Auth } from '../../services/auth';
+import { LanguageService } from '../../services/language';
+import { currencyForLanguage, formatAmd } from '../../config/currency';
+import { Toast } from '../../components/toast/toast';
+import { AppHeader } from '../../components/app-header/app-header';
+import { Icon } from '../../components/icon/icon';
+import { PricePipe } from '../../pipes/price';
+
+type Step = 'address' | 'payment' | 'review';
+
+@Component({
+  selector: 'app-checkout',
+  imports: [CommonModule, FormsModule, TranslatePipe, Toast, AppHeader, Icon, PricePipe],
+  templateUrl: './checkout.html',
+  styleUrl: './checkout.scss',
+})
+export class Checkout implements OnInit {
+  readonly stepOrder: Step[] = ['address', 'payment', 'review'];
+  step: Step = 'address';
+  userId: number = 1;
+
+  address: CheckoutAddress = { fullName: '', phone: '', addressLine: '', city: '', postalCode: '', country: '' };
+  addressTouched = false;
+
+  paymentMethod: PaymentMethod | null = null;
+  paymentTouched = false;
+  pendingInstallmentPlan: PendingInstallmentPlan | null = null;
+  installmentUnavailable = false;
+
+  cart: CartResponse | null = null;
+  cartLoading = true;
+  cartError = '';
+
+  placingOrder = false;
+  placeOrderError = '';
+
+  constructor(
+    private cartService: CartService,
+    private orderService: OrderService,
+    private checkoutService: CheckoutService,
+    private installmentCheckoutService: InstallmentCheckoutService,
+    private authService: Auth,
+    private languageService: LanguageService,
+    public router: Router,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.userId = this.authService.getUserId() ?? 1;
+  }
+
+  get displayCurrencyCode(): string {
+    return currencyForLanguage(this.languageService.current()).code;
+  }
+
+  get showCurrencyNote(): boolean {
+    return this.displayCurrencyCode !== 'AMD';
+  }
+
+  get amdChargeTotal(): string {
+    return this.cart ? formatAmd(this.cart.totalPrice) : '';
+  }
+
+  get installmentMonthlyFormatted(): string {
+    return this.pendingInstallmentPlan ? formatAmd(this.pendingInstallmentPlan.monthlyPayment) : '';
+  }
+
+  ngOnInit(): void {
+    const savedAddress = this.checkoutService.getAddress(this.userId);
+    if (savedAddress) {
+      this.address = savedAddress;
+    }
+
+    const savedPayment = this.checkoutService.getPaymentMethod(this.userId);
+    if (savedPayment) {
+      this.paymentMethod = savedPayment;
+    }
+
+    this.pendingInstallmentPlan = this.installmentCheckoutService.peekPending();
+    if (this.pendingInstallmentPlan) {
+      this.paymentMethod = 'INSTALLMENT';
+    }
+
+    this.loadCart();
+  }
+
+  loadCart(): void {
+    this.cartLoading = true;
+    this.cartError = '';
+    this.cartService.getCart(this.userId).subscribe({
+      next: (response) => {
+        this.cart = response.data;
+        this.cartLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.cartError = 'FAILED_TO_LOAD_CART';
+        this.cartLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  stepState(key: Step): 'complete' | 'active' | 'upcoming' {
+    const currentIndex = this.stepOrder.indexOf(this.step);
+    const keyIndex = this.stepOrder.indexOf(key);
+    if (keyIndex < currentIndex) return 'complete';
+    if (keyIndex === currentIndex) return 'active';
+    return 'upcoming';
+  }
+
+  get isAddressValid(): boolean {
+    const a = this.address;
+    return !!(a.fullName.trim() && a.phone.trim() && a.addressLine.trim() && a.city.trim() && a.postalCode.trim() && a.country.trim());
+  }
+
+  get isCartEmpty(): boolean {
+    return !this.cart || this.cart.items.length === 0;
+  }
+
+  goToPayment(): void {
+    this.addressTouched = true;
+    if (!this.isAddressValid) return;
+    this.checkoutService.saveAddress(this.userId, this.address);
+    this.step = 'payment';
+  }
+
+  selectPayment(method: PaymentMethod): void {
+
+    if (method === 'INSTALLMENT' && !this.pendingInstallmentPlan) {
+      this.installmentUnavailable = true;
+      return;
+    }
+    this.installmentUnavailable = false;
+    this.paymentMethod = method;
+  }
+
+  private readonly paymentMethodLabelKeys: Record<PaymentMethod, string> = {
+    IDRAM: 'PAYMENT_IDRAM',
+    TELCELL: 'PAYMENT_TELCELL',
+    ROKET_LINE: 'PAYMENT_ROKET_LINE',
+    INSTALLMENT: 'PAYMENT_INSTALLMENT'
+  };
+
+  get paymentMethodLabelKey(): string | null {
+    return this.paymentMethod ? this.paymentMethodLabelKeys[this.paymentMethod] : null;
+  }
+
+  goToReview(): void {
+    this.paymentTouched = true;
+    if (!this.paymentMethod) return;
+    this.checkoutService.savePaymentMethod(this.userId, this.paymentMethod);
+    this.step = 'review';
+  }
+
+  backTo(step: Step): void {
+    this.step = step;
+  }
+
+  private buildAddressPayload(): AddressPayload {
+    const a = this.address;
+    return {
+      fullName: a.fullName.trim(),
+      phone: a.phone.trim(),
+      line1: a.addressLine.trim(),
+      city: a.city.trim(),
+      postalCode: a.postalCode.trim(),
+      country: a.country.trim()
+    };
+  }
+
+  placeOrder(): void {
+    if (this.isCartEmpty || this.placingOrder || !this.paymentMethod) return;
+    if (this.paymentMethod === 'INSTALLMENT' && !this.pendingInstallmentPlan) return;
+    this.placingOrder = true;
+    this.placeOrderError = '';
+
+    const addressPayload = this.buildAddressPayload();
+    const request: CheckoutRequest = {
+      shippingAddress: addressPayload,
+      billingAddress: addressPayload,
+      paymentMethod: this.paymentMethod,
+      installmentPlan: this.paymentMethod === 'INSTALLMENT' && this.pendingInstallmentPlan
+        ? this.pendingInstallmentPlan
+        : undefined
+    };
+
+    this.orderService.checkout(this.userId, request).subscribe({
+      next: (response) => {
+        this.placingOrder = false;
+
+        this.cartService.clearLocalState();
+        this.installmentCheckoutService.clear();
+        this.router.navigate(['/order-confirmation', response.data.id], {
+          state: {
+            justCheckedOut: true,
+            paymentRedirectUrl: response.data.paymentRedirectUrl ?? null,
+            paymentMethod: response.data.paymentMethod ?? this.paymentMethod
+          }
+        }).then();
+      },
+      error: () => {
+        this.placeOrderError = 'FAILED_TO_PLACE_ORDER';
+        this.placingOrder = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+}

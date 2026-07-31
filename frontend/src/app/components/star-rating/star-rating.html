@@ -1,0 +1,18 @@
+<span class="star-rating">
+  @for (star of stars; track $index) {
+    <span class="star">
+      <span class="star-bg">★</span>
+      @if (star === 'full') {
+        <span class="star-fill full">★</span>
+      } @else if (star === 'half') {
+        <span class="star-fill half">★</span>
+      }
+    </span>
+  }
+  @if (showValue) {
+    <span class="value">{{ rating.toFixed(1) }}</span>
+  }
+  @if (count !== null) {
+    <span class="count">({{ count | number }})</span>
+  }
+</span>

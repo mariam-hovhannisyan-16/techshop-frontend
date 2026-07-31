@@ -1,0 +1,112 @@
+<div class="admin-chat-container">
+  <app-header [subtitle]="'ADMIN_PANEL' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="admin-chat-content">
+    <div class="admin-tabs">
+      <button type="button" (click)="router.navigate(['/admin/products'])">{{ 'ADMIN_PRODUCTS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/users'])">{{ 'ADMIN_USERS_NAV' | translate }}</button>
+      <button type="button" class="active">{{ 'ADMIN_CHAT_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/stats'])">{{ 'ADMIN_STATS_NAV' | translate }}</button>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadConversations()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else {
+      <div class="chat-panel-wrap">
+        <div class="conversation-list">
+          @if (conversations.length === 0) {
+            <p class="empty-note">{{ 'ADMIN_CHAT_EMPTY' | translate }}</p>
+          } @else {
+            @for (summary of conversations; track summary.conversation.id) {
+              <button type="button" class="conversation-row" [class.active]="isSelected(summary)" (click)="openConversation(summary)">
+                <span class="conv-avatar">{{ summary.displayName.charAt(0).toUpperCase() }}</span>
+                <span class="conv-body">
+                  <span class="conv-name-row">
+                    <span class="conv-name">{{ summary.displayName }}</span>
+                    <span class="status-badge" [class.escalated]="summary.conversation.escalated">
+                      {{ (summary.conversation.escalated ? 'ADMIN_CHAT_HUMAN_BADGE' : 'ADMIN_CHAT_BOT_BADGE') | translate }}
+                    </span>
+                  </span>
+                  <span class="conv-preview">{{ summary.preview || '—' }}</span>
+                </span>
+                @if (summary.unread) {
+                  <span class="unread-dot"></span>
+                }
+              </button>
+            }
+          }
+        </div>
+
+        <div class="thread-pane">
+          @if (!selected) {
+            <p class="select-prompt">{{ 'ADMIN_CHAT_SELECT_PROMPT' | translate }}</p>
+          } @else {
+            <div class="thread-header">
+              <span class="thread-name-row">
+                <span class="thread-name">{{ selected.displayName }}</span>
+                <span class="status-badge" [class.escalated]="selected.conversation.escalated">
+                  {{ (selected.conversation.escalated ? 'ADMIN_CHAT_HUMAN_BADGE' : 'ADMIN_CHAT_BOT_BADGE') | translate }}
+                </span>
+              </span>
+              <button type="button" class="close-thread-btn" (click)="closeThread()" [attr.aria-label]="'CHAT_CLOSE' | translate">
+                <app-icon name="close" />
+              </button>
+            </div>
+
+            <div class="thread-messages" #messageList>
+              @if (threadLoading) {
+                <div class="thread-loading">
+                  <div class="spinner"></div>
+                </div>
+              } @else if (messages.length === 0) {
+                <p class="thread-empty">{{ 'ADMIN_CHAT_THREAD_EMPTY' | translate }}</p>
+              } @else {
+                @for (message of messages; track message.id) {
+                  <div
+                    class="thread-message"
+                    [class.customer]="message.sender === 'CUSTOMER'"
+                    [class.support]="message.sender === 'SUPPORT'"
+                    [class.bot]="message.sender === 'BOT'"
+                  >
+                    @if (message.sender === 'BOT') {
+                      <span class="sender-label"><app-icon name="sparkle" /> {{ 'CHAT_BOT_LABEL' | translate }}</span>
+                    }
+                    <div class="bubble">{{ message.text }}</div>
+                  </div>
+                }
+              }
+            </div>
+
+            <form class="reply-row" (ngSubmit)="sendReply()">
+              <input
+                type="text"
+                name="replyDraft"
+                [(ngModel)]="replyDraft"
+                [placeholder]="'ADMIN_CHAT_REPLY_PLACEHOLDER' | translate"
+                autocomplete="off"
+              >
+              <button type="submit" class="send-btn" [disabled]="!replyDraft.trim() || sending" [attr.aria-label]="'CHAT_SEND' | translate">
+                <app-icon name="send" />
+              </button>
+            </form>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

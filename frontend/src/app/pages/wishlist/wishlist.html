@@ -1,0 +1,154 @@
+<div class="wishlist-container">
+  <app-header [subtitle]="'WISHLIST' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="wishlist-content">
+    <div class="wishlist-header">
+      <div class="title-group">
+        <div class="header-heart"><app-icon name="heart" [filled]="true" /></div>
+        <div>
+          <h2>
+            {{ 'WISHLIST' | translate }}
+            @if (items.length > 0) {
+              <span class="count-badge">{{ items.length }}</span>
+            }
+          </h2>
+          <p class="subtitle">{{ 'WISHLIST_SUBTITLE' | translate }}</p>
+        </div>
+      </div>
+
+      @if (items.length > 0) {
+        <button type="button" class="clear-list-btn" (click)="clearWishlist()">
+          {{ 'CLEAR_WISHLIST' | translate }}
+        </button>
+      }
+    </div>
+
+    @if (loading) {
+      <div class="wishlist-layout">
+        <div class="wishlist-main">
+          <div class="skeleton-list">
+            @for (i of [1, 2, 3]; track i) {
+              <div class="skeleton-row"></div>
+            }
+          </div>
+        </div>
+        <aside class="wishlist-sidebar">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </aside>
+      </div>
+    } @else if (errorMessage) {
+      <app-empty-state icon="warning" [message]="errorMessage | translate">
+        <button (click)="loadWishlist()">{{ 'RETRY' | translate }}</button>
+      </app-empty-state>
+    } @else {
+      <div class="wishlist-layout">
+        <div class="wishlist-main">
+          @if (items.length > 0) {
+            <div class="wishlist-items">
+              @for (item of items; track item.productId) {
+                <app-product-card
+                  size="large"
+                  [product]="toCardData(item)"
+                  [showWishlistButton]="false"
+                  [showRemoveButton]="true"
+                  [showViewButton]="true"
+                  addToCartLabelKey="ADD_TO_CART"
+                  [addToCartDisabled]="item.quantity <= 0"
+                  (view)="viewProduct($event)"
+                  (addToCart)="addToCart($event)"
+                  (remove)="removeItem($event)"
+                />
+              }
+            </div>
+
+            <div class="notify-row">
+              <div class="notify-icon"><app-icon name="bell" /></div>
+              <div class="notify-text">
+                <strong>{{ 'PRICE_NOTIFY_TITLE' | translate }}</strong>
+                <span>{{ 'PRICE_NOTIFY_DESC' | translate }}</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [checked]="notifyPriceChanges" (change)="toggleNotifyPriceChanges()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          } @else {
+            <app-empty-state icon="heart" [message]="'WISHLIST_EMPTY' | translate">
+              <button (click)="router.navigate(['/products'])">{{ 'VIEW_PRODUCTS' | translate }}</button>
+            </app-empty-state>
+          }
+        </div>
+
+        <aside class="wishlist-sidebar">
+          @if (recommendedProducts.length > 0) {
+            <div class="sidebar-card recommended-card">
+              <div class="sidebar-card-header">
+                <h3>{{ 'YOU_MIGHT_ALSO_LIKE' | translate }}</h3>
+                <a class="view-all-link" (click)="viewAllRecommended()">{{ 'VIEW_ALL' | translate }}</a>
+              </div>
+              <div class="mini-product-grid">
+                @for (rp of recommendedProducts; track rp.id) {
+                  <div class="mini-product" (click)="viewProduct(rp.id)">
+                    <div class="mini-product-image">
+                      @if (miniImageSrc(rp); as src) {
+                        <img [src]="src" [alt]="rp.name">
+                      } @else {
+                        <app-icon name="box" />
+                      }
+                    </div>
+                    <p class="mini-product-name">{{ rp.name }}</p>
+                    <p class="mini-product-price">{{ rp.price | price }}</p>
+                    <button type="button" class="mini-add-btn" [attr.aria-label]="'ADD_TO_CART' | translate" (click)="quickAddToCart(rp.id); $event.stopPropagation()">
+                      <app-icon name="cart" />
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="sidebar-card delivery-card">
+            <div class="sidebar-card-icon truck"><app-icon name="truck" /></div>
+            <h3>{{ 'FREE_DELIVERY_TITLE' | translate }}</h3>
+            <ul class="check-list">
+              <li><app-icon name="check-circle" />{{ 'FREE_DELIVERY_YEREVAN' | translate }}</li>
+              <li><app-icon name="check-circle" />{{ 'FREE_DELIVERY_REGIONS' | translate }}</li>
+              <li><app-icon name="check-circle" />{{ 'FREE_DELIVERY_THRESHOLD' | translate }}</li>
+            </ul>
+          </div>
+
+          <div class="sidebar-card secure-card">
+            <div class="sidebar-card-icon shield"><app-icon name="shield-check" /></div>
+            <h3>{{ 'SECURE_SHOPPING_TITLE' | translate }}</h3>
+            <p>{{ 'SECURE_SHOPPING_TEXT' | translate }}</p>
+            <div class="payment-logos">
+              <span class="payment-chip">Visa</span>
+              <span class="payment-chip">Mastercard</span>
+              <span class="payment-chip">ArCa</span>
+              <span class="payment-chip">Amex</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="support-banner">
+        <div class="support-banner-text">
+          <h3>{{ 'SUPPORT_BANNER_TITLE' | translate }}</h3>
+          <p>{{ 'SUPPORT_BANNER_TEXT' | translate }}</p>
+          <button type="button" class="contact-btn" (click)="openChat()">
+            <app-icon name="message-circle" /> {{ 'CONTACT_US' | translate }}
+          </button>
+        </div>
+        <div class="support-banner-icon"><app-icon name="message-circle" /></div>
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

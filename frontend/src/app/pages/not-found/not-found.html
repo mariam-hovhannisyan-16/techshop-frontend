@@ -1,0 +1,9 @@
+<div class="not-found-container">
+  <div class="not-found-card">
+    <div class="not-found-icon"><app-icon name="compass" /></div>
+    <h1>404</h1>
+    <h2>{{ 'PAGE_NOT_FOUND' | translate }}</h2>
+    <p>{{ 'PAGE_NOT_FOUND_MESSAGE' | translate }}</p>
+    <button (click)="router.navigate(['/products'])">{{ 'GO_HOME' | translate }}</button>
+  </div>
+</div>

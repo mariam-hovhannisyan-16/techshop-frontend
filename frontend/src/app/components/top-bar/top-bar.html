@@ -1,0 +1,43 @@
+<div class="top-bar">
+  <div class="delivery-info">
+    <span class="location-icon"><app-icon name="pin" /></span>
+    <span class="delivery-text">{{ 'DELIVERY_NATIONWIDE' | translate }}</span>
+
+    <div class="city-select">
+      <button type="button" class="city-btn" (click)="toggleCityMenu()" [attr.aria-expanded]="cityMenuOpen">
+        <span>{{ selectedCity.labelKey | translate }}</span>
+        <span class="chevron" [class.open]="cityMenuOpen">▾</span>
+      </button>
+
+      @if (cityMenuOpen) {
+        <div class="city-dropdown">
+          @for (city of cities; track city.id) {
+            <button type="button" [class.active]="city.id === selectedCity.id" (click)="selectCity(city)">
+              {{ city.labelKey | translate }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="top-bar-right">
+    <app-language-switcher />
+
+    <div class="phone-info">
+      <button type="button" class="phone-btn" (click)="togglePhoneMenu()" [attr.aria-expanded]="phoneMenuOpen">
+        <span class="phone-icon"><app-icon name="phone" /></span>
+        <span class="phone-number">{{ supportNumber }}</span>
+        <span class="chevron" [class.open]="phoneMenuOpen">▾</span>
+      </button>
+
+      @if (phoneMenuOpen) {
+        <div class="phone-dropdown">
+          <button type="button" class="phone-dropdown-item" (click)="copyNumber()">
+            <app-icon name="copy" /> {{ 'COPY_NUMBER' | translate }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

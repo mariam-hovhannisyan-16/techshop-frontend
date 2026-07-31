@@ -1,0 +1,53 @@
+<div class="confirmation-container">
+  <app-header [subtitle]="'CHECKOUT' | translate" brandRoute="/products" />
+
+  <div class="confirmation-content">
+    <div class="result-panel">
+      @switch (state) {
+        @case ('redirecting') {
+          <div class="inline-loading">
+            <div class="spinner"></div>
+            <h2>{{ 'REDIRECTING_TO_PAYMENT_TITLE' | translate }}</h2>
+            <p>{{ 'REDIRECTING_TO_PAYMENT_MESSAGE' | translate }}</p>
+            <button type="button" class="secondary-btn" (click)="openProviderPage()">{{ 'OPEN_PAYMENT_PAGE' | translate }}</button>
+          </div>
+        }
+        @case ('verifying') {
+          <div class="inline-loading">
+            <div class="spinner"></div>
+            <h2>{{ 'VERIFYING_PAYMENT_TITLE' | translate }}</h2>
+            <p>{{ 'VERIFYING_PAYMENT_MESSAGE' | translate }}</p>
+          </div>
+        }
+        @case ('success') {
+          <div class="result-icon success"><app-icon name="check-circle" /></div>
+          <h2>{{ 'ORDER_CONFIRMED_TITLE' | translate }}</h2>
+          <p>{{ 'ORDER_CONFIRMED_MESSAGE' | translate }}</p>
+
+          @if (order) {
+            <div class="order-recap">
+              <span>{{ 'ORDER' | translate }} #{{ order.id }}</span>
+              <strong>{{ order.totalPrice | price }}</strong>
+            </div>
+            <app-order-tracking [status]="order.status" [createdAt]="order.createdAt" />
+          }
+
+          <div class="step-actions">
+            <button type="button" class="secondary-btn" (click)="continueShopping()">{{ 'CONTINUE_SHOPPING' | translate }}</button>
+            <button type="button" class="primary-btn" (click)="viewOrderDetails()">{{ 'VIEW_ORDER' | translate }}</button>
+          </div>
+        }
+        @case ('failed') {
+          <div class="result-icon failed"><app-icon name="warning" /></div>
+          <h2>{{ 'PAYMENT_FAILED_TITLE' | translate }}</h2>
+          <p>{{ (errorMessage || 'PAYMENT_FAILED_MESSAGE') | translate }}</p>
+
+          <div class="step-actions">
+            <button type="button" class="secondary-btn" (click)="continueShopping()">{{ 'CONTINUE_SHOPPING' | translate }}</button>
+            <button type="button" class="primary-btn" (click)="retryPayment()">{{ 'RETRY_PAYMENT' | translate }}</button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

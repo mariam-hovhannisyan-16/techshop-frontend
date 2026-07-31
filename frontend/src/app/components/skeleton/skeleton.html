@@ -1,0 +1,5 @@
+<div class="skeleton-wrap" [class.row]="variant === 'row'">
+  @for (i of items; track i) {
+    <div class="skeleton-block" [class.row]="variant === 'row'"></div>
+  }
+</div>

@@ -1,0 +1,53 @@
+<div class="orders-container">
+  <app-header [subtitle]="'ORDERS' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="orders-content">
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadOrders()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else if (orders.length > 0) {
+      @for (order of orders; track order.id) {
+        <div class="order-card">
+          <div class="order-header">
+            <div class="order-id">
+              <span class="label">{{ 'ORDER' | translate }}</span>
+              <h3>#{{ order.id }}</h3>
+            </div>
+            <div class="order-status" [class]="order.status.toLowerCase()">
+              {{ ('STATUS_' + order.status) | translate }}
+            </div>
+          </div>
+          <div class="order-details">
+            <div class="detail">
+              <span class="label">{{ 'TOTAL' | translate }}</span>
+              <strong>{{ order.totalPrice | price }}</strong>
+            </div>
+            <div class="detail">
+              <span class="label">{{ 'DATE' | translate }}</span>
+              <span>{{ order.createdAt | date:'dd.MM.yyyy' }}</span>
+            </div>
+          </div>
+          <button class="view-details-btn" (click)="viewOrder(order.id)">{{ 'VIEW_DETAILS' | translate }}</button>
+        </div>
+      }
+    } @else {
+      <div class="empty-orders">
+        <div class="empty-icon"><app-icon name="box" /></div>
+        <h3>{{ 'NO_ORDERS' | translate }}</h3>
+        <button (click)="router.navigate(['/products'])">{{ 'CONTINUE_SHOPPING' | translate }}</button>
+      </div>
+    }
+  </div>
+</div>
