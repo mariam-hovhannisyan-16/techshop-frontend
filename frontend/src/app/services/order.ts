@@ -74,6 +74,32 @@ interface ApiResponse<T> {
   data: T;
 }
 
+export interface DigitalTwinSummary {
+  id: number;
+  productName: string;
+  purchaseDate: string;
+  warrantyEndDate: string;
+  warrantyActive: boolean;
+}
+
+export interface RepairEntry {
+  id: number;
+  description: string;
+  entryDate: string;
+  createdAt: string;
+}
+
+export interface DigitalTwinDetail {
+  id: number;
+  productName: string;
+  productId: number;
+  purchaseDate: string;
+  warrantyEndDate: string;
+  warrantyActive: boolean;
+  notes: string | null;
+  repairs: RepairEntry[];
+}
+
 const LOCAL_ORDERS_KEY_PREFIX = 'local_orders_';
 
 @Injectable({
@@ -206,5 +232,21 @@ export class OrderService {
         return throwError(() => err);
       })
     );
+  }
+
+  getMyProducts(): Observable<ApiResponse<DigitalTwinSummary[]>> {
+    return this.http.get<ApiResponse<DigitalTwinSummary[]>>(`${this.apiUrl}/my-products`, { headers: this.getHeaders() });
+  }
+
+  getMyProductDetail(id: number): Observable<ApiResponse<DigitalTwinDetail>> {
+    return this.http.get<ApiResponse<DigitalTwinDetail>>(`${this.apiUrl}/my-products/${id}`, { headers: this.getHeaders() });
+  }
+
+  addRepairEntry(id: number, description: string, date: string): Observable<ApiResponse<DigitalTwinDetail>> {
+    return this.http.post<ApiResponse<DigitalTwinDetail>>(`${this.apiUrl}/my-products/${id}/repairs`, { description, date }, { headers: this.getHeaders() });
+  }
+
+  updateNotes(id: number, notes: string): Observable<ApiResponse<DigitalTwinDetail>> {
+    return this.http.put<ApiResponse<DigitalTwinDetail>>(`${this.apiUrl}/my-products/${id}/notes`, { notes }, { headers: this.getHeaders() });
   }
 }
