@@ -8,7 +8,7 @@ export type IconName =
   | 'plug' | 'cash' | 'card' | 'compass' | 'bolt' | 'grid'
   | 'arrow-left' | 'eye' | 'eye-off' | 'message-circle' | 'send' | 'close'
   | 'edit' | 'lock' | 'mail' | 'google' | 'info' | 'bell' | 'plus' | 'trash'
-  | 'calculator' | 'sparkle' | 'trend-up' | 'trend-down' | 'trend-flat';
+  | 'calculator' | 'sparkle' | 'trend-up' | 'trend-down' | 'trend-flat' | 'gift';
 
 @Component({
   selector: 'app-icon',
