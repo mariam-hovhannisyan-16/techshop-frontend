@@ -1,0 +1,117 @@
+.my-products-container {
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', sans-serif;
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .back-btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--border);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+    }
+  }
+
+  .my-products-content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 0 1.5rem;
+    }
+  }
+
+  .twins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .twin-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .twin-media {
+      width: 100%;
+      height: 180px;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .twin-media-fallback {
+        font-size: 3rem;
+        color: var(--text-secondary);
+      }
+    }
+
+    .twin-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding: 1.1rem 1.25rem;
+
+      h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .purchase-date {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        margin: 0;
+      }
+
+      .warranty {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 0.2rem 0 0;
+
+        app-icon { font-size: 0.95rem; }
+
+        &.active { color: var(--accent); }
+        &.expired { color: var(--danger); }
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .my-products-container .my-products-content {
+    padding: 1rem;
+  }
+}

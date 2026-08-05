@@ -1,0 +1,105 @@
+<div class="my-product-detail-container">
+  <app-header [subtitle]="'MY_PRODUCTS' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/my-products'])">← {{ 'MY_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="my-product-detail-content">
+    @if (loading) {
+      <app-skeleton [count]="2" />
+    } @else if (hasError || !twin) {
+      <app-empty-state icon="warning" [message]="'FAILED_TO_LOAD_MY_PRODUCTS' | translate">
+        <button (click)="load()">{{ 'RETRY' | translate }}</button>
+      </app-empty-state>
+    } @else {
+      <div class="twin-panel">
+        <div class="twin-media">
+          @if (productImage; as src) {
+            <img [src]="src" [alt]="twin.productName">
+          } @else {
+            <div class="twin-media-fallback"><app-icon name="box" /></div>
+          }
+        </div>
+        <div class="twin-info">
+          <h1>{{ twin.productName }}</h1>
+
+          <div class="info-row">
+            <span class="info-label">{{ 'PURCHASE_DATE' | translate }}</span>
+            <span class="info-value">{{ twin.purchaseDate | date:'dd.MM.yyyy' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">{{ 'WARRANTY_END_DATE' | translate }}</span>
+            <span class="info-value">{{ twin.warrantyEndDate | date:'dd.MM.yyyy' }}</span>
+          </div>
+
+          @if (twin.warrantyActive) {
+            <p class="warranty active">
+              <app-icon name="shield-check" />
+              {{ 'WARRANTY_ACTIVE_UNTIL' | translate }} {{ twin.warrantyEndDate | date:'dd.MM.yyyy' }}
+            </p>
+          } @else {
+            <p class="warranty expired">
+              <app-icon name="warning" />
+              {{ 'WARRANTY_EXPIRED' | translate }}
+            </p>
+          }
+        </div>
+      </div>
+
+      <div class="notes-section">
+        <h2>{{ 'NOTES_LABEL' | translate }}</h2>
+        <textarea
+          rows="4"
+          [(ngModel)]="notes"
+          [disabled]="savingNotes"
+          (blur)="saveNotes()"
+        ></textarea>
+        <button type="button" class="save-notes-btn" [disabled]="savingNotes" (click)="saveNotes()">
+          {{ 'SAVE' | translate }}
+        </button>
+      </div>
+
+      <div class="repairs-section">
+        <div class="repairs-header">
+          <h2>{{ 'REPAIR_HISTORY' | translate }}</h2>
+          <button type="button" class="add-repair-btn" (click)="toggleRepairForm()">
+            <app-icon [name]="showRepairForm ? 'close' : 'plus'" /> {{ 'ADD_REPAIR_BTN' | translate }}
+          </button>
+        </div>
+
+        @if (showRepairForm) {
+          <form class="repair-form" (ngSubmit)="submitRepair()">
+            <label>
+              <span>{{ 'REPAIR_DESCRIPTION_LABEL' | translate }}</span>
+              <input type="text" name="repairDescription" [(ngModel)]="repairForm.description" required>
+            </label>
+            <label>
+              <span>{{ 'DATE' | translate }}</span>
+              <input type="date" name="repairDate" [(ngModel)]="repairForm.date" required>
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="save-btn" [disabled]="addingRepair || !isRepairFormValid">{{ 'SAVE' | translate }}</button>
+              <button type="button" class="cancel-btn" [disabled]="addingRepair" (click)="toggleRepairForm()">{{ 'CANCEL' | translate }}</button>
+            </div>
+          </form>
+        }
+
+        @if (twin.repairs.length === 0) {
+          <p class="no-repairs">{{ 'NO_REPAIRS' | translate }}</p>
+        } @else {
+          <div class="repair-timeline">
+            @for (repair of twin.repairs; track repair.id) {
+              <div class="repair-entry">
+                <span class="repair-date">{{ repair.entryDate | date:'dd.MM.yyyy' }}</span>
+                <span class="repair-description">{{ repair.description }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>
