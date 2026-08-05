@@ -15,7 +15,7 @@ export interface ProductCardData {
   description?: string;
   originalPrice?: number;
   quantity?: number;
-  images?: string[];
+  imageUrl?: string;
   rating?: number;
   reviewCount?: number;
   badge?: 'bestseller' | 'new' | 'top-rated' | 'hot-deal';
@@ -64,7 +64,7 @@ export class ProductCard {
 
   get imageSrc(): string | null {
     if (this.failedImage) return null;
-    return this.product.images?.[0] ?? null;
+    return this.product.imageUrl ?? null;
   }
 
   onImageError(): void {

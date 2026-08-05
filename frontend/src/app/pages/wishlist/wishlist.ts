@@ -119,7 +119,7 @@ export class Wishlist implements OnInit {
       quantity: item.quantity,
       description: catalogEntry?.description,
       originalPrice: catalogEntry?.originalPrice,
-      images: catalogEntry?.images,
+      imageUrl: catalogEntry?.imageUrl,
       rating: catalogEntry?.rating,
       reviewCount: catalogEntry?.reviewCount,
       badge: catalogEntry?.badge,
@@ -171,7 +171,7 @@ export class Wishlist implements OnInit {
   }
 
   miniImageSrc(product: ProductResponse): string | null {
-    return product.images?.[0] ?? null;
+    return product.imageUrl ?? null;
   }
 
   quickAddToCart(productId: number): void {

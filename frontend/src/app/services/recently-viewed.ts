@@ -5,7 +5,7 @@ export interface RecentlyViewedEntry {
   name: string;
   price: number;
   viewedAt: string;
-  images?: string[];
+  imageUrl?: string;
 }
 
 const STORAGE_KEY = 'recently_viewed_products';
@@ -31,10 +31,10 @@ export class RecentlyViewedService {
     this.items.set(entries);
   }
 
-  record(product: { id: number; name: string; price: number; images?: string[] }): void {
+  record(product: { id: number; name: string; price: number; imageUrl?: string }): void {
     const existing = this.items().filter(entry => entry.id !== product.id);
     const updated = [
-      { id: product.id, name: product.name, price: product.price, images: product.images, viewedAt: new Date().toISOString() },
+      { id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl, viewedAt: new Date().toISOString() },
       ...existing
     ].slice(0, MAX_ENTRIES);
     this.persist(updated);

@@ -100,7 +100,7 @@ export class CartService {
             productId: line.productId,
             productName: product?.name ?? `#${line.productId}`,
             productPrice: price,
-            productImage: product?.images?.[0],
+            productImage: product?.imageUrl,
             quantity: line.quantity,
             totalPrice: price * line.quantity
           };
@@ -118,7 +118,7 @@ export class CartService {
         const catalogById = new Map(catalogResponse.data.map(p => [p.id, p]));
         const items = response.data.items.map(item => ({
           ...item,
-          productImage: catalogById.get(item.productId)?.images?.[0]
+          productImage: catalogById.get(item.productId)?.imageUrl
         }));
         return { ...response, data: { ...response.data, items } };
       })

@@ -75,7 +75,7 @@ export class ProductDetail implements OnInit {
         this.loading = false;
         this.cdr.detectChanges();
 
-        this.recentlyViewedService.record({ id: this.product.id, name: this.product.name, price: this.product.price, images: this.product.images });
+        this.recentlyViewedService.record({ id: this.product.id, name: this.product.name, price: this.product.price, imageUrl: this.product.imageUrl });
         this.loadRelatedProducts();
         this.loadReviews();
       },
@@ -139,7 +139,7 @@ export class ProductDetail implements OnInit {
   private failedImages = new Set<string>();
 
   get galleryImages(): string[] {
-    return this.product?.images?.length ? this.product.images : [];
+    return this.product?.imageUrl ? [this.product.imageUrl] : [];
   }
 
   get mainImageSrc(): string | null {
