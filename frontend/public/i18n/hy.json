@@ -355,6 +355,8 @@
   "RECENT_ORDERS": "Վերջին պատվերները",
   "VIEW_ALL_ORDERS": "Բոլոր պատվերները",
   "FEATURE_NOT_AVAILABLE": "Այս գործառույթը դեռ հասանելի չէ։",
+  "PRICE_PREDICTION_TITLE": "Գների կանխատեսում",
+  "PRICE_PREDICTION_INSUFFICIENT": "Բավարար տվյալ չկա կանխատեսման համար",
   "INSTALLMENT_PRICE_LINK": "Ապառիկ գին",
   "INSTALLMENT_MODAL_TITLE": "Ապառիկ գին՝ {{price}} դր.",
   "INSTALLMENT_ANNUAL_RATE": "Տարեկան տոկոս (%)",

@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Product, ProductResponse } from '../../services/product';
+import { Product, ProductResponse, PricePredictionResponse } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { Auth } from '../../services/auth';
 import { AuthDrawerService } from '../../services/auth-drawer';
@@ -16,7 +16,7 @@ import { AppHeader } from '../../components/app-header/app-header';
 import { Skeleton } from '../../components/skeleton/skeleton';
 import { StarRating } from '../../components/star-rating/star-rating';
 import { ProductCard } from '../../components/product-card/product-card';
-import { Icon } from '../../components/icon/icon';
+import { Icon, IconName } from '../../components/icon/icon';
 import { InstallmentModal } from '../../components/installment-modal/installment-modal';
 import { PricePipe } from '../../pipes/price';
 
@@ -40,6 +40,8 @@ export class ProductDetail implements OnInit {
   reviews: Review[] = [];
   averageRating = 0;
   reviewsLoading = true;
+
+  pricePrediction: PricePredictionResponse | null = null;
 
   constructor(
     private productService: Product,
@@ -68,6 +70,7 @@ export class ProductDetail implements OnInit {
     this.notFound = false;
     this.activeImageIndex = 0;
     this.quantity = 1;
+    this.pricePrediction = null;
 
     this.productService.getProductById(this.productId).subscribe({
       next: (response) => {
@@ -78,6 +81,7 @@ export class ProductDetail implements OnInit {
         this.recentlyViewedService.record({ id: this.product.id, name: this.product.name, price: this.product.price, imageUrl: this.product.imageUrl });
         this.loadRelatedProducts();
         this.loadReviews();
+        this.loadPricePrediction();
       },
       error: (err) => {
         if (err.status === 404) {
@@ -122,6 +126,26 @@ export class ProductDetail implements OnInit {
       this.averageRating = avg;
       this.cdr.detectChanges();
     });
+  }
+
+  private loadPricePrediction(): void {
+    if (!this.product) return;
+    this.productService.getPricePrediction(this.product.id).subscribe(prediction => {
+      this.pricePrediction = prediction;
+      this.cdr.detectChanges();
+    });
+  }
+
+  get pricePredictionIcon(): IconName {
+    const text = this.pricePrediction?.prediction ?? '';
+    if (text.includes('նվազի')) return 'trend-down';
+    if (text.includes('աճի')) return 'trend-up';
+    return 'trend-flat';
+  }
+
+  get pricePredictionInsufficient(): boolean {
+    return !this.pricePrediction?.prediction &&
+      (this.pricePrediction?.reason === 'insufficient_history' || this.pricePrediction?.reason === 'prediction_unavailable');
   }
 
   get inferredCategory(): string | null {

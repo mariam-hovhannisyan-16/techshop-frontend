@@ -102,6 +102,21 @@
         </div>
       </div>
 
+      @if (pricePrediction?.prediction) {
+        <div class="price-prediction-card">
+          <span class="price-prediction-title">📈 {{ 'PRICE_PREDICTION_TITLE' | translate }}</span>
+          <div class="price-prediction-body">
+            <app-icon [name]="pricePredictionIcon" />
+            <span>{{ pricePrediction?.prediction }}</span>
+          </div>
+        </div>
+      } @else if (pricePredictionInsufficient) {
+        <div class="price-prediction-card subtle">
+          <span class="price-prediction-title">📈 {{ 'PRICE_PREDICTION_TITLE' | translate }}</span>
+          <p class="price-prediction-empty">{{ 'PRICE_PREDICTION_INSUFFICIENT' | translate }}</p>
+        </div>
+      }
+
       <div class="reviews-section">
         <h2>{{ 'REVIEWS' | translate }}</h2>
         @if (reviewsLoading) {

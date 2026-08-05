@@ -355,6 +355,8 @@
   "RECENT_ORDERS": "Recent Orders",
   "VIEW_ALL_ORDERS": "All Orders",
   "FEATURE_NOT_AVAILABLE": "This feature isn't available yet.",
+  "PRICE_PREDICTION_TITLE": "Price Prediction",
+  "PRICE_PREDICTION_INSUFFICIENT": "Not enough data for a prediction yet",
   "INSTALLMENT_PRICE_LINK": "Installment price",
   "INSTALLMENT_MODAL_TITLE": "Installment price: {{price}} AMD",
   "INSTALLMENT_ANNUAL_RATE": "Annual interest rate (%)",

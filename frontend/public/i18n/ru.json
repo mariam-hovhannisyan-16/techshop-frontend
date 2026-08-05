@@ -355,6 +355,8 @@
   "RECENT_ORDERS": "Последние заказы",
   "VIEW_ALL_ORDERS": "Все заказы",
   "FEATURE_NOT_AVAILABLE": "Эта функция пока недоступна.",
+  "PRICE_PREDICTION_TITLE": "Прогноз цены",
+  "PRICE_PREDICTION_INSUFFICIENT": "Пока недостаточно данных для прогноза",
   "INSTALLMENT_PRICE_LINK": "Цена в рассрочку",
   "INSTALLMENT_MODAL_TITLE": "Цена в рассрочку: {{price}} драм",
   "INSTALLMENT_ANNUAL_RATE": "Годовая процентная ставка (%)",

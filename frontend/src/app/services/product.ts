@@ -38,6 +38,12 @@ interface ProductPage {
   content: BackendProductPayload[];
 }
 
+export interface PricePredictionResponse {
+  prediction: string | null;
+  reason: string | null;
+  generatedAt: string | null;
+}
+
 const ADMIN_OVERRIDES_KEY = 'admin_product_overrides';
 const ADMIN_LOCAL_PRODUCTS_KEY = 'admin_local_products';
 const ADMIN_DELETED_IDS_KEY = 'admin_deleted_product_ids';
@@ -568,6 +574,14 @@ export class Product {
         }
         return throwError(() => err);
       })
+    );
+  }
+
+  getPricePrediction(productId: number): Observable<PricePredictionResponse | null> {
+    const url = `${this.apiUrl}/${productId}/price-prediction`;
+    return this.http.get<ApiResponse<PricePredictionResponse>>(url, { headers: this.getHeaders() }).pipe(
+      map(response => response.data),
+      catchError(() => of(null))
     );
   }
 
