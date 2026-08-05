@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { generateUuid } from '../utils/uuid';
 
 export interface SavedAddress {
   id: string;
@@ -41,7 +42,7 @@ export class ProfileService {
   }
 
   addAddress(userId: number, address: Omit<SavedAddress, 'id'>): SavedAddress[] {
-    const updated = [...this.getAddresses(userId), { ...address, id: crypto.randomUUID() }];
+    const updated = [...this.getAddresses(userId), { ...address, id: generateUuid() }];
     this.saveAddresses(userId, updated);
     return updated;
   }

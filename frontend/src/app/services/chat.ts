@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import { Auth } from './auth';
 import { environment } from '../../environments/environment';
+import { generateUuid } from '../utils/uuid';
 
 export type MessageSender = 'CUSTOMER' | 'SUPPORT' | 'BOT';
 export type ConversationStatus = 'OPEN' | 'CLOSED';
@@ -70,7 +71,7 @@ export class ChatService {
   private getGuestSessionId(): string {
     let id = localStorage.getItem(GUEST_SESSION_KEY);
     if (!id) {
-      id = crypto.randomUUID();
+      id = generateUuid();
       localStorage.setItem(GUEST_SESSION_KEY, id);
     }
     return id;
