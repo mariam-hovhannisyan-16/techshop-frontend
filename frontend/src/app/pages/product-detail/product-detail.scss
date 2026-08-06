@@ -214,23 +214,22 @@
           gap: 0.6rem;
         }
 
-        .storage-chip {
-          padding: 0.5rem 1.1rem;
+        .storage-box {
+          padding: 0.5rem 1rem;
           background: var(--bg-page);
           color: var(--text-secondary);
-          border: 1px solid var(--border-strong);
-          border-radius: 999px;
+          border: 2px solid var(--border);
+          border-radius: 8px;
           font-size: 0.9rem;
-          font-weight: 600;
+          font-weight: 500;
           cursor: pointer;
           transition: all 0.2s;
 
           &:hover { border-color: var(--accent); color: var(--text-primary); }
 
           &.active {
-            background: var(--accent);
             border-color: var(--accent);
-            color: var(--text-on-accent);
+            color: var(--text-primary);
           }
         }
       }
