@@ -98,6 +98,25 @@
             <button class="add-btn" [disabled]="product.quantity <= 0" (click)="addToCart()">
               <app-icon name="cart" /> {{ 'ADD_TO_CART' | translate }}
             </button>
+
+            <div class="installment-info-boxes">
+              <div class="installment-info-box">
+                <app-icon name="calculator" />
+                <div class="installment-info-text">
+                  <span class="installment-info-label">{{ 'INSTALLMENT_PRICE_LINK' | translate }}</span>
+                  <span class="installment-info-value">{{ product.price | price }}</span>
+                  <span class="installment-info-note">{{ 'INSTALLMENT_NO_INTEREST_NOTE' | translate }}</span>
+                </div>
+              </div>
+              <div class="installment-info-box">
+                <app-icon name="cash" />
+                <div class="installment-info-text">
+                  <span class="installment-info-label">{{ 'INSTALLMENT_SUMMARY_MONTHLY' | translate }}</span>
+                  <span class="installment-info-value">{{ installmentMonthlyPayment | price }}</span>
+                  <span class="installment-info-note">{{ 'INSTALLMENT_MONTHLY_NOTE' | translate:{ months: installmentMonths } }}</span>
+                </div>
+              </div>
+            </div>
           }
         </div>
       </div>

@@ -17,7 +17,7 @@ import { Skeleton } from '../../components/skeleton/skeleton';
 import { StarRating } from '../../components/star-rating/star-rating';
 import { ProductCard } from '../../components/product-card/product-card';
 import { Icon, IconName } from '../../components/icon/icon';
-import { InstallmentModal } from '../../components/installment-modal/installment-modal';
+import { InstallmentModal, DEFAULT_INSTALLMENT_DURATION_MONTHS } from '../../components/installment-modal/installment-modal';
 import { PricePipe } from '../../pipes/price';
 
 @Component({
@@ -181,6 +181,13 @@ export class ProductDetail implements OnInit {
 
   selectImage(index: number): void {
     this.activeImageIndex = index;
+  }
+
+  readonly installmentMonths = DEFAULT_INSTALLMENT_DURATION_MONTHS;
+
+  get installmentMonthlyPayment(): number {
+    if (!this.product) return 0;
+    return Math.round(this.product.price / this.installmentMonths);
   }
 
   get hasDiscount(): boolean {

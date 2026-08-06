@@ -279,6 +279,53 @@
         }
       }
 
+      .installment-info-boxes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-top: 1.2rem;
+      }
+
+      .installment-info-box {
+        flex: 1 1 200px;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.9rem 1.1rem;
+
+        app-icon {
+          flex-shrink: 0;
+          font-size: 1.3rem;
+          color: var(--accent);
+        }
+
+        .installment-info-text {
+          display: flex;
+          flex-direction: column;
+          gap: 0.15rem;
+          min-width: 0;
+        }
+
+        .installment-info-label {
+          font-size: 0.78rem;
+          color: var(--text-secondary);
+        }
+
+        .installment-info-value {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        .installment-info-note {
+          font-size: 0.75rem;
+          color: var(--text-tertiary);
+        }
+      }
+
       .add-btn {
         align-self: flex-start;
         padding: 0.9rem 2rem;

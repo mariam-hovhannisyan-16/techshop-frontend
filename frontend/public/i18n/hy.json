@@ -404,5 +404,7 @@
   "INSTALLMENT_REQUIRES_PLAN": "Խնդրում ենք նախ հաշվարկել ապառիկ պլանը ապրանքի էջում։",
   "INSTALLMENT_PLAN_SUMMARY_TITLE": "Ձեր ապառիկ պլանը",
   "INSTALLMENT_SUMMARY_MONTHLY": "Ամսական վճար",
-  "INSTALLMENT_SUMMARY_DURATION_MONTHS": "{{months}} ամիս"
+  "INSTALLMENT_SUMMARY_DURATION_MONTHS": "{{months}} ամիս",
+  "INSTALLMENT_NO_INTEREST_NOTE": "առանց բանկի տոկոսների",
+  "INSTALLMENT_MONTHLY_NOTE": "({{months}} ամսվա ընթացքում)"
 }
