@@ -25,6 +25,8 @@
   "LOADING": "Загрузка...",
   "RETRY": "Повторить",
   "STORAGE_LABEL": "Память",
+  "SIM_TYPE_LABEL": "Тип SIM",
+  "COLOR_LABEL": "Цвет",
   "IN_STOCK": "В наличии",
   "OUT_OF_STOCK": "Нет в наличии",
   "WISHLIST_EMPTY": "Ваш список избранного пуст.",

@@ -9,6 +9,11 @@ export interface StorageOption {
   priceDelta: number;
 }
 
+export interface ColorVariant {
+  label: string;
+  imageUrl: string;
+}
+
 export interface ProductResponse {
   id: number;
   name: string;
@@ -28,6 +33,9 @@ export interface ProductResponse {
   // no notion of storage variants, so this is undefined for real products and
   // the storage selector on product-detail simply doesn't render for those.
   storageOptions?: StorageOption[];
+  // Phone-only, mock-only, same reasoning as storageOptions above.
+  simOptions?: string[];
+  colorVariants?: ColorVariant[];
 }
 
 interface ApiResponse<T> {
@@ -390,6 +398,30 @@ const MOCK_PRODUCTS: ProductResponse[] = [
     id: 1063, name: 'MacBook Pro M4', description: 'Հզոր laptop՝ 14" Liquid Retina XDR էկրանով, M4 սերնդի չիպով', price: 1280000, quantity: 4,
     imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=900&q=82&fit=crop&auto=format',
     rating: 4.9, reviewCount: 210, badge: 'new', spec: 'M4 Pro chip · 24GB RAM'
+  },
+  {
+    id: 1064, name: 'iPhone 17 Pro', description: 'Ֆլագման սմարթֆոն 256GB հիշողությամբ', price: 580000, quantity: 9,
+    imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=900&q=82&fit=crop&auto=format',
+    rating: 4.8, reviewCount: 45, badge: 'new', spec: '256GB · A19 Pro chip',
+    storageOptions: [{ label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 70000 }, { label: '1TB', priceDelta: 150000 }],
+    simOptions: ['Dual eSIM', 'Nano-SIM & eSIM'],
+    colorVariants: [
+      { label: 'Space Gray', imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=900&q=82&fit=crop&auto=format' },
+      { label: 'Silver', imageUrl: 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=900&q=82&fit=crop&auto=format' },
+      { label: 'Deep Blue', imageUrl: 'https://images.unsplash.com/photo-1607936854279-55e8a4c64888?w=900&q=82&fit=crop&auto=format' }
+    ]
+  },
+  {
+    id: 1065, name: 'iPhone 17 Pro Max', description: 'Ֆլագման Max մոդել՝ 256GB հիշողությամբ և մեծ էկրանով', price: 680000, quantity: 6,
+    imageUrl: 'https://images.unsplash.com/photo-1678652197831-2d180705cd2c?w=900&q=82&fit=crop&auto=format',
+    rating: 4.9, reviewCount: 28, badge: 'new', spec: '256GB · A19 Pro chip · Max display',
+    storageOptions: [{ label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 70000 }, { label: '1TB', priceDelta: 150000 }],
+    simOptions: ['Dual eSIM', 'Nano-SIM & eSIM'],
+    colorVariants: [
+      { label: 'Deep Blue', imageUrl: 'https://images.unsplash.com/photo-1678652197831-2d180705cd2c?w=900&q=82&fit=crop&auto=format' },
+      { label: 'Space Gray', imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=900&q=82&fit=crop&auto=format' },
+      { label: 'Silver', imageUrl: 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=900&q=82&fit=crop&auto=format' }
+    ]
   }
 ];
 

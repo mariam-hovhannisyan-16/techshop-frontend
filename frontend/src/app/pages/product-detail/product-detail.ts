@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Product, ProductResponse, PricePredictionResponse, StorageOption } from '../../services/product';
+import { Product, ProductResponse, PricePredictionResponse, StorageOption, ColorVariant } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { Auth } from '../../services/auth';
 import { AuthDrawerService } from '../../services/auth-drawer';
@@ -36,6 +36,8 @@ export class ProductDetail implements OnInit {
   quantity = 1;
   activeImageIndex = 0;
   selectedStorageOption: StorageOption | null = null;
+  selectedSimOption: string | null = null;
+  selectedColorVariant: ColorVariant | null = null;
 
   relatedProducts: ProductResponse[] = [];
   reviews: Review[] = [];
@@ -73,6 +75,8 @@ export class ProductDetail implements OnInit {
     this.quantity = 1;
     this.pricePrediction = null;
     this.selectedStorageOption = null;
+    this.selectedSimOption = null;
+    this.selectedColorVariant = null;
 
     this.productService.getProductById(this.productId).subscribe({
       next: (response) => {
@@ -80,6 +84,8 @@ export class ProductDetail implements OnInit {
         this.selectedStorageOption = this.product.storageOptions?.find(o => o.priceDelta === 0)
           ?? this.product.storageOptions?.[0]
           ?? null;
+        this.selectedSimOption = this.product.simOptions?.[0] ?? null;
+        this.selectedColorVariant = this.product.colorVariants?.[0] ?? null;
         this.loading = false;
         this.cdr.detectChanges();
 
@@ -172,8 +178,12 @@ export class ProductDetail implements OnInit {
   }
 
   get mainImageSrc(): string | null {
-    const src = this.galleryImages[this.activeImageIndex];
+    const src = this.selectedColorVariant?.imageUrl ?? this.galleryImages[this.activeImageIndex];
     return src && !this.failedImages.has(src) ? src : null;
+  }
+
+  get hasColorSelector(): boolean {
+    return (this.product?.colorVariants?.length ?? 0) > 1;
   }
 
   isImageFailed(src: string): boolean {
@@ -197,6 +207,14 @@ export class ProductDetail implements OnInit {
 
   selectStorage(option: StorageOption): void {
     this.selectedStorageOption = option;
+  }
+
+  selectSim(option: string): void {
+    this.selectedSimOption = option;
+  }
+
+  selectColor(variant: ColorVariant): void {
+    this.selectedColorVariant = variant;
   }
 
   get installmentMonthlyPayment(): number {

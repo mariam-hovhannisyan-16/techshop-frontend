@@ -25,6 +25,8 @@
   "LOADING": "Loading...",
   "RETRY": "Try Again",
   "STORAGE_LABEL": "Storage",
+  "SIM_TYPE_LABEL": "SIM Type",
+  "COLOR_LABEL": "Color",
   "IN_STOCK": "In Stock",
   "OUT_OF_STOCK": "Out of Stock",
   "WISHLIST_EMPTY": "Your wishlist is empty.",

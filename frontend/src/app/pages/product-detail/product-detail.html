@@ -83,6 +83,44 @@
             </div>
           }
 
+          @if (product.simOptions && product.simOptions.length > 0) {
+            <div class="storage-selector">
+              <span class="storage-selector-label">{{ 'SIM_TYPE_LABEL' | translate }}</span>
+              <div class="storage-selector-options">
+                @for (sim of product.simOptions; track sim) {
+                  <button
+                    type="button"
+                    class="storage-box"
+                    [class.active]="sim === selectedSimOption"
+                    (click)="selectSim(sim)"
+                  >
+                    {{ sim }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if (hasColorSelector) {
+            <div class="color-selector">
+              <span class="color-selector-label">{{ 'COLOR_LABEL' | translate }}</span>
+              <div class="color-selector-options">
+                @for (variant of product.colorVariants; track variant.label) {
+                  <button
+                    type="button"
+                    class="color-swatch"
+                    [class.active]="variant === selectedColorVariant"
+                    [attr.aria-label]="variant.label"
+                    [attr.title]="variant.label"
+                    (click)="selectColor(variant)"
+                  >
+                    <img [src]="variant.imageUrl" [alt]="variant.label">
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
           <div class="price-row">
             @if (hasDiscount) {
               <span class="discount-badge">-{{ discountPercent }}% {{ 'SALE' | translate }}</span>
