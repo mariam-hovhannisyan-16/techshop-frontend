@@ -9,7 +9,7 @@ export interface CheckoutAddress {
   country: string;
 }
 
-export type PaymentMethod = 'IDRAM' | 'TELCELL' | 'ROKET_LINE' | 'INSTALLMENT';
+export type PaymentMethod = 'IDRAM' | 'TELCELL' | 'ROKET_LINE' | 'INSTALLMENT' | 'CARD';
 
 @Injectable({
   providedIn: 'root'

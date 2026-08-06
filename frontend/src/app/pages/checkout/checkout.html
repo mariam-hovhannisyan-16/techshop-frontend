@@ -52,7 +52,12 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>{{ 'CITY' | translate }}</label>
-                <input type="text" name="city" [(ngModel)]="address.city">
+                <select name="city" [(ngModel)]="address.city">
+                  <option value="" disabled>{{ 'SELECT_CITY_PLACEHOLDER' | translate }}</option>
+                  @for (city of cities; track city.value) {
+                    <option [value]="city.value">{{ city.labelKey | translate }}</option>
+                  }
+                </select>
                 @if (addressTouched && !address.city.trim()) {
                   <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
                 }
@@ -67,7 +72,12 @@
             </div>
             <div class="form-row">
               <label>{{ 'COUNTRY' | translate }}</label>
-              <input type="text" name="country" [(ngModel)]="address.country">
+              <select name="country" [(ngModel)]="address.country">
+                <option value="" disabled>{{ 'SELECT_COUNTRY_PLACEHOLDER' | translate }}</option>
+                @for (country of countries; track country.value) {
+                  <option [value]="country.value">{{ country.labelKey | translate }}</option>
+                }
+              </select>
               @if (addressTouched && !address.country.trim()) {
                 <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
               }
@@ -95,6 +105,13 @@
             </button>
             <button type="button" class="payment-option" [class.active]="paymentMethod === 'INSTALLMENT'" (click)="selectPayment('INSTALLMENT')">
               <app-icon name="calculator" /> {{ 'PAYMENT_INSTALLMENT' | translate }}
+            </button>
+            <button type="button" class="payment-option" [class.active]="paymentMethod === 'CARD'" (click)="selectPayment('CARD')">
+              <app-icon name="badge-check" />
+              <span class="payment-option-text">
+                <span class="payment-option-label">{{ 'PAYMENT_CARD' | translate }}</span>
+                <span class="payment-option-sublabel">{{ 'PAYMENT_CARD_SUBLABEL' | translate }}</span>
+              </span>
             </button>
           </div>
           @if (paymentTouched && !paymentMethod) {

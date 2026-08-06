@@ -131,7 +131,8 @@
         color: var(--text-secondary);
       }
 
-      input {
+      input,
+      select {
         padding: 0.8rem 1rem;
         background: var(--bg-page);
         border: 1px solid var(--border-strong);
@@ -142,6 +143,12 @@
         transition: border 0.2s;
 
         &:focus { border-color: var(--accent); }
+      }
+
+      select {
+        cursor: pointer;
+
+        &:invalid { color: var(--text-secondary); }
       }
     }
 
@@ -227,6 +234,18 @@
       &.active {
         border-color: var(--accent);
         background: var(--accent-soft-weak);
+      }
+
+      .payment-option-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      .payment-option-sublabel {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: var(--text-secondary);
       }
     }
   }

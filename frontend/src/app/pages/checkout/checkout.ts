@@ -17,6 +17,11 @@ import { PricePipe } from '../../pipes/price';
 
 type Step = 'address' | 'payment' | 'review';
 
+interface SelectOption {
+  value: string;
+  labelKey: string;
+}
+
 @Component({
   selector: 'app-checkout',
   imports: [CommonModule, FormsModule, TranslatePipe, Toast, AppHeader, Icon, PricePipe],
@@ -28,8 +33,30 @@ export class Checkout implements OnInit {
   step: Step = 'address';
   userId: number = 1;
 
-  address: CheckoutAddress = { fullName: '', phone: '', addressLine: '', city: '', postalCode: '', country: '' };
+  address: CheckoutAddress = { fullName: '', phone: '', addressLine: '', city: '', postalCode: '', country: 'Armenia' };
   addressTouched = false;
+
+  readonly cities: SelectOption[] = [
+    { value: 'Yerevan', labelKey: 'CITY_YEREVAN' },
+    { value: 'Gyumri', labelKey: 'CITY_GYUMRI' },
+    { value: 'Vanadzor', labelKey: 'CITY_VANADZOR' },
+    { value: 'Vagharshapat', labelKey: 'CITY_VAGHARSHAPAT' },
+    { value: 'Abovyan', labelKey: 'CITY_ABOVYAN' },
+    { value: 'Hrazdan', labelKey: 'CITY_HRAZDAN' },
+    { value: 'Armavir', labelKey: 'CITY_ARMAVIR' },
+    { value: 'Artashat', labelKey: 'CITY_ARTASHAT' },
+    { value: 'Ashtarak', labelKey: 'CITY_ASHTARAK' },
+    { value: 'Gavar', labelKey: 'CITY_GAVAR' },
+    { value: 'Kapan', labelKey: 'CITY_KAPAN' },
+    { value: 'Ijevan', labelKey: 'CITY_IJEVAN' },
+    { value: 'Yeghegnadzor', labelKey: 'CITY_YEGHEGNADZOR' },
+    { value: 'Dilijan', labelKey: 'CITY_DILIJAN' },
+    { value: 'Goris', labelKey: 'CITY_GORIS' }
+  ];
+
+  readonly countries: SelectOption[] = [
+    { value: 'Armenia', labelKey: 'COUNTRY_ARMENIA' }
+  ];
 
   paymentMethod: PaymentMethod | null = null;
   paymentTouched = false;
@@ -146,7 +173,8 @@ export class Checkout implements OnInit {
     IDRAM: 'PAYMENT_IDRAM',
     TELCELL: 'PAYMENT_TELCELL',
     ROKET_LINE: 'PAYMENT_ROKET_LINE',
-    INSTALLMENT: 'PAYMENT_INSTALLMENT'
+    INSTALLMENT: 'PAYMENT_INSTALLMENT',
+    CARD: 'PAYMENT_CARD'
   };
 
   get paymentMethodLabelKey(): string | null {
