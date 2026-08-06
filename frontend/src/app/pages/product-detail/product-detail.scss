@@ -60,7 +60,7 @@
 
   .product-detail-content {
     padding: 2rem;
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
   }
 
@@ -280,21 +280,21 @@
       }
 
       .installment-info-boxes {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
         margin-top: 1.2rem;
       }
 
       .installment-info-box {
-        flex: 1 1 200px;
+        min-width: 0;
         display: flex;
         align-items: center;
         gap: 0.7rem;
         background: var(--bg-panel);
         border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 0.9rem 1.1rem;
+        padding: 1rem 1.25rem;
 
         app-icon {
           flex-shrink: 0;
@@ -472,5 +472,11 @@
         align-self: stretch;
       }
     }
+  }
+}
+
+@media (max-width: 560px) {
+  .product-detail-container .product-info .installment-info-boxes {
+    grid-template-columns: 1fr;
   }
 }
