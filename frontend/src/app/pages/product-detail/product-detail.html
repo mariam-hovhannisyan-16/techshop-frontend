@@ -65,12 +65,30 @@
           <app-star-rating [rating]="averageRating" [count]="reviews.length" />
           <p class="description">{{ product.description }}</p>
 
+          @if (product.storageOptions && product.storageOptions.length > 0) {
+            <div class="storage-selector">
+              <span class="storage-selector-label">{{ 'STORAGE_LABEL' | translate }}</span>
+              <div class="storage-selector-options">
+                @for (option of product.storageOptions; track option.label) {
+                  <button
+                    type="button"
+                    class="storage-chip"
+                    [class.active]="option === selectedStorageOption"
+                    (click)="selectStorage(option)"
+                  >
+                    {{ option.label }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
           <div class="price-row">
             @if (hasDiscount) {
               <span class="discount-badge">-{{ discountPercent }}% {{ 'SALE' | translate }}</span>
               <span class="original-price">{{ product.originalPrice | price }}</span>
             }
-            <span class="price">{{ product.price | price }}</span>
+            <span class="price">{{ displayPrice | price }}</span>
           </div>
 
           @if (!isAdmin) {
@@ -104,7 +122,7 @@
                 <app-icon name="calculator" />
                 <div class="installment-info-text">
                   <span class="installment-info-label">{{ 'INSTALLMENT_PRICE_LINK' | translate }}</span>
-                  <span class="installment-info-value">{{ product.price | price }}</span>
+                  <span class="installment-info-value">{{ displayPrice | price }}</span>
                   <span class="installment-info-note">{{ 'INSTALLMENT_NO_INTEREST_NOTE' | translate }}</span>
                 </div>
               </div>
@@ -180,7 +198,7 @@
         </div>
       }
 
-      <app-installment-modal #installmentModal [price]="product.price" [productId]="product.id" />
+      <app-installment-modal #installmentModal [price]="displayPrice" [productId]="product.id" />
     }
   </div>
 

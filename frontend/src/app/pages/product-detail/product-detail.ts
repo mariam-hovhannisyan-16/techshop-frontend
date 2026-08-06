@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Product, ProductResponse, PricePredictionResponse } from '../../services/product';
+import { Product, ProductResponse, PricePredictionResponse, StorageOption } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { Auth } from '../../services/auth';
 import { AuthDrawerService } from '../../services/auth-drawer';
@@ -35,6 +35,7 @@ export class ProductDetail implements OnInit {
   userId: number = 1;
   quantity = 1;
   activeImageIndex = 0;
+  selectedStorageOption: StorageOption | null = null;
 
   relatedProducts: ProductResponse[] = [];
   reviews: Review[] = [];
@@ -71,10 +72,14 @@ export class ProductDetail implements OnInit {
     this.activeImageIndex = 0;
     this.quantity = 1;
     this.pricePrediction = null;
+    this.selectedStorageOption = null;
 
     this.productService.getProductById(this.productId).subscribe({
       next: (response) => {
         this.product = response.data;
+        this.selectedStorageOption = this.product.storageOptions?.find(o => o.priceDelta === 0)
+          ?? this.product.storageOptions?.[0]
+          ?? null;
         this.loading = false;
         this.cdr.detectChanges();
 
@@ -185,9 +190,17 @@ export class ProductDetail implements OnInit {
 
   readonly installmentMonths = DEFAULT_INSTALLMENT_DURATION_MONTHS;
 
-  get installmentMonthlyPayment(): number {
+  get displayPrice(): number {
     if (!this.product) return 0;
-    return Math.round(this.product.price / this.installmentMonths);
+    return this.product.price + (this.selectedStorageOption?.priceDelta ?? 0);
+  }
+
+  selectStorage(option: StorageOption): void {
+    this.selectedStorageOption = option;
+  }
+
+  get installmentMonthlyPayment(): number {
+    return Math.round(this.displayPrice / this.installmentMonths);
   }
 
   get hasDiscount(): boolean {

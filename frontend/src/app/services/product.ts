@@ -4,6 +4,11 @@ import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { Auth } from './auth';
 import { environment } from '../../environments/environment';
 
+export interface StorageOption {
+  label: string;
+  priceDelta: number;
+}
+
 export interface ProductResponse {
   id: number;
   name: string;
@@ -19,6 +24,10 @@ export interface ProductResponse {
   badge?: 'bestseller' | 'new' | 'top-rated' | 'hot-deal';
   spec?: string;
   warrantyYears?: number;
+  // Only populated for phone/tablet-type mock products — the live backend has
+  // no notion of storage variants, so this is undefined for real products and
+  // the storage selector on product-detail simply doesn't render for those.
+  storageOptions?: StorageOption[];
 }
 
 interface ApiResponse<T> {
@@ -58,12 +67,14 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   {
     id: 1001, name: 'iPhone 15 Pro', description: 'Ֆլագման սմարթֆոն 128GB հիշողությամբ', price: 650000, originalPrice: 730000, quantity: 12,
     imageUrl: 'https://images.unsplash.com/photo-1736173155811-e8142fd553ee?w=900&q=82&fit=crop&auto=format',
-    rating: 4.9, reviewCount: 1847, badge: 'bestseller', spec: '128GB · A17 Pro chip'
+    rating: 4.9, reviewCount: 1847, badge: 'bestseller', spec: '128GB · A17 Pro chip',
+    storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
   {
     id: 1002, name: 'Samsung Galaxy S24', description: 'Android սմարթֆոն 256GB հիշողությամբ', price: 520000, quantity: 8,
     imageUrl: 'https://images.unsplash.com/photo-1706372124814-417e2f0c3fe0?w=900&q=82&fit=crop&auto=format',
-    rating: 4.6, reviewCount: 342, badge: 'new', spec: '256GB · Snapdragon 8 Gen 3'
+    rating: 4.6, reviewCount: 342, badge: 'new', spec: '256GB · Snapdragon 8 Gen 3',
+    storageOptions: [{ label: '128GB', priceDelta: -50000 }, { label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 50000 }]
   },
   {
     id: 1003, name: 'MacBook Air M2', description: 'Թեթև և հզոր laptop՝ 13" էկրանով', price: 780000, quantity: 5,
@@ -113,7 +124,8 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   {
     id: 1012, name: 'iPad Air', description: 'Պլանշետ՝ M1 չիպով և Apple Pencil աջակցությամբ', price: 420000, quantity: 11,
     imageUrl: 'https://images.unsplash.com/photo-1527698266440-12104e498b76?w=900&q=82&fit=crop&auto=format',
-    rating: 4.7, reviewCount: 540, spec: '256GB · M1 chip'
+    rating: 4.7, reviewCount: 540, spec: '256GB · M1 chip',
+    storageOptions: [{ label: '128GB', priceDelta: -50000 }, { label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 50000 }]
   },
   {
     id: 1013, name: 'Apple Magic Keyboard', description: 'Անլար ստեղնաշար աքսեսուար', price: 58000, quantity: 25,
@@ -148,22 +160,26 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   {
     id: 1019, name: 'Google Pixel 8', description: 'Android հեռախոս 128GB հիշողությամբ', price: 430000, quantity: 10,
     imageUrl: 'https://images.unsplash.com/photo-1760604359549-8921b6139a1c?w=900&q=82&fit=crop&auto=format',
-    rating: 4.6, reviewCount: 420, badge: 'new', spec: '128GB · Tensor G3 chip'
+    rating: 4.6, reviewCount: 420, badge: 'new', spec: '128GB · Tensor G3 chip',
+    storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
   {
     id: 1020, name: 'Xiaomi 14', description: 'Android հեռախոս 256GB հիշողությամբ', price: 500000, quantity: 9,
     imageUrl: 'https://images.unsplash.com/photo-1773414422122-96165e640180?w=900&q=82&fit=crop&auto=format',
-    rating: 4.5, reviewCount: 310, spec: '256GB · Snapdragon 8 Gen 3'
+    rating: 4.5, reviewCount: 310, spec: '256GB · Snapdragon 8 Gen 3',
+    storageOptions: [{ label: '128GB', priceDelta: -50000 }, { label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 50000 }]
   },
   {
     id: 1021, name: 'OnePlus 12', description: 'Արագագործ հեռախոս 256GB հիշողությամբ', price: 495000, quantity: 7,
     imageUrl: 'https://images.unsplash.com/photo-1773293915418-fb03a80120a7?w=900&q=82&fit=crop&auto=format',
-    rating: 4.6, reviewCount: 275, spec: '256GB · Snapdragon 8 Gen 3'
+    rating: 4.6, reviewCount: 275, spec: '256GB · Snapdragon 8 Gen 3',
+    storageOptions: [{ label: '128GB', priceDelta: -50000 }, { label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 50000 }]
   },
   {
     id: 1022, name: 'Samsung Galaxy A55', description: 'Մատչելի Android սմարթֆոն', price: 235000, quantity: 15,
     imageUrl: 'https://images.unsplash.com/photo-1653179767387-35ce2dbdbb5d?w=900&q=82&fit=crop&auto=format',
-    rating: 4.3, reviewCount: 190, spec: '128GB · Exynos 1480'
+    rating: 4.3, reviewCount: 190, spec: '128GB · Exynos 1480',
+    storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
   {
     id: 1023, name: 'Dell XPS 13', description: 'Կոմպակտ laptop՝ 13" էկրանով', price: 715000, quantity: 6,
@@ -233,27 +249,32 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   {
     id: 1036, name: 'Samsung Tab S9', description: 'Պլանշետ S Pen գրիչով', price: 400000, quantity: 8,
     imageUrl: 'https://images.unsplash.com/photo-1661595677185-06202000a195?w=900&q=82&fit=crop&auto=format',
-    rating: 4.6, reviewCount: 320, spec: '256GB · S Pen'
+    rating: 4.6, reviewCount: 320, spec: '256GB · S Pen',
+    storageOptions: [{ label: '128GB', priceDelta: -50000 }, { label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 50000 }]
   },
   {
     id: 1037, name: 'Lenovo Tab P11', description: 'Պլանշետ՝ մեծ մարտկոցով', price: 155000, quantity: 11,
     imageUrl: 'https://images.unsplash.com/photo-1675109322863-2f4eef9fe032?w=900&q=82&fit=crop&auto=format',
-    rating: 4.2, reviewCount: 140, spec: '128GB · 13ժ մարտկոց'
+    rating: 4.2, reviewCount: 140, spec: '128GB · 13ժ մարտկոց',
+    storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
   {
     id: 1038, name: 'Xiaomi Pad 6', description: 'Պլանշետ՝ բարձր արագագործությամբ', price: 210000, quantity: 9,
     imageUrl: 'https://images.pexels.com/photos/35300031/pexels-photo-35300031.jpeg?auto=compress&cs=tinysrgb&w=900',
-    rating: 4.4, reviewCount: 175, badge: 'new', spec: '256GB · 144Hz էկրան'
+    rating: 4.4, reviewCount: 175, badge: 'new', spec: '256GB · 144Hz էկրան',
+    storageOptions: [{ label: '128GB', priceDelta: -50000 }, { label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 50000 }]
   },
   {
     id: 1039, name: 'Huawei MatePad 11', description: 'Պլանշետ՝ ստիլուսի աջակցությամբ', price: 185000, quantity: 7,
     imageUrl: 'https://images.unsplash.com/photo-1675109322863-2f4eef9fe032?w=900&q=82&fit=crop&auto=format',
-    rating: 4.3, reviewCount: 110, spec: '128GB · 120Hz էկրան'
+    rating: 4.3, reviewCount: 110, spec: '128GB · 120Hz էկրան',
+    storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
   {
     id: 1040, name: 'Microsoft Surface Go 3', description: 'Պլանշետ՝ հանվող ստեղնաշարի աջակցությամբ', price: 250000, quantity: 6,
     imageUrl: 'https://images.unsplash.com/photo-1617780421749-ebd0ef657b2e?w=900&q=82&fit=crop&auto=format',
-    rating: 4.1, reviewCount: 95, spec: '128GB · Windows 11'
+    rating: 4.1, reviewCount: 95, spec: '128GB · Windows 11',
+    storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
   {
     id: 1041, name: 'Logitech MX Master 3S', description: 'Անլար mouse՝ բարձր ճշգրտությամբ', price: 58000, quantity: 20,
