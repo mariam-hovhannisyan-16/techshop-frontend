@@ -2,23 +2,6 @@
   <div class="delivery-info">
     <span class="location-icon"><app-icon name="pin" /></span>
     <span class="delivery-text">{{ 'DELIVERY_NATIONWIDE' | translate }}</span>
-
-    <div class="city-select">
-      <button type="button" class="city-btn" (click)="toggleCityMenu()" [attr.aria-expanded]="cityMenuOpen">
-        <span>{{ selectedCity.labelKey | translate }}</span>
-        <span class="chevron" [class.open]="cityMenuOpen">▾</span>
-      </button>
-
-      @if (cityMenuOpen) {
-        <div class="city-dropdown">
-          @for (city of cities; track city.id) {
-            <button type="button" [class.active]="city.id === selectedCity.id" (click)="selectCity(city)">
-              {{ city.labelKey | translate }}
-            </button>
-          }
-        </div>
-      }
-    </div>
   </div>
 
   <div class="top-bar-right">

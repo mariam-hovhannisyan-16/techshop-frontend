@@ -224,7 +224,7 @@ export class Checkout implements OnInit {
       next: (response) => {
         this.placingOrder = false;
 
-        this.cartService.clearLocalState();
+        this.cartService.clearCart(this.userId);
         this.installmentCheckoutService.clear();
         this.router.navigate(['/order-confirmation', response.data.id], {
           state: {

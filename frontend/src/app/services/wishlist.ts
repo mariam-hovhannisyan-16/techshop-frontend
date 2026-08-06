@@ -48,7 +48,13 @@ export class WishlistService {
   }
 
   private isFallbackEligible(err: unknown): boolean {
-    return this.isUnreachable(err) || (err instanceof HttpErrorResponse && err.status === 404);
+    // The wishlist backend rejects even freshly-issued, otherwise-valid tokens with 401
+    // (confirmed: the same token that succeeds against /api/orders gets 401 here), so a
+    // real backend bug — not an expired/invalid session — is the normal case for this
+    // service today. Treat 401 like the unreachable/404 cases so the feature still works
+    // via local storage instead of silently failing on every click.
+    return this.isUnreachable(err)
+      || (err instanceof HttpErrorResponse && (err.status === 404 || err.status === 401));
   }
 
   private localKey(): string {
@@ -111,7 +117,7 @@ export class WishlistService {
     return this.http.get<ApiResponse<WishlistItemResponse[]>>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       catchError(err => {
         if (this.isFallbackEligible(err)) {
-          console.warn(`[Wishlist] Backend unreachable or has no wishlist route at ${this.apiUrl} — using local wishlist for development.`);
+          console.warn(`[Wishlist] Backend at ${this.apiUrl} is unreachable, has no wishlist route, or rejected the request (401) — using local wishlist for development.`);
           return this.buildLocalWishlistResponse();
         }
         return throwError(() => err);
@@ -124,7 +130,7 @@ export class WishlistService {
       tap(() => this.productIds.update(ids => new Set(ids).add(productId))),
       catchError(err => {
         if (this.isFallbackEligible(err)) {
-          console.warn(`[Wishlist] Backend unreachable or has no wishlist route at ${this.apiUrl} — using local wishlist for development.`);
+          console.warn(`[Wishlist] Backend at ${this.apiUrl} is unreachable, has no wishlist route, or rejected the request (401) — using local wishlist for development.`);
           const ids = this.readLocalIds();
           if (!ids.includes(productId)) ids.push(productId);
           this.writeLocalIds(ids);
@@ -145,7 +151,7 @@ export class WishlistService {
       })),
       catchError(err => {
         if (this.isFallbackEligible(err)) {
-          console.warn(`[Wishlist] Backend unreachable or has no wishlist route at ${this.apiUrl} — using local wishlist for development.`);
+          console.warn(`[Wishlist] Backend at ${this.apiUrl} is unreachable, has no wishlist route, or rejected the request (401) — using local wishlist for development.`);
           const ids = this.readLocalIds().filter(id => id !== productId);
           this.writeLocalIds(ids);
           this.productIds.update(current => {
