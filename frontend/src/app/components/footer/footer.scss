@@ -100,57 +100,10 @@
     }
 
     .footer-payments-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-    }
-
-    .payment-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.55rem 1.1rem;
-      background: var(--bg-panel);
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      white-space: nowrap;
-      transition: all 0.2s;
-
-      &::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--brand-color, var(--accent));
-        flex-shrink: 0;
-      }
-
-      &:hover { border-color: var(--accent); color: var(--text-primary); }
-
-      &--arca { --brand-color: #f7b733; }
-      &--telcell { --brand-color: #3ecf6e; }
-      &--idram { --brand-color: #ff8a3d; }
-      &--myameria { --brand-color: #b57bee; }
-    }
-
-    .payment-badge--logo {
-      padding: 0.5rem 1.1rem;
-      background: #fff;
-      border-color: #fff;
-
-      &::before { display: none; }
-
-      &:hover { border-color: var(--accent); }
-
-      img {
-        display: block;
-        height: 26px;
-        width: auto;
-      }
+      display: block;
+      height: 30px;
+      width: auto;
+      max-width: 100%;
     }
   }
 

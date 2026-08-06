@@ -8,12 +8,6 @@ interface FooterCategoryLink {
   labelKey: string;
 }
 
-interface PaymentBadge {
-  id: string;
-  label: string;
-  logo?: string;
-}
-
 @Component({
   selector: 'app-footer',
   imports: [TranslatePipe, Icon],
@@ -30,15 +24,7 @@ export class Footer {
     { id: 'games', labelKey: 'GAMES' }
   ];
 
-  readonly paymentBadges: PaymentBadge[] = [
-    { id: 'visa', label: 'Visa', logo: 'icons/payment/visa.svg' },
-    { id: 'mastercard', label: 'Mastercard', logo: 'icons/payment/mastercard.svg' },
-    { id: 'arca', label: 'ArCa' },
-    { id: 'telcell', label: 'Telcell Wallet' },
-    { id: 'idram', label: 'Idram' },
-    { id: 'amex', label: 'American Express', logo: 'icons/payment/americanexpress.svg' },
-    { id: 'myameria', label: 'MyAmeria' }
-  ];
+  readonly paymentMethodsLogo = 'icons/payment/payment-methods-footer.svg';
 
   readonly supportLinkKeys = ['FOOTER_RETURNS', 'FOOTER_WARRANTY', 'FOOTER_CONTACT', 'FOOTER_FAQ'];
   readonly companyLinkKeys = ['FOOTER_ABOUT', 'FOOTER_CAREERS', 'FOOTER_BLOG', 'FOOTER_PRIVACY', 'FOOTER_TERMS'];

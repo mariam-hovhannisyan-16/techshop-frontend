@@ -42,17 +42,7 @@
   <div class="footer-payments">
     <p class="footer-payments-note">{{ 'FOOTER_PAYMENT_NOTE' | translate }}</p>
     <h3 class="footer-payments-title">{{ 'FOOTER_PAYMENT_METHODS' | translate }}</h3>
-    <div class="footer-payments-badges">
-      @for (badge of paymentBadges; track badge.id) {
-        @if (badge.logo) {
-          <span class="payment-badge payment-badge--logo">
-            <img [src]="badge.logo" [alt]="badge.label" loading="lazy" />
-          </span>
-        } @else {
-          <span class="payment-badge" [class]="'payment-badge--' + badge.id">{{ badge.label }}</span>
-        }
-      }
-    </div>
+    <img class="footer-payments-badges" [src]="paymentMethodsLogo" alt="Visa, Mastercard, ArCa, Telcell Wallet, Idram, American Express, MyAmeria" loading="lazy" />
   </div>
 
   <div class="footer-divider"></div>
