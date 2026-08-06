@@ -226,12 +226,12 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1030, name: 'TCL 43" Smart TV', description: 'Մատչելի հեռուստացույց խելացի հնարավորություններով', price: 135000, quantity: 11,
-    imageUrl: 'https://images.unsplash.com/photo-1615986200762-a1ed9610d3b1?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=900&q=82&fit=crop&auto=format',
     rating: 4.1, reviewCount: 98, spec: 'FHD · 43" · Smart TV'
   },
   {
     id: 1031, name: 'Samsung Crystal UHD 50"', description: 'Հեռուստացույց Crystal UHD տեխնոլոգիայով', price: 280000, quantity: 8,
-    imageUrl: 'https://images.unsplash.com/photo-1689686998931-858488b0c62c?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1552975084-6e027cd345c2?w=900&q=82&fit=crop&auto=format',
     rating: 4.4, reviewCount: 205, spec: '4K UHD · 50"'
   },
   {
@@ -274,7 +274,7 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1039, name: 'Huawei MatePad 11', description: 'Պլանշետ՝ ստիլուսի աջակցությամբ', price: 185000, quantity: 7,
-    imageUrl: 'https://images.unsplash.com/photo-1675109322863-2f4eef9fe032?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=900&q=82&fit=crop&auto=format',
     rating: 4.3, reviewCount: 110, spec: '128GB · 120Hz էկրան',
     storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
@@ -341,12 +341,12 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1052, name: 'Hisense 55" ULED TV', description: 'Հեռուստացույց ULED տեխնոլոգիայով', price: 340000, quantity: 8,
-    imageUrl: 'https://images.unsplash.com/photo-1593067607070-95193763e3ab?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=900&q=82&fit=crop&auto=format',
     rating: 4.3, reviewCount: 132, spec: '4K ULED · 55"'
   },
   {
     id: 1053, name: 'Panasonic 43" 4K TV', description: 'Մատչելի 4K հեռուստացույց', price: 195000, quantity: 10,
-    imageUrl: 'https://images.unsplash.com/photo-1615986200762-a1ed9610d3b1?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1567690187548-f07b1d7bf5a9?w=900&q=82&fit=crop&auto=format',
     rating: 4.2, reviewCount: 87, spec: '4K UHD · 43"'
   },
   {
