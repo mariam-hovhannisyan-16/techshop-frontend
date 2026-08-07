@@ -265,6 +265,7 @@
   "FOOTER_LOCATION": "Yerevan, Armenia",
   "TOAST_ADDED_TO_CART": "Added to cart",
   "TOAST_FAILED_ADD_TO_CART": "Failed to add to cart",
+  "TOAST_SESSION_EXPIRED": "Your session has expired. Please log in again.",
   "TOAST_ADDED_TO_WISHLIST": "Added to wishlist",
   "TOAST_REMOVED_FROM_WISHLIST": "Removed from wishlist",
   "TOAST_FAILED_UPDATE_WISHLIST": "Failed to update wishlist",

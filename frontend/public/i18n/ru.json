@@ -265,6 +265,7 @@
   "FOOTER_LOCATION": "Ереван, Армения",
   "TOAST_ADDED_TO_CART": "Добавлено в корзину",
   "TOAST_FAILED_ADD_TO_CART": "Не удалось добавить в корзину",
+  "TOAST_SESSION_EXPIRED": "Ваша сессия истекла. Пожалуйста, войдите снова.",
   "TOAST_ADDED_TO_WISHLIST": "Добавлено в избранное",
   "TOAST_REMOVED_FROM_WISHLIST": "Удалено из избранного",
   "TOAST_FAILED_UPDATE_WISHLIST": "Не удалось обновить список избранного",

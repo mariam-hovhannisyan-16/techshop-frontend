@@ -265,6 +265,7 @@
   "FOOTER_LOCATION": "Երևան, Հայաստան",
   "TOAST_ADDED_TO_CART": "Ավելացվեց զամբյուղում",
   "TOAST_FAILED_ADD_TO_CART": "Չհաջողվեց ավելացնել զամբյուղում",
+  "TOAST_SESSION_EXPIRED": "Ձեր նստաշրջանն ավարտվել է։ Խնդրում ենք նորից մուտք գործել։",
   "TOAST_ADDED_TO_WISHLIST": "Ավելացվեց ցանկությունների ցուցակում",
   "TOAST_REMOVED_FROM_WISHLIST": "Հեռացվեց ցանկությունների ցուցակից",
   "TOAST_FAILED_UPDATE_WISHLIST": "Չհաջողվեց թարմացնել ցանկությունների ցուցակը",
