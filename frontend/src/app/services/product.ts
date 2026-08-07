@@ -413,12 +413,12 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1065, name: 'iPhone 17 Pro Max', description: 'Ֆլագման Max մոդել՝ 256GB հիշողությամբ և մեծ էկրանով', price: 680000, quantity: 6,
-    imageUrl: 'https://images.unsplash.com/photo-1678652197831-2d180705cd2c?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1607936854279-55e8a4c64888?w=900&q=82&fit=crop&auto=format',
     rating: 4.9, reviewCount: 28, badge: 'new', spec: '256GB · A19 Pro chip · Max display',
     storageOptions: [{ label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 70000 }, { label: '1TB', priceDelta: 150000 }],
     simOptions: ['Dual eSIM', 'Nano-SIM & eSIM'],
     colorVariants: [
-      { label: 'Deep Blue', imageUrl: 'https://images.unsplash.com/photo-1678652197831-2d180705cd2c?w=900&q=82&fit=crop&auto=format' },
+      { label: 'Deep Blue', imageUrl: 'https://images.unsplash.com/photo-1607936854279-55e8a4c64888?w=900&q=82&fit=crop&auto=format' },
       { label: 'Space Gray', imageUrl: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=900&q=82&fit=crop&auto=format' },
       { label: 'Silver', imageUrl: 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=900&q=82&fit=crop&auto=format' }
     ]

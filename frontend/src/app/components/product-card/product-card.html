@@ -7,7 +7,7 @@
 >
   <div class="card-media">
     @if (imageSrc; as src) {
-      <img [src]="src" [alt]="product.name" (error)="onImageError()">
+      <img [src]="src" [alt]="product.name" [class.card-media-img--top]="categoryId === 'phones'" (error)="onImageError()">
     } @else {
       <div class="card-media-fallback"><app-icon name="box" /></div>
     }

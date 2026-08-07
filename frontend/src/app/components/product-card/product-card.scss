@@ -109,7 +109,17 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center center;
       display: block;
+
+      // Phone product photos are shot portrait with the device (and its camera
+      // module) in the upper portion of the frame. In this card's wide/short
+      // aspect ratio, a center-anchored crop can cut the camera module off the
+      // top while leaving empty background at the bottom — anchor to the top
+      // instead so the full phone silhouette stays in frame.
+      &.card-media-img--top {
+        object-position: center top;
+      }
     }
 
     .card-media-fallback {
