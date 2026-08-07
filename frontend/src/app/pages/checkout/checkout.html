@@ -6,227 +6,231 @@
   </app-header>
 
   <div class="checkout-content">
-    <div class="stepper">
-      <div class="stepper-item" [class]="stepState('address')">
-        <span class="stepper-dot">1</span>
-        <span class="stepper-label">{{ 'STEP_ADDRESS' | translate }}</span>
-      </div>
-      <div class="stepper-line" [class.complete]="stepState('address') === 'complete'"></div>
-      <div class="stepper-item" [class]="stepState('payment')">
-        <span class="stepper-dot">2</span>
-        <span class="stepper-label">{{ 'STEP_PAYMENT' | translate }}</span>
-      </div>
-      <div class="stepper-line" [class.complete]="stepState('payment') === 'complete'"></div>
-      <div class="stepper-item" [class]="stepState('review')">
-        <span class="stepper-dot">3</span>
-        <span class="stepper-label">{{ 'STEP_REVIEW' | translate }}</span>
-      </div>
-    </div>
+    <form class="checkout-form" (ngSubmit)="onSubmit()">
 
-    @switch (step) {
-      @case ('address') {
-        <div class="step-panel">
-          <h2>{{ 'STEP_ADDRESS' | translate }}</h2>
-          <form (ngSubmit)="goToPayment()">
-            <div class="form-row">
-              <label>{{ 'FULL_NAME' | translate }}</label>
-              <input type="text" name="fullName" [(ngModel)]="address.fullName">
-              @if (addressTouched && !address.fullName.trim()) {
-                <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-              }
-            </div>
-            <div class="form-row">
-              <label>{{ 'PHONE' | translate }}</label>
-              <input type="tel" name="phone" [(ngModel)]="address.phone">
-              @if (addressTouched && !address.phone.trim()) {
-                <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-              }
-            </div>
-            <div class="form-row">
-              <label>{{ 'ADDRESS_LINE' | translate }}</label>
-              <input type="text" name="addressLine" [(ngModel)]="address.addressLine">
-              @if (addressTouched && !address.addressLine.trim()) {
-                <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-              }
-            </div>
-            <div class="form-grid">
-              <div class="form-row">
-                <label>{{ 'CITY' | translate }}</label>
-                <select name="city" [(ngModel)]="address.city">
-                  <option value="" disabled>{{ 'SELECT_CITY_PLACEHOLDER' | translate }}</option>
-                  @for (city of cities; track city.value) {
-                    <option [value]="city.value">{{ city.labelKey | translate }}</option>
-                  }
-                </select>
-                @if (addressTouched && !address.city.trim()) {
-                  <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-                }
-              </div>
-              <div class="form-row">
-                <label>{{ 'POSTAL_CODE' | translate }}</label>
-                <input type="text" name="postalCode" [(ngModel)]="address.postalCode">
-                @if (addressTouched && !address.postalCode.trim()) {
-                  <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-                }
-              </div>
-            </div>
-            <div class="form-row">
-              <label>{{ 'COUNTRY' | translate }}</label>
-              <select name="country" [(ngModel)]="address.country">
-                <option value="" disabled>{{ 'SELECT_COUNTRY_PLACEHOLDER' | translate }}</option>
-                @for (country of countries; track country.value) {
-                  <option [value]="country.value">{{ country.labelKey | translate }}</option>
-                }
-              </select>
-              @if (addressTouched && !address.country.trim()) {
-                <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-              }
-            </div>
-            <p class="saved-note"><app-icon name="save" /> {{ 'SAVED_ON_DEVICE_NOTE' | translate }}</p>
-            <div class="step-actions">
-              <button type="submit" class="primary-btn">{{ 'NEXT' | translate }} →</button>
-            </div>
-          </form>
-        </div>
-      }
-
-      @case ('payment') {
-        <div class="step-panel">
+      <section class="checkout-section">
+        <div class="section-header">
           <h2>{{ 'PAYMENT_METHOD' | translate }}</h2>
-          <div class="payment-options">
-            <button type="button" class="payment-option" [class.active]="paymentMethod === 'IDRAM'" (click)="selectPayment('IDRAM')">
-              <app-icon name="card" /> {{ 'PAYMENT_IDRAM' | translate }}
+          @if (!isCartEmpty) {
+            <button type="button" class="installment-link" (click)="installmentModal.open()">
+              <app-icon name="calculator" /> {{ 'INSTALLMENT_PRICE_LINK' | translate }}
             </button>
-            <button type="button" class="payment-option" [class.active]="paymentMethod === 'TELCELL'" (click)="selectPayment('TELCELL')">
-              <app-icon name="smartphone" /> {{ 'PAYMENT_TELCELL' | translate }}
-            </button>
-            <button type="button" class="payment-option" [class.active]="paymentMethod === 'ROKET_LINE'" (click)="selectPayment('ROKET_LINE')">
-              <app-icon name="bolt" /> {{ 'PAYMENT_ROKET_LINE' | translate }}
-            </button>
-            <button type="button" class="payment-option" [class.active]="paymentMethod === 'INSTALLMENT'" (click)="selectPayment('INSTALLMENT')">
-              <app-icon name="calculator" /> {{ 'PAYMENT_INSTALLMENT' | translate }}
-            </button>
-            <button type="button" class="payment-option" [class.active]="paymentMethod === 'CARD'" (click)="selectPayment('CARD')">
-              <app-icon name="badge-check" />
-              <span class="payment-option-text">
-                <span class="payment-option-label">{{ 'PAYMENT_CARD' | translate }}</span>
-                <span class="payment-option-sublabel">{{ 'PAYMENT_CARD_SUBLABEL' | translate }}</span>
-              </span>
-            </button>
+          }
+        </div>
+
+        <div class="payment-options">
+          <button type="button" class="payment-option" [class.active]="paymentMethod === 'IDRAM'" (click)="selectPayment('IDRAM')">
+            <app-icon name="card" /> {{ 'PAYMENT_IDRAM' | translate }}
+          </button>
+          <button type="button" class="payment-option" [class.active]="paymentMethod === 'TELCELL'" (click)="selectPayment('TELCELL')">
+            <app-icon name="smartphone" /> {{ 'PAYMENT_TELCELL' | translate }}
+          </button>
+          <button type="button" class="payment-option" [class.active]="paymentMethod === 'ROKET_LINE'" (click)="selectPayment('ROKET_LINE')">
+            <app-icon name="bolt" /> {{ 'PAYMENT_ROKET_LINE' | translate }}
+          </button>
+          <button type="button" class="payment-option" [class.active]="paymentMethod === 'INSTALLMENT'" (click)="selectPayment('INSTALLMENT')">
+            <app-icon name="calculator" /> {{ 'PAYMENT_INSTALLMENT' | translate }}
+          </button>
+          <button type="button" class="payment-option" [class.active]="paymentMethod === 'CARD'" (click)="selectPayment('CARD')">
+            <app-icon name="badge-check" />
+            <span class="payment-option-text">
+              <span class="payment-option-label">{{ 'PAYMENT_CARD' | translate }}</span>
+              <span class="payment-option-sublabel">{{ 'PAYMENT_CARD_SUBLABEL' | translate }}</span>
+            </span>
+          </button>
+        </div>
+        @if (formTouched && !paymentMethod) {
+          <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+        }
+        @if (installmentUnavailable) {
+          <span class="field-error">{{ 'INSTALLMENT_REQUIRES_PLAN' | translate }}</span>
+        }
+        @if (paymentMethod === 'INSTALLMENT' && pendingInstallmentPlan) {
+          <div class="installment-summary">
+            <h3>{{ 'INSTALLMENT_PLAN_SUMMARY_TITLE' | translate }}</h3>
+            <div class="summary-row">
+              <span>{{ 'INSTALLMENT_BANK' | translate }}</span>
+              <strong>{{ pendingInstallmentPlan.bank }}</strong>
+            </div>
+            <div class="summary-row">
+              <span>{{ 'INSTALLMENT_SUMMARY_MONTHLY' | translate }}</span>
+              <strong>{{ installmentMonthlyFormatted }}</strong>
+            </div>
+            <div class="summary-row">
+              <span>{{ 'INSTALLMENT_DURATION' | translate }}</span>
+              <strong>{{ 'INSTALLMENT_SUMMARY_DURATION_MONTHS' | translate:{ months: pendingInstallmentPlan.durationMonths } }}</strong>
+            </div>
           </div>
-          @if (paymentTouched && !paymentMethod) {
+        }
+        @if (showCurrencyNote) {
+          <p class="currency-note">
+            <app-icon name="cash" />
+            {{ 'CHECKOUT_CURRENCY_NOTE' | translate:{ currency: displayCurrencyCode } }}
+          </p>
+        }
+      </section>
+
+      <section class="checkout-section">
+        <h2>{{ 'DELIVERY_DETAILS' | translate }}</h2>
+
+        <div class="form-row">
+          <label>{{ 'FULL_NAME' | translate }}</label>
+          <input type="text" name="fullName" [(ngModel)]="address.fullName">
+          @if (formTouched && !address.fullName.trim()) {
             <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
           }
-          @if (installmentUnavailable) {
-            <span class="field-error">{{ 'INSTALLMENT_REQUIRES_PLAN' | translate }}</span>
+        </div>
+
+        <div class="form-row">
+          <label>{{ 'PHONE' | translate }}</label>
+          <div class="phone-row">
+            <select name="phoneCountryCode" class="phone-code-select" [(ngModel)]="phoneCountryCode">
+              @for (code of phoneCountryCodes; track code) {
+                <option [value]="code">{{ code }}</option>
+              }
+            </select>
+            <input type="tel" name="phone" [(ngModel)]="address.phone">
+          </div>
+          @if (formTouched && !address.phone.trim()) {
+            <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
           }
-          @if (paymentMethod === 'INSTALLMENT' && pendingInstallmentPlan) {
-            <div class="installment-summary">
-              <h3>{{ 'INSTALLMENT_PLAN_SUMMARY_TITLE' | translate }}</h3>
-              <div class="summary-row">
-                <span>{{ 'INSTALLMENT_BANK' | translate }}</span>
-                <strong>{{ pendingInstallmentPlan.bank }}</strong>
-              </div>
-              <div class="summary-row">
-                <span>{{ 'INSTALLMENT_SUMMARY_MONTHLY' | translate }}</span>
-                <strong>{{ installmentMonthlyFormatted }}</strong>
-              </div>
-              <div class="summary-row">
-                <span>{{ 'INSTALLMENT_DURATION' | translate }}</span>
-                <strong>{{ 'INSTALLMENT_SUMMARY_DURATION_MONTHS' | translate:{ months: pendingInstallmentPlan.durationMonths } }}</strong>
-              </div>
-            </div>
+        </div>
+
+        <div class="form-row">
+          <label>{{ 'EMAIL' | translate }}</label>
+          <input type="email" name="email" [(ngModel)]="contactEmail">
+          @if (formTouched && !isEmailValid) {
+            <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
           }
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>{{ 'REGION' | translate }}</label>
+            <select name="city" [(ngModel)]="address.city">
+              <option value="" disabled>{{ 'SELECT_REGION_PLACEHOLDER' | translate }}</option>
+              @for (city of cities; track city.value) {
+                <option [value]="city.value">{{ city.labelKey | translate }}</option>
+              }
+            </select>
+            @if (formTouched && !address.city.trim()) {
+              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+            }
+          </div>
+          <div class="form-row">
+            <label>{{ 'CITY_DISTRICT' | translate }}</label>
+            <input type="text" name="cityDistrict" [(ngModel)]="address.state">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>{{ 'ADDRESS_LINE' | translate }}</label>
+          <input type="text" name="addressLine" [(ngModel)]="address.addressLine">
+          @if (formTouched && !address.addressLine.trim()) {
+            <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+          }
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label>{{ 'POSTAL_CODE' | translate }}</label>
+            <input type="text" name="postalCode" [(ngModel)]="address.postalCode">
+            @if (formTouched && !address.postalCode.trim()) {
+              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+            }
+          </div>
+          <div class="form-row">
+            <label>{{ 'COUNTRY' | translate }}</label>
+            <select name="country" [(ngModel)]="address.country">
+              <option value="" disabled>{{ 'SELECT_COUNTRY_PLACEHOLDER' | translate }}</option>
+              @for (country of countries; track country.value) {
+                <option [value]="country.value">{{ country.labelKey | translate }}</option>
+              }
+            </select>
+            @if (formTouched && !address.country.trim()) {
+              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>{{ 'NOTES' | translate }} <span class="optional-hint">({{ 'OPTIONAL' | translate }})</span></label>
+          <textarea name="notes" rows="3" [(ngModel)]="notes"></textarea>
+        </div>
+
+        <p class="saved-note"><app-icon name="save" /> {{ 'SAVED_ON_DEVICE_NOTE' | translate }}</p>
+      </section>
+
+      <section class="checkout-section">
+        <h2>{{ 'ORDER_SUMMARY' | translate }}</h2>
+
+        @if (cartLoading) {
+          <div class="inline-loading">
+            <div class="spinner"></div>
+            <p>{{ 'LOADING' | translate }}</p>
+          </div>
+        } @else if (cartError) {
+          <div class="inline-error">
+            <p>{{ cartError | translate }}</p>
+            <button type="button" (click)="loadCart()">{{ 'RETRY' | translate }}</button>
+          </div>
+        } @else if (isCartEmpty) {
+          <div class="inline-error">
+            <p>{{ 'CART_EMPTY_CHECKOUT' | translate }}</p>
+            <button type="button" (click)="router.navigate(['/products'])">{{ 'CONTINUE_SHOPPING' | translate }}</button>
+          </div>
+        } @else {
+          <div class="summary-items">
+            @for (item of cart!.items; track item.productId) {
+              <div class="summary-item">
+                <span class="name">{{ item.productName }} × {{ item.quantity }}</span>
+                <span class="price">{{ item.totalPrice | price }}</span>
+              </div>
+            }
+          </div>
+          <div class="summary-total">
+            <span>{{ 'TOTAL' | translate }}</span>
+            <strong>{{ cart!.totalPrice | price }}</strong>
+          </div>
           @if (showCurrencyNote) {
             <p class="currency-note">
               <app-icon name="cash" />
-              {{ 'CHECKOUT_CURRENCY_NOTE' | translate:{ currency: displayCurrencyCode } }}
+              {{ 'CHECKOUT_CHARGE_IN_AMD_NOTE' | translate:{ amdTotal: amdChargeTotal } }}
             </p>
           }
-          <div class="step-actions">
-            <button type="button" class="secondary-btn" (click)="backTo('address')">← {{ 'BACK' | translate }}</button>
-            <button type="button" class="primary-btn" (click)="goToReview()">{{ 'NEXT' | translate }} →</button>
-          </div>
-        </div>
+        }
+      </section>
+
+      @if (placeOrderError) {
+        <p class="field-error place-order-error">{{ placeOrderError | translate }}</p>
       }
 
-      @case ('review') {
-        <div class="step-panel review-panel">
-          <h2>{{ 'ORDER_SUMMARY' | translate }}</h2>
-
-          @if (cartLoading) {
-            <div class="inline-loading">
-              <div class="spinner"></div>
-              <p>{{ 'LOADING' | translate }}</p>
-            </div>
-          } @else if (cartError) {
-            <div class="inline-error">
-              <p>{{ cartError | translate }}</p>
-              <button (click)="loadCart()">{{ 'RETRY' | translate }}</button>
-            </div>
-          } @else if (isCartEmpty) {
-            <div class="inline-error">
-              <p>{{ 'CART_EMPTY_CHECKOUT' | translate }}</p>
-              <button (click)="router.navigate(['/products'])">{{ 'CONTINUE_SHOPPING' | translate }}</button>
-            </div>
-          } @else {
-            <div class="summary-items">
-              @for (item of cart!.items; track item.productId) {
-                <div class="summary-item">
-                  <span class="name">{{ item.productName }} × {{ item.quantity }}</span>
-                  <span class="price">{{ item.totalPrice | price }}</span>
-                </div>
-              }
-            </div>
-            <div class="summary-total">
-              <span>{{ 'TOTAL' | translate }}</span>
-              <strong>{{ cart!.totalPrice | price }}</strong>
-            </div>
-            @if (showCurrencyNote) {
-              <p class="currency-note">
-                <app-icon name="cash" />
-                {{ 'CHECKOUT_CHARGE_IN_AMD_NOTE' | translate:{ amdTotal: amdChargeTotal } }}
-              </p>
-            }
-          }
-
-          <div class="summary-section">
-            <h3>{{ 'SHIPPING_TO' | translate }}</h3>
-            <p>{{ address.fullName }} · {{ address.phone }}</p>
-            <p>{{ address.addressLine }}, {{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
-          </div>
-
-          <div class="summary-section">
-            <h3>{{ 'PAYMENT_METHOD' | translate }}</h3>
-            <p>{{ paymentMethodLabelKey | translate }}</p>
-            @if (paymentMethod === 'INSTALLMENT' && pendingInstallmentPlan) {
-              <p>
-                {{ pendingInstallmentPlan.bank }} ·
-                {{ installmentMonthlyFormatted }} ×
-                {{ 'INSTALLMENT_SUMMARY_DURATION_MONTHS' | translate:{ months: pendingInstallmentPlan.durationMonths } }}
-              </p>
-            }
-          </div>
-
-          @if (placeOrderError) {
-            <p class="field-error">{{ placeOrderError | translate }}</p>
-          }
-
-          <div class="step-actions">
-            <button type="button" class="secondary-btn" (click)="backTo('payment')">← {{ 'BACK' | translate }}</button>
-            <button
-              type="button"
-              class="primary-btn"
-              [disabled]="cartLoading || isCartEmpty || placingOrder"
-              (click)="placeOrder()"
-            >
-              {{ placingOrder ? ('PLACING_ORDER' | translate) : ('PLACE_ORDER' | translate) }}
-            </button>
-          </div>
-        </div>
+      <label class="terms-row">
+        <input type="checkbox" name="agreedToTerms" [(ngModel)]="agreedToTerms">
+        <span>{{ 'AGREE_TO_TERMS_PREFIX' | translate }} <a>{{ 'TERMS_LINK_TEXT' | translate }}</a></span>
+      </label>
+      @if (formTouched && !agreedToTerms) {
+        <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
       }
-    }
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="primary-btn buy-btn"
+          [disabled]="cartLoading || isCartEmpty || placingOrder"
+        >
+          {{ placingOrder ? ('PLACING_ORDER' | translate) : ('PLACE_ORDER' | translate) }}
+        </button>
+      </div>
+    </form>
   </div>
+
+  <app-installment-modal
+    #installmentModal
+    [price]="cart?.totalPrice ?? 0"
+    [skipCartMutation]="true"
+    (planConfirmed)="onInstallmentPlanConfirmed($event)"
+  />
 
   <app-toast />
 </div>

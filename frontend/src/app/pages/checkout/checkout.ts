@@ -7,6 +7,7 @@ import { CartService, CartResponse } from '../../services/cart';
 import { OrderService, AddressPayload, CheckoutRequest } from '../../services/order';
 import { CheckoutService, CheckoutAddress, PaymentMethod } from '../../services/checkout';
 import { InstallmentCheckoutService, PendingInstallmentPlan } from '../../services/installment-checkout';
+import { InstallmentModal } from '../../components/installment-modal/installment-modal';
 import { Auth } from '../../services/auth';
 import { LanguageService } from '../../services/language';
 import { currencyForLanguage, formatAmd } from '../../config/currency';
@@ -15,8 +16,6 @@ import { AppHeader } from '../../components/app-header/app-header';
 import { Icon } from '../../components/icon/icon';
 import { PricePipe } from '../../pipes/price';
 
-type Step = 'address' | 'payment' | 'review';
-
 interface SelectOption {
   value: string;
   labelKey: string;
@@ -24,17 +23,20 @@ interface SelectOption {
 
 @Component({
   selector: 'app-checkout',
-  imports: [CommonModule, FormsModule, TranslatePipe, Toast, AppHeader, Icon, PricePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, Toast, AppHeader, Icon, PricePipe, InstallmentModal],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss',
 })
 export class Checkout implements OnInit {
-  readonly stepOrder: Step[] = ['address', 'payment', 'review'];
-  step: Step = 'address';
   userId: number = 1;
 
-  address: CheckoutAddress = { fullName: '', phone: '', addressLine: '', city: '', postalCode: '', country: 'Armenia' };
-  addressTouched = false;
+  address: CheckoutAddress = { fullName: '', phone: '', addressLine: '', city: '', state: '', postalCode: '', country: 'Armenia' };
+  contactEmail = '';
+  readonly phoneCountryCodes: string[] = ['+374'];
+  phoneCountryCode = '+374';
+  notes = '';
+  agreedToTerms = false;
+  formTouched = false;
 
   readonly cities: SelectOption[] = [
     { value: 'Yerevan', labelKey: 'CITY_YEREVAN' },
@@ -59,7 +61,6 @@ export class Checkout implements OnInit {
   ];
 
   paymentMethod: PaymentMethod | null = null;
-  paymentTouched = false;
   pendingInstallmentPlan: PendingInstallmentPlan | null = null;
   installmentUnavailable = false;
 
@@ -115,6 +116,8 @@ export class Checkout implements OnInit {
       this.paymentMethod = 'INSTALLMENT';
     }
 
+    this.contactEmail = this.authService.getUser()?.email ?? '';
+
     this.loadCart();
   }
 
@@ -135,32 +138,28 @@ export class Checkout implements OnInit {
     });
   }
 
-  stepState(key: Step): 'complete' | 'active' | 'upcoming' {
-    const currentIndex = this.stepOrder.indexOf(this.step);
-    const keyIndex = this.stepOrder.indexOf(key);
-    if (keyIndex < currentIndex) return 'complete';
-    if (keyIndex === currentIndex) return 'active';
-    return 'upcoming';
-  }
-
   get isAddressValid(): boolean {
     const a = this.address;
     return !!(a.fullName.trim() && a.phone.trim() && a.addressLine.trim() && a.city.trim() && a.postalCode.trim() && a.country.trim());
+  }
+
+  get isEmailValid(): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.contactEmail.trim());
+  }
+
+  get isPaymentValid(): boolean {
+    return !!this.paymentMethod && !(this.paymentMethod === 'INSTALLMENT' && !this.pendingInstallmentPlan);
   }
 
   get isCartEmpty(): boolean {
     return !this.cart || this.cart.items.length === 0;
   }
 
-  goToPayment(): void {
-    this.addressTouched = true;
-    if (!this.isAddressValid) return;
-    this.checkoutService.saveAddress(this.userId, this.address);
-    this.step = 'payment';
+  get isFormValid(): boolean {
+    return this.isAddressValid && this.isEmailValid && this.isPaymentValid && this.agreedToTerms && !this.isCartEmpty;
   }
 
   selectPayment(method: PaymentMethod): void {
-
     if (method === 'INSTALLMENT' && !this.pendingInstallmentPlan) {
       this.installmentUnavailable = true;
       return;
@@ -169,39 +168,35 @@ export class Checkout implements OnInit {
     this.paymentMethod = method;
   }
 
-  private readonly paymentMethodLabelKeys: Record<PaymentMethod, string> = {
-    IDRAM: 'PAYMENT_IDRAM',
-    TELCELL: 'PAYMENT_TELCELL',
-    ROKET_LINE: 'PAYMENT_ROKET_LINE',
-    INSTALLMENT: 'PAYMENT_INSTALLMENT',
-    CARD: 'PAYMENT_CARD'
-  };
-
-  get paymentMethodLabelKey(): string | null {
-    return this.paymentMethod ? this.paymentMethodLabelKeys[this.paymentMethod] : null;
-  }
-
-  goToReview(): void {
-    this.paymentTouched = true;
-    if (!this.paymentMethod) return;
-    this.checkoutService.savePaymentMethod(this.userId, this.paymentMethod);
-    this.step = 'review';
-  }
-
-  backTo(step: Step): void {
-    this.step = step;
+  onInstallmentPlanConfirmed(plan: PendingInstallmentPlan): void {
+    this.pendingInstallmentPlan = plan;
+    this.paymentMethod = 'INSTALLMENT';
+    this.installmentUnavailable = false;
   }
 
   private buildAddressPayload(): AddressPayload {
     const a = this.address;
     return {
       fullName: a.fullName.trim(),
-      phone: a.phone.trim(),
+      phone: `${this.phoneCountryCode}${a.phone.trim()}`,
       line1: a.addressLine.trim(),
       city: a.city.trim(),
+      state: a.state?.trim() || undefined,
       postalCode: a.postalCode.trim(),
       country: a.country.trim()
     };
+  }
+
+  onSubmit(): void {
+    this.formTouched = true;
+    if (this.paymentMethod === 'INSTALLMENT' && !this.pendingInstallmentPlan) {
+      this.installmentUnavailable = true;
+    }
+    if (!this.isFormValid) return;
+
+    this.checkoutService.saveAddress(this.userId, this.address);
+    this.checkoutService.savePaymentMethod(this.userId, this.paymentMethod!);
+    this.placeOrder();
   }
 
   placeOrder(): void {
@@ -214,6 +209,7 @@ export class Checkout implements OnInit {
     const request: CheckoutRequest = {
       shippingAddress: addressPayload,
       billingAddress: addressPayload,
+      notes: this.notes.trim() || undefined,
       paymentMethod: this.paymentMethod,
       installmentPlan: this.paymentMethod === 'INSTALLMENT' && this.pendingInstallmentPlan
         ? this.pendingInstallmentPlan

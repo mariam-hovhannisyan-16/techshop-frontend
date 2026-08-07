@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, Input, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -6,7 +6,7 @@ import { Icon } from '../icon/icon';
 import { Auth } from '../../services/auth';
 import { AuthDrawerService } from '../../services/auth-drawer';
 import { CartService } from '../../services/cart';
-import { InstallmentCheckoutService } from '../../services/installment-checkout';
+import { InstallmentCheckoutService, PendingInstallmentPlan } from '../../services/installment-checkout';
 import { ToastService } from '../../services/toast';
 
 interface AmortizationRow {
@@ -36,7 +36,14 @@ const NUMBER_FORMAT = new Intl.NumberFormat('en-US');
 })
 export class InstallmentModal {
   @Input({ required: true }) price!: number;
-  @Input({ required: true }) productId!: number;
+  // Required when the modal adds a product to the cart itself (product-detail usage).
+  // Omitted when skipCartMutation is true (checkout usage, where the cart is already final).
+  @Input() productId?: number;
+  // Checkout is already looking at a finalized cart — proceeding there should just record
+  // the calculated plan and let the caller pick INSTALLMENT as the payment method, instead
+  // of adding another item to the cart and navigating to /checkout (the product-detail flow).
+  @Input() skipCartMutation = false;
+  @Output() planConfirmed = new EventEmitter<PendingInstallmentPlan>();
 
   readonly durationOptions = DURATION_OPTIONS_MONTHS;
   readonly bankOptions = BANK_OPTIONS;
@@ -158,17 +165,26 @@ export class InstallmentModal {
       return;
     }
 
+    const plan: PendingInstallmentPlan = {
+      bank: this.bank,
+      annualRate: this.annualRate,
+      durationMonths: this.durationMonths,
+      downPayment: this.downPaymentAmount,
+      monthlyPayment: this.monthlyPaymentAmount
+    };
+
+    if (this.skipCartMutation) {
+      this.installmentCheckoutService.setPending(plan);
+      this.close();
+      this.planConfirmed.emit(plan);
+      return;
+    }
+
     const userId = this.authService.getUserId() ?? 1;
     this.proceeding = true;
-    this.cartService.addItem(userId, this.productId, 1).subscribe({
+    this.cartService.addItem(userId, this.productId!, 1).subscribe({
       next: () => {
-        this.installmentCheckoutService.setPending({
-          bank: this.bank,
-          annualRate: this.annualRate,
-          durationMonths: this.durationMonths,
-          downPayment: this.downPaymentAmount,
-          monthlyPayment: this.monthlyPaymentAmount
-        });
+        this.installmentCheckoutService.setPending(plan);
         this.proceeding = false;
         this.close();
         this.router.navigate(['/checkout']).then();
