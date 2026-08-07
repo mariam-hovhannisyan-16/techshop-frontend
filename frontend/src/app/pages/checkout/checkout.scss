@@ -125,6 +125,17 @@
       gap: 1rem;
     }
 
+    .postal-code-row {
+      max-width: 10rem;
+
+      label { font-size: 0.75rem; }
+
+      input {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.85rem;
+      }
+    }
+
     .field-error {
       color: var(--danger);
       font-size: 0.8rem;
@@ -237,23 +248,24 @@
   }
 
   .payment-options {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.8rem;
 
     .payment-option {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      padding: 1rem 1.2rem;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.9rem 0.6rem;
       background: var(--bg-page);
       border: 1px solid var(--border-strong);
       border-radius: 10px;
       color: var(--text-primary);
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      text-align: left;
+      text-align: center;
       transition: all 0.2s;
 
       &:hover { border-color: var(--accent); }
@@ -267,10 +279,11 @@
         display: flex;
         flex-direction: column;
         gap: 0.15rem;
+        text-align: left;
       }
 
       .payment-option-sublabel {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 400;
         color: var(--text-secondary);
       }
@@ -454,6 +467,10 @@
 
     .form-grid {
       grid-template-columns: 1fr;
+    }
+
+    .payment-options {
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .phone-row {

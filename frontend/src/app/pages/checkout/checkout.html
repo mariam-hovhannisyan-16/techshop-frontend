@@ -73,35 +73,45 @@
       <section class="checkout-section">
         <h2>{{ 'DELIVERY_DETAILS' | translate }}</h2>
 
-        <div class="form-row">
-          <label>{{ 'FULL_NAME' | translate }}</label>
-          <input type="text" name="fullName" [(ngModel)]="address.fullName">
-          @if (formTouched && !address.fullName.trim()) {
-            <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-          }
-        </div>
-
-        <div class="form-row">
-          <label>{{ 'PHONE' | translate }}</label>
-          <div class="phone-row">
-            <select name="phoneCountryCode" class="phone-code-select" [(ngModel)]="phoneCountryCode">
-              @for (code of phoneCountryCodes; track code) {
-                <option [value]="code">{{ code }}</option>
-              }
-            </select>
-            <input type="tel" name="phone" [(ngModel)]="address.phone">
+        <div class="form-grid">
+          <div class="form-row">
+            <label>{{ 'FIRST_NAME' | translate }}</label>
+            <input type="text" name="firstName" [(ngModel)]="address.firstName">
+            @if (formTouched && !address.firstName.trim()) {
+              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+            }
           </div>
-          @if (formTouched && !address.phone.trim()) {
-            <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-          }
+          <div class="form-row">
+            <label>{{ 'LAST_NAME' | translate }}</label>
+            <input type="text" name="lastName" [(ngModel)]="address.lastName">
+            @if (formTouched && !address.lastName.trim()) {
+              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+            }
+          </div>
         </div>
 
-        <div class="form-row">
-          <label>{{ 'EMAIL' | translate }}</label>
-          <input type="email" name="email" [(ngModel)]="contactEmail">
-          @if (formTouched && !isEmailValid) {
-            <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-          }
+        <div class="form-grid">
+          <div class="form-row">
+            <label>{{ 'CHECKOUT_PHONE_LABEL' | translate }}</label>
+            <div class="phone-row">
+              <select name="phoneCountryCode" class="phone-code-select" [(ngModel)]="phoneCountryCode">
+                @for (code of phoneCountryCodes; track code) {
+                  <option [value]="code">{{ code }}</option>
+                }
+              </select>
+              <input type="tel" name="phone" [(ngModel)]="address.phone">
+            </div>
+            @if (formTouched && !address.phone.trim()) {
+              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+            }
+          </div>
+          <div class="form-row">
+            <label>{{ 'EMAIL' | translate }}</label>
+            <input type="email" name="email" [(ngModel)]="contactEmail">
+            @if (formTouched && !isEmailValid) {
+              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+            }
+          </div>
         </div>
 
         <div class="form-grid">
@@ -125,32 +135,18 @@
 
         <div class="form-row">
           <label>{{ 'ADDRESS_LINE' | translate }}</label>
-          <input type="text" name="addressLine" [(ngModel)]="address.addressLine">
+          <input type="text" name="addressLine" [placeholder]="'ADDRESS_LINE_PLACEHOLDER' | translate" [(ngModel)]="address.addressLine">
           @if (formTouched && !address.addressLine.trim()) {
             <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
           }
         </div>
 
-        <div class="form-grid">
-          <div class="form-row">
-            <label>{{ 'POSTAL_CODE' | translate }}</label>
-            <input type="text" name="postalCode" [(ngModel)]="address.postalCode">
-            @if (formTouched && !address.postalCode.trim()) {
-              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-            }
-          </div>
-          <div class="form-row">
-            <label>{{ 'COUNTRY' | translate }}</label>
-            <select name="country" [(ngModel)]="address.country">
-              <option value="" disabled>{{ 'SELECT_COUNTRY_PLACEHOLDER' | translate }}</option>
-              @for (country of countries; track country.value) {
-                <option [value]="country.value">{{ country.labelKey | translate }}</option>
-              }
-            </select>
-            @if (formTouched && !address.country.trim()) {
-              <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
-            }
-          </div>
+        <div class="form-row postal-code-row">
+          <label>{{ 'POSTAL_CODE' | translate }}</label>
+          <input type="text" name="postalCode" [(ngModel)]="address.postalCode">
+          @if (formTouched && !address.postalCode.trim()) {
+            <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
+          }
         </div>
 
         <div class="form-row">

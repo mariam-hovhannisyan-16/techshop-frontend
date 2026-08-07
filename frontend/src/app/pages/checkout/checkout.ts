@@ -30,7 +30,7 @@ interface SelectOption {
 export class Checkout implements OnInit {
   userId: number = 1;
 
-  address: CheckoutAddress = { fullName: '', phone: '', addressLine: '', city: '', state: '', postalCode: '', country: 'Armenia' };
+  address: CheckoutAddress = { firstName: '', lastName: '', phone: '', addressLine: '', city: '', state: '', postalCode: '', country: 'Armenia' };
   contactEmail = '';
   readonly phoneCountryCodes: string[] = ['+374'];
   phoneCountryCode = '+374';
@@ -54,10 +54,6 @@ export class Checkout implements OnInit {
     { value: 'Yeghegnadzor', labelKey: 'CITY_YEGHEGNADZOR' },
     { value: 'Dilijan', labelKey: 'CITY_DILIJAN' },
     { value: 'Goris', labelKey: 'CITY_GORIS' }
-  ];
-
-  readonly countries: SelectOption[] = [
-    { value: 'Armenia', labelKey: 'COUNTRY_ARMENIA' }
   ];
 
   paymentMethod: PaymentMethod | null = null;
@@ -140,7 +136,7 @@ export class Checkout implements OnInit {
 
   get isAddressValid(): boolean {
     const a = this.address;
-    return !!(a.fullName.trim() && a.phone.trim() && a.addressLine.trim() && a.city.trim() && a.postalCode.trim() && a.country.trim());
+    return !!(a.firstName.trim() && a.lastName.trim() && a.phone.trim() && a.addressLine.trim() && a.city.trim() && a.postalCode.trim());
   }
 
   get isEmailValid(): boolean {
@@ -177,7 +173,7 @@ export class Checkout implements OnInit {
   private buildAddressPayload(): AddressPayload {
     const a = this.address;
     return {
-      fullName: a.fullName.trim(),
+      fullName: `${a.firstName.trim()} ${a.lastName.trim()}`.trim(),
       phone: `${this.phoneCountryCode}${a.phone.trim()}`,
       line1: a.addressLine.trim(),
       city: a.city.trim(),

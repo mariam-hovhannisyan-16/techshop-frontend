@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 
 export interface CheckoutAddress {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   addressLine: string;
   city: string;

@@ -143,14 +143,14 @@ describe('Checkout — single-page end-to-end submission', () => {
       el.dispatchEvent(new Event('change'));
     };
 
-    setInput('fullName', 'Անի Հակոբյան');
+    setInput('firstName', 'Անի');
+    setInput('lastName', 'Հակոբյան');
     setInput('phone', '77123456');
     setInput('email', 'ani@example.com');
     setSelect('city', 'Yerevan');
     setInput('cityDistrict', 'Kentron');
     setInput('addressLine', 'Mashtots 1');
     setInput('postalCode', '0001');
-    setSelect('country', 'Armenia');
     setInput('notes', 'Please call before delivery');
     fixture.detectChanges();
 
@@ -174,6 +174,7 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(checkoutReq.request.method).toBe('POST');
     expect(checkoutReq.request.body.paymentMethod).toBe('IDRAM');
     expect(checkoutReq.request.body.shippingAddress.fullName).toBe('Անի Հակոբյան');
+    expect(checkoutReq.request.body.shippingAddress.country).toBe('Armenia');
     expect(checkoutReq.request.body.shippingAddress.phone).toBe('+37477123456');
     expect(checkoutReq.request.body.shippingAddress.city).toBe('Yerevan');
     expect(checkoutReq.request.body.shippingAddress.state).toBe('Kentron');
