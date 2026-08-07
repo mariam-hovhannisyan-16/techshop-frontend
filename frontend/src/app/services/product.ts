@@ -74,7 +74,7 @@ const ADMIN_DELETED_IDS_KEY = 'admin_deleted_product_ids';
 const MOCK_PRODUCTS: ProductResponse[] = [
   {
     id: 1001, name: 'iPhone 15 Pro', description: 'Ֆլագման սմարթֆոն 128GB հիշողությամբ', price: 650000, originalPrice: 730000, quantity: 12,
-    imageUrl: 'https://images.unsplash.com/photo-1736173155811-e8142fd553ee?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=900&q=82&fit=crop&auto=format',
     rating: 4.9, reviewCount: 1847, badge: 'bestseller', spec: '128GB · A17 Pro chip',
     storageOptions: [{ label: '128GB', priceDelta: 0 }, { label: '256GB', priceDelta: 50000 }, { label: '512GB', priceDelta: 100000 }]
   },
@@ -142,12 +142,12 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1014, name: 'Sony PlayStation 5', description: 'Խաղային կոնսուլ 825GB կրիչով', price: 285000, quantity: 8,
-    imageUrl: 'https://images.unsplash.com/photo-1622297845775-5ff3fef71d13?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=900&q=82&fit=crop&auto=format',
     rating: 4.9, reviewCount: 1420, badge: 'bestseller', spec: '825GB SSD · 4K Gaming'
   },
   {
     id: 1015, name: 'Microsoft Xbox Series X', description: 'Խաղային կոնսուլ 1TB կրիչով', price: 290000, quantity: 6,
-    imageUrl: 'https://images.unsplash.com/photo-1683823363266-efa8cedec4d4?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1621259182978-fbf93132d53d?w=900&q=82&fit=crop&auto=format',
     rating: 4.8, reviewCount: 980, badge: 'new', spec: '1TB SSD · 4K · 120fps'
   },
   {
@@ -179,7 +179,7 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1021, name: 'OnePlus 12', description: 'Արագագործ հեռախոս 256GB հիշողությամբ', price: 495000, quantity: 7,
-    imageUrl: 'https://images.unsplash.com/photo-1773293915418-fb03a80120a7?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=900&q=82&fit=crop&auto=format',
     rating: 4.6, reviewCount: 275, spec: '256GB · Snapdragon 8 Gen 3',
     storageOptions: [{ label: '128GB', priceDelta: -50000 }, { label: '256GB', priceDelta: 0 }, { label: '512GB', priceDelta: 50000 }]
   },
@@ -196,7 +196,7 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1024, name: 'Lenovo ThinkPad X1 Carbon', description: 'Բիզնես laptop՝ թեթև կորպուսով', price: 840000, quantity: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1770932327451-63bb8530f607?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900&q=82&fit=crop&auto=format',
     rating: 4.6, reviewCount: 260, spec: 'Intel Core i7 · 32GB RAM'
   },
   {
@@ -216,7 +216,7 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1028, name: 'Sony Bravia 65" 4K', description: 'Հեռուստացույց Google TV հարթակով', price: 700000, quantity: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1593067607070-95193763e3ab?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?w=900&q=82&fit=crop&auto=format',
     rating: 4.7, reviewCount: 265, spec: '4K HDR · 65" · Google TV'
   },
   {
@@ -321,7 +321,7 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1048, name: 'Apple iPhone 14', description: 'Հզոր սմարթֆոն 128GB հիշողությամբ', price: 480000, quantity: 11,
-    imageUrl: 'https://images.unsplash.com/photo-1690220928060-a32811e39f54?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1574755393849-623942496936?w=900&q=82&fit=crop&auto=format',
     rating: 4.7, reviewCount: 980, spec: '128GB · A15 Bionic chip'
   },
   {
@@ -391,7 +391,7 @@ const MOCK_PRODUCTS: ProductResponse[] = [
   },
   {
     id: 1062, name: 'MacBook Air M1', description: 'Թեթև laptop՝ 13" էկրանով, մատչելի Apple chip-ով', price: 730000, quantity: 8,
-    imageUrl: 'https://images.unsplash.com/photo-1614630536369-2516d7c0a58c?w=900&q=82&fit=crop&auto=format',
+    imageUrl: 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=900&q=82&fit=crop&auto=format',
     rating: 4.7, reviewCount: 780, spec: '8-core CPU · 8GB unified memory'
   },
   {
