@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { Auth } from './auth';
 import { environment } from '../../environments/environment';
 
@@ -53,6 +53,8 @@ interface BackendProductPayload extends Omit<ProductResponse, 'quantity'> {
 
 interface ProductPage {
   content: BackendProductPayload[];
+  pageNumber?: number;
+  totalPages?: number;
 }
 
 export interface PricePredictionResponse {
@@ -533,12 +535,14 @@ export class Product {
     };
   }
 
-  // The live backend paginates list responses as { content: [...], pageNumber, pageSize, ... }
-  // instead of returning a bare array; accept either shape.
-  private extractProducts(data: unknown): BackendProductPayload[] | null {
-    if (Array.isArray(data)) return data as BackendProductPayload[];
+  // The live backend paginates list responses as { content: [...], pageNumber, pageSize,
+  // totalPages, ... } instead of returning a bare array; accept either shape. A bare array
+  // is treated as already being the complete list (totalPages: 1).
+  private extractPage(data: unknown): { content: BackendProductPayload[]; totalPages: number } | null {
+    if (Array.isArray(data)) return { content: data as BackendProductPayload[], totalPages: 1 };
     if (data && typeof data === 'object' && Array.isArray((data as ProductPage).content)) {
-      return (data as ProductPage).content;
+      const page = data as ProductPage;
+      return { content: page.content, totalPages: page.totalPages ?? 1 };
     }
     return null;
   }
@@ -550,15 +554,28 @@ export class Product {
     return response;
   }
 
+  // The backend paginates with a default page size (20), so a single unparameterized
+  // request only returns the first page. Fetch the first page, then use its totalPages
+  // to pull the remaining pages in parallel and concatenate them into the full catalog.
   getAllProducts(): Observable<ApiResponse<ProductResponse[]>> {
     return this.http.get<ApiResponse<unknown>>(this.apiUrl, { headers: this.getHeaders() }).pipe(
-      map(response => {
-        const products = this.extractProducts(response.data);
-        if (!products) {
+      switchMap(response => {
+        const firstPage = this.extractPage(response.data);
+        if (!firstPage) {
           throw new HttpErrorResponse({ url: this.apiUrl, status: 0 });
         }
-        return { ...response, data: products.map(p => this.normalizeProduct(p)) };
+        if (firstPage.totalPages <= 1) {
+          return of(firstPage.content);
+        }
+        const remainingPages = Array.from({ length: firstPage.totalPages - 1 }, (_, i) =>
+          this.http.get<ApiResponse<unknown>>(this.apiUrl, {
+            headers: this.getHeaders(),
+            params: { page: String(i + 1) }
+          }).pipe(map(pageResponse => this.extractPage(pageResponse.data)?.content ?? []))
+        );
+        return forkJoin(remainingPages).pipe(map(pages => [firstPage.content, ...pages].flat()));
       }),
+      map(products => ({ success: true, message: 'ok', data: products.map(p => this.normalizeProduct(p)) })),
       map(response => ({ ...response, data: this.applyLocalAdditionsAndDeletions(response.data) })),
       catchError(err => {
         if (this.isUnreachable(err)) {
