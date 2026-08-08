@@ -57,18 +57,6 @@ interface ProductPage {
   totalPages?: number;
 }
 
-export interface PricePredictionResponse {
-  prediction: string | null;
-  reason: string | null;
-  generatedAt: string | null;
-}
-
-export interface SurpriseBoxResponse {
-  items: ProductResponse[];
-  totalPrice: number;
-  remainingBudget: number;
-}
-
 const ADMIN_OVERRIDES_KEY = 'admin_product_overrides';
 const ADMIN_LOCAL_PRODUCTS_KEY = 'admin_local_products';
 const ADMIN_DELETED_IDS_KEY = 'admin_deleted_product_ids';
@@ -647,50 +635,6 @@ export class Product {
         if (mockMatch) {
           console.warn(`[Product] Backend at ${this.apiUrl} is unreachable or returned an unexpected response shape — using local mock data for development.`);
           return of({ success: true, message: 'mock', data: this.applyOverrides([mockMatch])[0] });
-        }
-        return throwError(() => err);
-      })
-    );
-  }
-
-  getPricePrediction(productId: number): Observable<PricePredictionResponse | null> {
-    const url = `${this.apiUrl}/${productId}/price-prediction`;
-    return this.http.get<ApiResponse<PricePredictionResponse>>(url, { headers: this.getHeaders() }).pipe(
-      map(response => response.data),
-      catchError(() => of(null))
-    );
-  }
-
-  private buildMockSurpriseBox(budget: number): SurpriseBoxResponse {
-    const pool = this.applyOverrides([...MOCK_PRODUCTS]).filter(p => p.price <= budget);
-    const shuffled = pool.sort(() => Math.random() - 0.5);
-    const items: ProductResponse[] = [];
-    let remaining = budget;
-    for (const product of shuffled) {
-      if (product.price <= remaining) {
-        items.push(product);
-        remaining -= product.price;
-      }
-    }
-    const totalPrice = items.reduce((sum, p) => sum + p.price, 0);
-    return { items, totalPrice, remainingBudget: budget - totalPrice };
-  }
-
-  getSurpriseBox(budget: number): Observable<SurpriseBoxResponse> {
-    const url = `${this.apiUrl}/surprise-box`;
-    return this.http.get<ApiResponse<{ items: BackendProductPayload[]; totalPrice: number; remainingBudget: number }>>(url, {
-      headers: this.getHeaders(),
-      params: { budget: String(budget) }
-    }).pipe(
-      map(response => ({
-        items: response.data.items.map(p => this.normalizeProduct(p)),
-        totalPrice: response.data.totalPrice,
-        remainingBudget: response.data.remainingBudget
-      })),
-      catchError(err => {
-        if (this.isUnreachable(err)) {
-          console.warn(`[Product] Backend at ${url} is unreachable — generating a local surprise box for development.`);
-          return of(this.buildMockSurpriseBox(budget));
         }
         return throwError(() => err);
       })

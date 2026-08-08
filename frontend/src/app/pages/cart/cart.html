@@ -14,35 +14,87 @@
 
   <div class="cart-content">
     @if (cart && cart.items.length > 0) {
-      <div class="cart-items">
-        @for (item of cart.items; track item.productId) {
-          <div class="cart-item">
-            @if (imageSrc(item); as src) {
-              <img class="item-image" [src]="src" [alt]="item.productName" (error)="onImageError(item.productId)">
-            } @else {
-              <div class="item-icon"><app-icon name="box" /></div>
+      <div class="cart-table-wrapper">
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th class="col-product">{{ 'PRODUCT' | translate }}</th>
+              <th class="col-price">{{ 'PRICE' | translate }}</th>
+              <th class="col-qty">{{ 'QUANTITY' | translate }}</th>
+              <th class="col-line-total">{{ 'LINE_TOTAL' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of cart.items; track item.productId) {
+              <tr class="cart-row">
+                <td class="col-product">
+                  <div class="product-cell">
+                    <button
+                      type="button"
+                      class="remove-btn"
+                      [disabled]="isUpdating(item.productId)"
+                      [attr.aria-label]="'REMOVE_ITEM' | translate"
+                      (click)="removeItem(item.productId)"
+                    >
+                      <app-icon name="trash" />
+                    </button>
+                    @if (imageSrc(item); as src) {
+                      <img class="item-image" [src]="src" [alt]="item.productName" (error)="onImageError(item.productId)">
+                    } @else {
+                      <div class="item-icon"><app-icon name="box" /></div>
+                    }
+                    <div class="item-info">
+                      <h3>{{ item.productName }}</h3>
+                      @if (specParts(item); as specs) {
+                        @if (specs.length > 0) {
+                          <div class="item-specs">
+                            @for (part of specs; track part) {
+                              <span class="spec-chip">{{ part }}</span>
+                            }
+                          </div>
+                        }
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td class="col-price" [attr.data-label]="'PRICE' | translate">{{ item.productPrice | price }}</td>
+                <td class="col-qty" [attr.data-label]="'QUANTITY' | translate">
+                  <div class="qty-selector">
+                    <button type="button" [disabled]="isUpdating(item.productId) || item.quantity <= 1" (click)="decrementQuantity(item)">−</button>
+                    <span>{{ item.quantity }}</span>
+                    <button type="button" [disabled]="isUpdating(item.productId)" (click)="incrementQuantity(item)">+</button>
+                  </div>
+                </td>
+                <td class="col-line-total" [attr.data-label]="'LINE_TOTAL' | translate">{{ item.totalPrice | price }}</td>
+              </tr>
             }
-            <div class="item-info">
-              <h3>{{ item.productName }}</h3>
-              <p>{{ item.productPrice | price }} × {{ item.quantity }}</p>
-            </div>
-            <div class="item-total">
-              <span>{{ item.totalPrice | price }}</span>
-            </div>
-            <button class="remove-btn" (click)="removeItem(item.productId)">✕</button>
-          </div>
-        }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cart-actions-row">
+        <button type="button" class="refresh-btn" (click)="loadCart()">
+          <app-icon name="refresh" /> {{ 'UPDATE_CART' | translate }}
+        </button>
       </div>
 
       <div class="cart-summary">
         <div class="summary-card">
-          <h3>{{ 'ORDER_SUMMARY' | translate }}</h3>
-          <div class="summary-row">
-            <span>{{ 'TOTAL' | translate }}</span>
-            <strong>{{ cart.totalPrice | price }}</strong>
-          </div>
+          <h3>{{ 'CART_TOTAL_TITLE' | translate }}</h3>
+          <table class="summary-table">
+            <tbody>
+              <tr>
+                <td>{{ 'CART_SUBTOTAL' | translate }}</td>
+                <td>{{ cart.totalPrice | price }}</td>
+              </tr>
+              <tr class="total-row">
+                <td>{{ 'CART_TOTAL' | translate }}</td>
+                <td>{{ cart.totalPrice | price }}</td>
+              </tr>
+            </tbody>
+          </table>
           <button class="order-btn" (click)="goToCheckout()">
-            <app-icon name="cart" /> {{ 'PROCEED_TO_CHECKOUT' | translate }}
+            {{ 'PROCEED_TO_CHECKOUT' | translate }}
           </button>
         </div>
       </div>

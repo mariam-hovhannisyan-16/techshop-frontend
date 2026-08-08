@@ -22,6 +22,7 @@ export class Cart implements OnInit {
   userId: number = 1;
 
   private failedImages = new Set<number>();
+  private updatingProductIds = new Set<number>();
 
   constructor(
     private cartService: CartService,
@@ -61,13 +62,53 @@ export class Cart implements OnInit {
     this.failedImages.add(productId);
   }
 
+  specParts(item: CartItemResponse): string[] {
+    return item.productSpec ? item.productSpec.split('·').map(part => part.trim()).filter(Boolean) : [];
+  }
+
+  isUpdating(productId: number): boolean {
+    return this.updatingProductIds.has(productId);
+  }
+
+  incrementQuantity(item: CartItemResponse): void {
+    this.changeQuantity(item, item.quantity + 1);
+  }
+
+  decrementQuantity(item: CartItemResponse): void {
+    this.changeQuantity(item, item.quantity - 1);
+  }
+
+  private changeQuantity(item: CartItemResponse, newQuantity: number): void {
+    if (this.isUpdating(item.productId) || newQuantity < 1) return;
+    this.updatingProductIds.add(item.productId);
+    this.cartService.updateItemQuantity(this.userId, item.productId, item.quantity, newQuantity).subscribe({
+      next: (response) => {
+        this.cart = response.data;
+        this.updatingProductIds.delete(item.productId);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.updatingProductIds.delete(item.productId);
+        this.toastService.show(this.translateService.instant('TOAST_FAILED_UPDATE_QUANTITY'), 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   removeItem(productId: number): void {
+    if (this.isUpdating(productId)) return;
+    this.updatingProductIds.add(productId);
     this.cartService.removeItem(this.userId, productId).subscribe({
       next: (response) => {
         this.cart = response.data;
+        this.updatingProductIds.delete(productId);
         this.cdr.detectChanges();
       },
-      error: () => this.toastService.show(this.translateService.instant('TOAST_FAILED_REMOVE_ITEM'), 'error')
+      error: () => {
+        this.updatingProductIds.delete(productId);
+        this.toastService.show(this.translateService.instant('TOAST_FAILED_REMOVE_ITEM'), 'error');
+        this.cdr.detectChanges();
+      }
     });
   }
 

@@ -18,7 +18,6 @@ export const routes: Routes = [
   { path: 'wishlist', loadComponent: () => import('./pages/wishlist/wishlist').then((m) => m.Wishlist), canActivate: [authGuard, customerGuard] },
   { path: 'profile', loadComponent: () => import('./pages/profile/profile').then((m) => m.Profile), canActivate: [authGuard] },
   { path: 'deals', loadComponent: () => import('./pages/deals/deals').then((m) => m.Deals) },
-  { path: 'surprise-box', loadComponent: () => import('./pages/surprise-box/surprise-box').then((m) => m.SurpriseBox) },
   { path: 'admin/products', loadComponent: () => import('./pages/admin-products/admin-products').then((m) => m.AdminProducts), canActivate: [adminGuard] },
   { path: 'admin/users', loadComponent: () => import('./pages/admin-users/admin-users').then((m) => m.AdminUsers), canActivate: [adminGuard] },
   { path: 'admin/chat', loadComponent: () => import('./pages/admin-chat/admin-chat').then((m) => m.AdminChat), canActivate: [adminGuard] },

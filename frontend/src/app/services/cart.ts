@@ -13,6 +13,7 @@ export interface CartItemResponse {
   quantity: number;
   totalPrice: number;
   productImage?: string;
+  productSpec?: string;
 }
 
 export interface CartResponse {
@@ -118,7 +119,8 @@ export class CartService {
         const catalogById = new Map(catalogResponse.data.map(p => [p.id, p]));
         const items = response.data.items.map(item => ({
           ...item,
-          productImage: catalogById.get(item.productId)?.imageUrl
+          productImage: catalogById.get(item.productId)?.imageUrl,
+          productSpec: catalogById.get(item.productId)?.spec
         }));
         return { ...response, data: { ...response.data, items } };
       })
@@ -192,5 +194,23 @@ export class CartService {
         return throwError(() => err);
       })
     );
+  }
+
+  // The backend has no dedicated "set quantity" endpoint — addItem is additive (increments
+  // the existing line) and removeItem drops the line entirely. Compose those two primitives
+  // to reach an arbitrary target quantity instead of adding new backend surface.
+  updateItemQuantity(userId: number, productId: number, currentQuantity: number, newQuantity: number): Observable<ApiResponse<CartResponse>> {
+    if (newQuantity <= 0) {
+      return this.removeItem(userId, productId);
+    }
+    if (newQuantity > currentQuantity) {
+      return this.addItem(userId, productId, newQuantity - currentQuantity);
+    }
+    if (newQuantity < currentQuantity) {
+      return this.removeItem(userId, productId).pipe(
+        switchMap(() => this.addItem(userId, productId, newQuantity))
+      );
+    }
+    return this.getCart(userId);
   }
 }

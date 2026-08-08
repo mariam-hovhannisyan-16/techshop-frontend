@@ -129,12 +129,6 @@ export class Profile implements OnInit {
       action: () => this.router.navigate(['/wishlist'])
     },
     {
-      icon: 'shield-check',
-      titleKey: 'MY_PRODUCTS',
-      descriptionKey: 'QUICK_ACTION_MY_PRODUCTS_DESC',
-      action: () => this.router.navigate(['/my-products'])
-    },
-    {
       icon: 'pin',
       titleKey: 'ADDRESS_BOOK',
       descriptionKey: 'QUICK_ACTION_ADDRESSES_DESC',
