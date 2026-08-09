@@ -27,13 +27,14 @@ describe('Cart', () => {
   });
 });
 
-describe('Cart — table layout quantity and removal', () => {
+describe('Cart — card layout quantity, removal and wishlist', () => {
   let fixture: ComponentFixture<Cart>;
   let httpMock: HttpTestingController;
 
   const cartUrl = `${environment.cartApiUrl}/api/cart/1`;
   const itemsUrl = `${environment.cartApiUrl}/api/cart/1/items`;
   const productsUrl = `${environment.productApiUrl}/api/products`;
+  const wishlistItemUrl = `${environment.wishlistApiUrl}/api/v1/wishlist/1001`;
 
   const fakeJwt = (payload: object) => `h.${btoa(JSON.stringify(payload))}.s`;
 
@@ -41,7 +42,7 @@ describe('Cart — table layout quantity and removal', () => {
     success: true,
     message: 'ok',
     data: [
-      { id: 1001, name: 'iPhone 15 Pro', description: '', price: 650000, stock: 5, imageUrl: '/img.jpg', spec: '128GB · A17 Pro chip' }
+      { id: 1001, name: 'iPhone 15 Pro', description: '', price: 650000, stock: 5, imageUrl: '/img.jpg', rating: 4.9, reviewCount: 128 }
     ]
   };
 
@@ -87,20 +88,40 @@ describe('Cart — table layout quantity and removal', () => {
     httpMock.expectOne(productsUrl).flush(productsResponse);
 
     fixture.detectChanges();
-    drainLeftover(); // app-header's wishlist/notifications badges
+    drainLeftover(); // app-header's wishlist/notifications badges, WishlistService's own refresh()
     fixture.detectChanges();
   });
 
   afterEach(() => httpMock.verify());
 
-  it('renders the product spec chips and starting quantity', () => {
-    const chips = fixture.nativeElement.querySelectorAll('.spec-chip');
-    expect(Array.from(chips).map((el: any) => el.textContent.trim())).toEqual(['128GB', 'A17 Pro chip']);
-    expect(fixture.nativeElement.querySelector('.qty-selector span').textContent.trim()).toBe('2');
+  it('renders the rating, price and starting quantity', () => {
+    expect(fixture.nativeElement.querySelector('.item-name').textContent.trim()).toBe('iPhone 15 Pro');
+    expect(fixture.nativeElement.querySelector('app-star-rating')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.qty-stepper input').value).toBe('2');
+    expect(fixture.nativeElement.querySelector('.stock-status').textContent).toContain('CART_ITEM_IN_STOCK');
+  });
+
+  it('renders the free-shipping banner below the item list with the shared dynamic threshold', () => {
+    const itemsList = fixture.nativeElement.querySelector('.cart-items-list');
+    const banner = fixture.nativeElement.querySelector('.shipping-banner');
+    expect(banner).not.toBeNull();
+    // "below the cart items list" — assert DOM order, not just presence.
+    expect(itemsList.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    expect(banner.querySelector('.shipping-icon-badge app-icon')).not.toBeNull();
+    expect(banner.querySelector('.shipping-truck-icon')).not.toBeNull();
+    expect(banner.querySelector('strong').textContent.trim()).toBe('FREE_DELIVERY_TITLE');
+
+    // Component-level: the banner subtitle and the summary sidebar's delivery tooltip are
+    // both interpolated from this one property, itself derived from the shared
+    // FREE_SHIPPING_THRESHOLD_AMD constant — proving there's no second, hardcoded number.
+    expect(fixture.componentInstance.freeShippingThresholdFormatted).toBe('֏30,000');
+    const tooltip = fixture.nativeElement.querySelector('.delivery-label app-icon').getAttribute('title');
+    expect(tooltip).toContain('FREE_DELIVERY_THRESHOLD');
   });
 
   it('increments quantity via the + button by calling addItem with a delta of 1', () => {
-    const incrementBtn: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-selector button')[1];
+    const incrementBtn: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-stepper button')[1];
     incrementBtn.click();
 
     const req = httpMock.expectOne(itemsUrl);
@@ -110,11 +131,11 @@ describe('Cart — table layout quantity and removal', () => {
     httpMock.expectOne(productsUrl).flush(productsResponse);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.qty-selector span').textContent.trim()).toBe('3');
+    expect(fixture.nativeElement.querySelector('.qty-stepper input').value).toBe('3');
   });
 
   it('decrements quantity via the − button by removing then re-adding at the target quantity', () => {
-    const decrementBtn: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-selector button')[0];
+    const decrementBtn: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-stepper button')[0];
     decrementBtn.click();
 
     const removeReq = httpMock.expectOne(req => req.url === `${environment.cartApiUrl}/api/cart/1/items/1001` && req.method === 'DELETE');
@@ -127,18 +148,32 @@ describe('Cart — table layout quantity and removal', () => {
     httpMock.expectOne(productsUrl).flush(productsResponse);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.qty-selector span').textContent.trim()).toBe('1');
+    expect(fixture.nativeElement.querySelector('.qty-stepper input').value).toBe('1');
+  });
+
+  it('changes quantity by typing directly into the quantity input', () => {
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.qty-stepper input');
+    input.value = '5';
+    input.dispatchEvent(new Event('change'));
+
+    const req = httpMock.expectOne(itemsUrl);
+    expect(req.request.body).toEqual({ productId: 1001, quantity: 3 });
+    req.flush(cartWith(5));
+    httpMock.expectOne(productsUrl).flush(productsResponse);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.qty-stepper input').value).toBe('5');
   });
 
   it('disables the − button at quantity 1 so it cannot go below 1', () => {
-    const decrementBtn: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-selector button')[0];
+    const decrementBtn: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-stepper button')[0];
     decrementBtn.click();
     httpMock.expectOne(req => req.url === `${environment.cartApiUrl}/api/cart/1/items/1001` && req.method === 'DELETE').flush(cartWith(0));
     httpMock.expectOne(itemsUrl).flush(cartWith(1));
     httpMock.expectOne(productsUrl).flush(productsResponse);
     fixture.detectChanges();
 
-    const decrementBtnAfter: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-selector button')[0];
+    const decrementBtnAfter: HTMLButtonElement = fixture.nativeElement.querySelectorAll('.qty-stepper button')[0];
     expect(decrementBtnAfter.disabled).toBe(true);
   });
 
@@ -150,7 +185,7 @@ describe('Cart — table layout quantity and removal', () => {
     req.flush(cartWith(0));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.cart-table')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.cart-item-card')).toBeNull();
     expect(fixture.nativeElement.querySelector('.empty-cart')).not.toBeNull();
   });
 
@@ -162,6 +197,19 @@ describe('Cart — table layout quantity and removal', () => {
     httpMock.expectOne(productsUrl).flush(productsResponse);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.qty-selector span').textContent.trim()).toBe('5');
+    expect(fixture.nativeElement.querySelector('.qty-stepper input').value).toBe('5');
+  });
+
+  it('toggles the wishlist heart button for the item', () => {
+    const wishlistBtn: HTMLButtonElement = fixture.nativeElement.querySelector('app-wishlist-button .wishlist-btn');
+    expect(wishlistBtn.classList.contains('active')).toBe(false);
+
+    wishlistBtn.click();
+
+    const req = httpMock.expectOne(req => req.url === wishlistItemUrl && req.method === 'POST');
+    req.flush({ success: true, message: 'ok', data: [{ productId: 1001, productName: 'iPhone 15 Pro', productPrice: 650000, quantity: 1 }] });
+    fixture.detectChanges();
+
+    expect(wishlistBtn.classList.contains('active')).toBe(true);
   });
 });

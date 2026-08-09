@@ -14,88 +14,114 @@
 
   <div class="cart-content">
     @if (cart && cart.items.length > 0) {
-      <div class="cart-table-wrapper">
-        <table class="cart-table">
-          <thead>
-            <tr>
-              <th class="col-product">{{ 'PRODUCT' | translate }}</th>
-              <th class="col-price">{{ 'PRICE' | translate }}</th>
-              <th class="col-qty">{{ 'QUANTITY' | translate }}</th>
-              <th class="col-line-total">{{ 'LINE_TOTAL' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div class="cart-page-header">
+        <h1 class="cart-heading">
+          <app-icon name="cart" /> {{ 'CART_HEADING' | translate:{ count: cart.items.length } }}
+        </h1>
+        <p class="cart-subtext">
+          {{ 'CART_RETENTION_PREFIX' | translate }} <span class="highlight">{{ 'CART_RETENTION_HIGHLIGHT' | translate }}</span>
+        </p>
+      </div>
+
+      <div class="cart-layout">
+        <div class="cart-items-col">
+          <div class="cart-items-header">
+            <button type="button" class="refresh-btn" (click)="loadCart()">
+              <app-icon name="refresh" /> {{ 'UPDATE_CART' | translate }}
+            </button>
+          </div>
+
+          <div class="cart-items-list">
             @for (item of cart.items; track item.productId) {
-              <tr class="cart-row">
-                <td class="col-product">
-                  <div class="product-cell">
-                    <button
-                      type="button"
-                      class="remove-btn"
-                      [disabled]="isUpdating(item.productId)"
-                      [attr.aria-label]="'REMOVE_ITEM' | translate"
-                      (click)="removeItem(item.productId)"
-                    >
-                      <app-icon name="trash" />
-                    </button>
-                    @if (imageSrc(item); as src) {
-                      <img class="item-image" [src]="src" [alt]="item.productName" (error)="onImageError(item.productId)">
-                    } @else {
-                      <div class="item-icon"><app-icon name="box" /></div>
-                    }
-                    <div class="item-info">
-                      <h3>{{ item.productName }}</h3>
-                      @if (specParts(item); as specs) {
-                        @if (specs.length > 0) {
-                          <div class="item-specs">
-                            @for (part of specs; track part) {
-                              <span class="spec-chip">{{ part }}</span>
-                            }
-                          </div>
-                        }
-                      }
-                    </div>
-                  </div>
-                </td>
-                <td class="col-price" [attr.data-label]="'PRICE' | translate">{{ item.productPrice | price }}</td>
-                <td class="col-qty" [attr.data-label]="'QUANTITY' | translate">
-                  <div class="qty-selector">
+              <div class="cart-item-card">
+                @if (imageSrc(item); as src) {
+                  <img class="item-image" [src]="src" [alt]="item.productName" (error)="onImageError(item.productId)">
+                } @else {
+                  <div class="item-image item-icon"><app-icon name="box" /></div>
+                }
+
+                <div class="item-main">
+                  <h3 class="item-name">{{ item.productName }}</h3>
+                  @if (item.productRating) {
+                    <app-star-rating [rating]="item.productRating" [count]="item.productReviewCount ?? null" [showValue]="true" />
+                  }
+                  <p class="item-price">{{ item.productPrice | price }}</p>
+                  <p class="stock-status" [class.out]="!isInStock(item)">
+                    <span class="status-dot"></span>
+                    {{ (isInStock(item) ? 'CART_ITEM_IN_STOCK' : 'OUT_OF_STOCK') | translate }}
+                  </p>
+                </div>
+
+                <div class="item-qty">
+                  <div class="qty-stepper">
                     <button type="button" [disabled]="isUpdating(item.productId) || item.quantity <= 1" (click)="decrementQuantity(item)">−</button>
-                    <span>{{ item.quantity }}</span>
+                    <input
+                      type="number"
+                      min="1"
+                      [value]="item.quantity"
+                      [disabled]="isUpdating(item.productId)"
+                      (change)="onQuantityInputChange(item, $event)"
+                    >
                     <button type="button" [disabled]="isUpdating(item.productId)" (click)="incrementQuantity(item)">+</button>
                   </div>
-                </td>
-                <td class="col-line-total" [attr.data-label]="'LINE_TOTAL' | translate">{{ item.totalPrice | price }}</td>
-              </tr>
+                  <p class="item-line-total">{{ item.totalPrice | price }}</p>
+                </div>
+
+                <div class="item-actions">
+                  <app-wishlist-button [productId]="item.productId" [inline]="true" />
+                  <button
+                    type="button"
+                    class="remove-btn"
+                    [disabled]="isUpdating(item.productId)"
+                    [attr.aria-label]="'REMOVE_ITEM' | translate"
+                    (click)="removeItem(item.productId)"
+                  >
+                    <app-icon name="trash" />
+                  </button>
+                </div>
+              </div>
             }
-          </tbody>
-        </table>
-      </div>
+          </div>
 
-      <div class="cart-actions-row">
-        <button type="button" class="refresh-btn" (click)="loadCart()">
-          <app-icon name="refresh" /> {{ 'UPDATE_CART' | translate }}
-        </button>
-      </div>
+          <div class="shipping-banner">
+            <div class="shipping-icon-badge">
+              <app-icon name="shield-check" />
+            </div>
+            <div class="shipping-text">
+              <strong>{{ 'FREE_DELIVERY_TITLE' | translate }}</strong>
+              <span>{{ 'FREE_SHIPPING_BANNER_SUBTITLE' | translate:{ threshold: freeShippingThresholdFormatted } }}</span>
+            </div>
+            <app-icon name="truck" class="shipping-truck-icon" />
+          </div>
+        </div>
 
-      <div class="cart-summary">
-        <div class="summary-card">
-          <h3>{{ 'CART_TOTAL_TITLE' | translate }}</h3>
-          <table class="summary-table">
-            <tbody>
-              <tr>
-                <td>{{ 'CART_SUBTOTAL' | translate }}</td>
-                <td>{{ cart.totalPrice | price }}</td>
-              </tr>
-              <tr class="total-row">
-                <td>{{ 'CART_TOTAL' | translate }}</td>
-                <td>{{ cart.totalPrice | price }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <button class="order-btn" (click)="goToCheckout()">
-            {{ 'PROCEED_TO_CHECKOUT' | translate }}
-          </button>
+        <div class="cart-summary">
+          <div class="summary-card">
+            <h3>{{ 'ORDER_SUMMARY' | translate }}</h3>
+            <div class="summary-row">
+              <span>{{ 'CART_SUBTOTAL' | translate }}</span>
+              <span>{{ cart.totalPrice | price }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="delivery-label">
+                {{ 'CART_DELIVERY' | translate }}
+                <app-icon name="info" [attr.title]="'FREE_DELIVERY_THRESHOLD' | translate:{ threshold: freeShippingThresholdFormatted }" />
+              </span>
+              <span>{{ 'CART_DELIVERY_FREE' | translate }}</span>
+            </div>
+            <div class="summary-row total-row">
+              <span>{{ 'CART_TOTAL' | translate }}</span>
+              <span>{{ cart.totalPrice | price }}</span>
+            </div>
+
+            <button class="order-btn" (click)="goToCheckout()">
+              {{ 'PROCEED_TO_CHECKOUT' | translate }} →
+            </button>
+
+            <p class="secure-note">
+              <app-icon name="shield-check" /> {{ 'CART_SECURE_PAYMENT_NOTE' | translate }}
+            </p>
+          </div>
         </div>
       </div>
     } @else {

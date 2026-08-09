@@ -13,7 +13,9 @@ export interface CartItemResponse {
   quantity: number;
   totalPrice: number;
   productImage?: string;
-  productSpec?: string;
+  productRating?: number;
+  productReviewCount?: number;
+  productStock?: number;
 }
 
 export interface CartResponse {
@@ -102,6 +104,9 @@ export class CartService {
             productName: product?.name ?? `#${line.productId}`,
             productPrice: price,
             productImage: product?.imageUrl,
+            productRating: product?.rating,
+            productReviewCount: product?.reviewCount,
+            productStock: product?.quantity,
             quantity: line.quantity,
             totalPrice: price * line.quantity
           };
@@ -117,11 +122,16 @@ export class CartService {
     return this.productService.getAllProducts().pipe(
       map(catalogResponse => {
         const catalogById = new Map(catalogResponse.data.map(p => [p.id, p]));
-        const items = response.data.items.map(item => ({
-          ...item,
-          productImage: catalogById.get(item.productId)?.imageUrl,
-          productSpec: catalogById.get(item.productId)?.spec
-        }));
+        const items = response.data.items.map(item => {
+          const product = catalogById.get(item.productId);
+          return {
+            ...item,
+            productImage: product?.imageUrl,
+            productRating: product?.rating,
+            productReviewCount: product?.reviewCount,
+            productStock: product?.quantity
+          };
+        });
         return { ...response, data: { ...response.data, items } };
       })
     );

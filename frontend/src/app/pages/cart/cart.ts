@@ -8,11 +8,15 @@ import { ToastService } from '../../services/toast';
 import { AppHeader } from '../../components/app-header/app-header';
 import { Icon } from '../../components/icon/icon';
 import { Toast } from '../../components/toast/toast';
+import { StarRating } from '../../components/star-rating/star-rating';
+import { WishlistButton } from '../../components/wishlist-button/wishlist-button';
 import { PricePipe } from '../../pipes/price';
+import { FREE_SHIPPING_THRESHOLD_AMD } from '../../config/delivery';
+import { formatAmd } from '../../config/currency';
 
 @Component({
   selector: 'app-cart',
-  imports: [CommonModule, AppHeader, Icon, Toast, PricePipe, TranslatePipe],
+  imports: [CommonModule, AppHeader, Icon, Toast, StarRating, WishlistButton, PricePipe, TranslatePipe],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
 })
@@ -23,6 +27,8 @@ export class Cart implements OnInit {
 
   private failedImages = new Set<number>();
   private updatingProductIds = new Set<number>();
+
+  readonly freeShippingThresholdFormatted = formatAmd(FREE_SHIPPING_THRESHOLD_AMD);
 
   constructor(
     private cartService: CartService,
@@ -62,8 +68,8 @@ export class Cart implements OnInit {
     this.failedImages.add(productId);
   }
 
-  specParts(item: CartItemResponse): string[] {
-    return item.productSpec ? item.productSpec.split('·').map(part => part.trim()).filter(Boolean) : [];
+  isInStock(item: CartItemResponse): boolean {
+    return item.productStock === undefined || item.productStock > 0;
   }
 
   isUpdating(productId: number): boolean {
@@ -76,6 +82,16 @@ export class Cart implements OnInit {
 
   decrementQuantity(item: CartItemResponse): void {
     this.changeQuantity(item, item.quantity - 1);
+  }
+
+  onQuantityInputChange(item: CartItemResponse, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = Math.floor(Number(input.value));
+    if (!Number.isFinite(value) || value < 1) {
+      input.value = String(item.quantity);
+      return;
+    }
+    this.changeQuantity(item, value);
   }
 
   private changeQuantity(item: CartItemResponse, newQuantity: number): void {

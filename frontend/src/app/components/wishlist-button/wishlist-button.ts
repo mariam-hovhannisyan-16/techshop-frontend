@@ -11,9 +11,14 @@ import { Icon } from '../icon/icon';
   imports: [Icon, TranslatePipe],
   templateUrl: './wishlist-button.html',
   styleUrl: './wishlist-button.scss',
+  host: { '[class.inline]': 'inline' },
 })
 export class WishlistButton {
   @Input({ required: true }) productId!: number;
+  // Default (false) overlays the button in the corner of a product image, as used on
+  // product cards/detail. Set true to lay it out inline instead (e.g. in a cart row's
+  // action group), matching the surrounding flex layout instead of floating over it.
+  @Input() inline = false;
 
   constructor(
     private wishlistService: WishlistService,
