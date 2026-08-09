@@ -222,4 +222,30 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
 
     expect(wishlistBtn.classList.contains('active')).toBe(true);
   });
+
+  it('adds the three visual-polish accents: heading glow, summary top edge, and CTA glow', () => {
+    // jsdom doesn't implement getComputedStyle for pseudo-elements ("Not implemented:
+    // Window's getComputedStyle() method: with pseudo-elements"), so the ::before
+    // gradients themselves can't be inspected here — the compiled build succeeding
+    // already confirms that scss is valid. What we *can* verify in this environment is
+    // that the real elements hosting those pseudo-elements are wired up correctly, which
+    // is what actually determines whether the glow renders in the right place.
+    const header: HTMLElement = fixture.nativeElement.querySelector('.cart-page-header');
+    expect(getComputedStyle(header).position).toBe('relative');
+    const heading: HTMLElement = fixture.nativeElement.querySelector('.cart-heading');
+    expect(getComputedStyle(heading).position).toBe('relative'); // stacks above the glow
+
+    const summaryCard: HTMLElement = fixture.nativeElement.querySelector('.summary-card');
+    const summaryStyle = getComputedStyle(summaryCard);
+    expect(summaryStyle.overflow).toBe('hidden'); // clips the top-edge bar to the rounded corners
+    expect(summaryStyle.position).toBe('sticky'); // unaffected by the new overflow/edge
+
+    const orderBtn: HTMLElement = fixture.nativeElement.querySelector('.order-btn');
+    const orderBtnStyle = getComputedStyle(orderBtn);
+    expect(orderBtnStyle.boxShadow).not.toBe('none');
+    // jsdom doesn't resolve var() inside shorthand properties, so this stays as the raw
+    // custom-property reference rather than the resolved rgba(0, 102, 255, ...) — still
+    // enough to confirm the accent-glow token is actually wired into box-shadow.
+    expect(orderBtnStyle.boxShadow).toContain('var(--accent-soft-strong)');
+  });
 });

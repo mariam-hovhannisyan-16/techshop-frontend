@@ -41,9 +41,25 @@
   }
 
   .cart-page-header {
+    position: relative;
     margin-bottom: 1.5rem;
 
+    // Same soft accent-glow technique used behind the profile page's welcome banner
+    // (radial-gradient fading to transparent) — just enough to break up the flat
+    // background behind the heading, not a hard shape.
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -2%;
+      width: 340px;
+      height: 260px;
+      background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
     .cart-heading {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 0.6rem;
@@ -271,6 +287,19 @@
       padding: 1.5rem;
       position: sticky;
       top: 2rem;
+      overflow: hidden;
+
+      // Accent-to-transparent top edge so the summary card reads as the page's primary
+      // card rather than another flat rectangle like the item rows.
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      }
 
       h3 {
         font-size: 1.1rem;
@@ -330,10 +359,15 @@
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
+      // Same accent-glow language as the hover treatment on product cards elsewhere in
+      // the app (box-shadow: ... var(--accent-soft)) — kept on at rest here since this is
+      // the page's primary CTA, then deepened slightly on hover.
+      box-shadow: 0 8px 24px -10px var(--accent-soft-strong);
 
       &:hover {
         opacity: 0.9;
         transform: translateY(-1px);
+        box-shadow: 0 10px 28px -8px var(--accent-soft-strong);
       }
     }
 
