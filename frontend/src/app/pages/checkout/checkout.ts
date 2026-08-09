@@ -221,7 +221,6 @@ export class Checkout implements OnInit {
         this.router.navigate(['/order-confirmation', response.data.id], {
           state: {
             justCheckedOut: true,
-            paymentRedirectUrl: response.data.paymentRedirectUrl ?? null,
             paymentMethod: response.data.paymentMethod ?? this.paymentMethod
           }
         }).then();

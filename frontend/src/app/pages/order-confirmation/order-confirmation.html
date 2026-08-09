@@ -4,14 +4,6 @@
   <div class="confirmation-content">
     <div class="result-panel">
       @switch (state) {
-        @case ('redirecting') {
-          <div class="inline-loading">
-            <div class="spinner"></div>
-            <h2>{{ 'REDIRECTING_TO_PAYMENT_TITLE' | translate }}</h2>
-            <p>{{ 'REDIRECTING_TO_PAYMENT_MESSAGE' | translate }}</p>
-            <button type="button" class="secondary-btn" (click)="openProviderPage()">{{ 'OPEN_PAYMENT_PAGE' | translate }}</button>
-          </div>
-        }
         @case ('verifying') {
           <div class="inline-loading">
             <div class="spinner"></div>

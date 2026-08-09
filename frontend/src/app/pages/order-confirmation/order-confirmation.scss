@@ -67,20 +67,6 @@
 
     h2 { margin: 0.5rem 0 0; }
     p { margin: 0 0 0.5rem; }
-
-    .secondary-btn {
-      padding: 0.6rem 1.4rem;
-      background: var(--border);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-strong);
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-      transition: all 0.2s;
-
-      &:hover { color: var(--text-primary); border-color: var(--text-secondary); }
-    }
   }
 
   .spinner {

@@ -180,17 +180,25 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(checkoutReq.request.body.shippingAddress.state).toBe('Kentron');
     expect(checkoutReq.request.body.notes).toBe('Please call before delivery');
 
+    // The real backend response for IDRAM/TELCELL includes a paymentRedirectUrl pointing
+    // at a sandbox domain that doesn't actually resolve (confirmed: sandbox.idram.am /
+    // sandbox.telcellwallet.am both DNS_PROBE_FINISHED_NXDOMAIN) — flush one here to prove
+    // checkout.ts no longer forwards it into the navigation state at all.
     checkoutReq.flush({
       success: true,
       message: 'ok',
-      data: { id: 555, userId: 1, items: [], totalPrice: 650000, status: 'PENDING', paymentMethod: 'IDRAM', createdAt: '2026-01-01' }
+      data: {
+        id: 555, userId: 1, items: [], totalPrice: 650000, status: 'PENDING', paymentMethod: 'IDRAM', createdAt: '2026-01-01',
+        paymentRedirectUrl: 'https://sandbox.idram.am/payment?ref=fake&amount=650000&merchant_id=sandbox-merchant'
+      }
     });
 
     expect(component.placingOrder).toBe(false);
     expect(component.placeOrderError).toBe('');
-    expect(navigateSpy).toHaveBeenCalledWith(
-      ['/order-confirmation', 555],
-      expect.objectContaining({ state: expect.objectContaining({ justCheckedOut: true }) })
-    );
+    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    const [route, extras] = navigateSpy.mock.calls[0];
+    expect(route).toEqual(['/order-confirmation', 555]);
+    expect(extras?.state).toEqual({ justCheckedOut: true, paymentMethod: 'IDRAM' });
+    expect(extras?.state).not.toHaveProperty('paymentRedirectUrl');
   });
 });

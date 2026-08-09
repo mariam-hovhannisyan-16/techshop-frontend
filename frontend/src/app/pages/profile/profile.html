@@ -62,16 +62,6 @@
             </div>
           </div>
 
-          <div class="quick-actions-grid">
-            @for (action of quickActions; track action.titleKey) {
-              <button type="button" class="quick-action-card" (click)="action.action()">
-                <div class="qa-icon"><app-icon [name]="action.icon" /></div>
-                <h3>{{ action.titleKey | translate }}</h3>
-                <p>{{ action.descriptionKey | translate }}</p>
-              </button>
-            }
-          </div>
-
           <div class="profile-card recent-orders-card">
             <div class="card-header">
               <h2>{{ 'RECENT_ORDERS' | translate }}</h2>

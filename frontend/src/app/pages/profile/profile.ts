@@ -11,7 +11,7 @@ import { CartService } from '../../services/cart';
 import { ToastService } from '../../services/toast';
 import { Toast } from '../../components/toast/toast';
 import { AppHeader } from '../../components/app-header/app-header';
-import { Icon, IconName } from '../../components/icon/icon';
+import { Icon } from '../../components/icon/icon';
 import { PricePipe } from '../../pipes/price';
 
 type NewAddress = Omit<SavedAddress, 'id'>;
@@ -26,13 +26,6 @@ const EMPTY_ADDRESS: NewAddress = {
   postalCode: '',
   country: ''
 };
-
-interface QuickAction {
-  icon: IconName;
-  titleKey: string;
-  descriptionKey: string;
-  action: () => void;
-}
 
 @Component({
   selector: 'app-profile',
@@ -110,43 +103,6 @@ export class Profile implements OnInit {
 
   goToSection(section: Section): void {
     this.section = section;
-  }
-
-  private readonly allQuickActions: QuickAction[] = [
-    {
-      icon: 'edit',
-      titleKey: 'PERSONAL_INFO',
-      descriptionKey: 'QUICK_ACTION_PERSONAL_INFO_DESC',
-      action: () => this.toggleEditInfo()
-    },
-    {
-      icon: 'box',
-      titleKey: 'ORDER_HISTORY',
-      descriptionKey: 'QUICK_ACTION_ORDERS_DESC',
-      action: () => this.router.navigate(['/orders'])
-    },
-    {
-      icon: 'heart',
-      titleKey: 'WISHLIST',
-      descriptionKey: 'QUICK_ACTION_WISHLIST_DESC',
-      action: () => this.router.navigate(['/wishlist'])
-    },
-    {
-      icon: 'pin',
-      titleKey: 'ADDRESS_BOOK',
-      descriptionKey: 'QUICK_ACTION_ADDRESSES_DESC',
-      action: () => this.goToSection('addresses')
-    },
-    {
-      icon: 'lock',
-      titleKey: 'CHANGE_PASSWORD',
-      descriptionKey: 'QUICK_ACTION_PASSWORD_DESC',
-      action: () => this.goToSection('change-password')
-    }
-  ];
-
-  get quickActions(): QuickAction[] {
-    return this.isAdmin ? this.allQuickActions.filter(a => a.titleKey !== 'WISHLIST') : this.allQuickActions;
   }
 
   toggleEditInfo(): void {

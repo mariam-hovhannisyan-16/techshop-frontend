@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
+import { vi } from 'vitest';
 import { environment } from '../../../environments/environment';
 
 import { Profile } from './profile';
@@ -125,5 +126,48 @@ describe('Profile — recent orders / stats resolve, and only one logout control
     expect(logoutButtons.length).toBe(1);
     expect(logoutButtons[0].classList.contains('sidebar-item')).toBe(true);
     expect(fixture.nativeElement.querySelector('.welcome-actions .logout-btn')).toBeNull();
+  });
+
+  it('sidebar alone still navigates to all 5 sections now that the redundant quick-action card grid is gone', () => {
+    fixture.detectChanges();
+    httpMock.expectOne(ordersUrl).flush({ success: true, message: 'Success', data: [] });
+    drainLeftover();
+
+    expect(fixture.nativeElement.querySelector('.quick-actions-grid')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.quick-action-card')).toBeNull();
+
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const sidebarItem = (label: string): HTMLElement =>
+      Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.sidebar-nav .sidebar-item'))
+        .find(el => el.textContent?.includes(label))!;
+
+    // My Info -> in-page overview section (already the default, so first move elsewhere then back)
+    sidebarItem('ADDRESS_BOOK').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.profile-card.change-password-card')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.address-list, .no-addresses')).not.toBeNull();
+
+    sidebarItem('SIDEBAR_MY_INFO').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.welcome-banner')).not.toBeNull();
+
+    // Order History -> cross-page navigation
+    sidebarItem('ORDER_HISTORY').click();
+    expect(navigateSpy).toHaveBeenCalledWith(['/orders']);
+
+    // Wishlist -> cross-page navigation
+    sidebarItem('WISHLIST').click();
+    expect(navigateSpy).toHaveBeenCalledWith(['/wishlist']);
+
+    // Address Book -> in-page section
+    sidebarItem('ADDRESS_BOOK').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.address-list, .no-addresses')).not.toBeNull();
+
+    // Change Password -> in-page section
+    sidebarItem('CHANGE_PASSWORD').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.profile-card.change-password-card')).not.toBeNull();
   });
 });

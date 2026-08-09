@@ -9,11 +9,10 @@ import { OrderTracking } from '../../components/order-tracking/order-tracking';
 import { Icon } from '../../components/icon/icon';
 import { PricePipe } from '../../pipes/price';
 
-type ResultState = 'redirecting' | 'verifying' | 'success' | 'failed';
+type ResultState = 'verifying' | 'success' | 'failed';
 
 interface CheckoutNavState {
   justCheckedOut?: boolean;
-  paymentRedirectUrl?: string | null;
   paymentMethod?: PaymentMethod;
 }
 
@@ -29,7 +28,6 @@ export class OrderConfirmation implements OnInit {
   state: ResultState = 'verifying';
   order: OrderResponse | undefined;
   errorMessage = '';
-  paymentRedirectUrl: string | null = null;
   paymentMethod: PaymentMethod | null = null;
 
   constructor(
@@ -48,29 +46,13 @@ export class OrderConfirmation implements OnInit {
     const navState = history.state as CheckoutNavState | undefined;
 
     if (navState?.justCheckedOut) {
-      this.paymentRedirectUrl = navState.paymentRedirectUrl ?? null;
       this.paymentMethod = navState.paymentMethod ?? null;
-      this.beginPaymentFlow();
+      // No payment method here has a real external gateway — checkout.ts creates the
+      // order (either via the backend or a local mock) and this page just confirms it,
+      // the same way it already did for Cash/Card. There's nothing to redirect to.
+      this.verifyPayment();
     } else {
       this.loadExistingOrder();
-    }
-  }
-
-  private beginPaymentFlow(): void {
-    if (this.paymentRedirectUrl) {
-      this.state = 'redirecting';
-      this.cdr.detectChanges();
-      this.openProviderPage();
-
-      setTimeout(() => this.verifyPayment(), 1200);
-    } else {
-      this.verifyPayment();
-    }
-  }
-
-  openProviderPage(): void {
-    if (this.paymentRedirectUrl) {
-      window.open(this.paymentRedirectUrl, '_blank', 'noopener');
     }
   }
 
