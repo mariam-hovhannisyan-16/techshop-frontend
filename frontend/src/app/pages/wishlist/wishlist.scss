@@ -96,13 +96,31 @@
 
   .wishlist-layout {
     display: flex;
-    align-items: flex-start;
+    // Stretch (the default) so .wishlist-main and .wishlist-sidebar match height when one
+    // is much taller than the other — the empty-state case centers within that full height
+    // via .wishlist-main.is-empty below. Plain block content (the loaded items list) is
+    // unaffected by the taller container since it doesn't stretch itself.
+    align-items: stretch;
     gap: 2rem;
   }
 
   .wishlist-main {
     flex: 1 1 68%;
     min-width: 0;
+
+    &.is-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .empty-state-card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
   }
 
   .wishlist-items {

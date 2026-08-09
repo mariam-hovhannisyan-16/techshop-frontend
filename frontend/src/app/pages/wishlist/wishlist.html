@@ -48,7 +48,7 @@
       </app-empty-state>
     } @else {
       <div class="wishlist-layout">
-        <div class="wishlist-main">
+        <div class="wishlist-main" [class.is-empty]="items.length === 0">
           @if (items.length > 0) {
             <div class="wishlist-items">
               @for (item of items; track item.productId) {
@@ -79,9 +79,11 @@
               </label>
             </div>
           } @else {
-            <app-empty-state icon="heart" [message]="'WISHLIST_EMPTY' | translate">
-              <button (click)="router.navigate(['/products'])">{{ 'VIEW_PRODUCTS' | translate }}</button>
-            </app-empty-state>
+            <div class="empty-state-card">
+              <app-empty-state icon="heart" [message]="'WISHLIST_EMPTY' | translate">
+                <button (click)="router.navigate(['/products'])">{{ 'VIEW_PRODUCTS' | translate }}</button>
+              </app-empty-state>
+            </div>
           }
         </div>
 
@@ -119,7 +121,7 @@
             <ul class="check-list">
               <li><app-icon name="check-circle" />{{ 'FREE_DELIVERY_YEREVAN' | translate }}</li>
               <li><app-icon name="check-circle" />{{ 'FREE_DELIVERY_REGIONS' | translate }}</li>
-              <li><app-icon name="check-circle" />{{ 'FREE_DELIVERY_THRESHOLD' | translate }}</li>
+              <li><app-icon name="check-circle" />{{ 'FREE_DELIVERY_THRESHOLD' | translate:{ threshold: freeShippingThresholdFormatted } }}</li>
             </ul>
           </div>
 

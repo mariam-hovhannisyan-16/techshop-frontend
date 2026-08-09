@@ -17,6 +17,8 @@ import { AppHeader } from '../../components/app-header/app-header';
 import { EmptyState } from '../../components/empty-state/empty-state';
 import { Icon } from '../../components/icon/icon';
 import { PricePipe } from '../../pipes/price';
+import { FREE_SHIPPING_THRESHOLD_AMD } from '../../config/delivery';
+import { formatAmd } from '../../config/currency';
 
 const RECOMMENDED_COUNT = 6;
 const NOTIFY_PRICE_KEY = 'wishlist_notify_price_changes';
@@ -38,6 +40,8 @@ export class Wishlist implements OnInit {
   loading = true;
   errorMessage = '';
   userId: number = 1;
+
+  readonly freeShippingThresholdFormatted = formatAmd(FREE_SHIPPING_THRESHOLD_AMD);
 
   constructor(
     private wishlistService: WishlistService,
