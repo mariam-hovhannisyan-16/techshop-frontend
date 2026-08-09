@@ -48,6 +48,13 @@ export class Profile implements OnInit {
   orders: OrderResponse[] = [];
   ordersLoading = true;
 
+  currentPassword = '';
+  newPassword = '';
+  confirmNewPassword = '';
+  passwordMismatch = false;
+  passwordTooShort = false;
+  changingPassword = false;
+
   constructor(
     private authService: Auth,
     private profileService: ProfileService,
@@ -103,6 +110,38 @@ export class Profile implements OnInit {
 
   goToSection(section: Section): void {
     this.section = section;
+    if (section === 'change-password') {
+      this.currentPassword = '';
+      this.newPassword = '';
+      this.confirmNewPassword = '';
+      this.passwordMismatch = false;
+      this.passwordTooShort = false;
+    }
+  }
+
+  submitChangePassword(): void {
+    if (this.changingPassword) return;
+
+    this.passwordMismatch = this.newPassword !== this.confirmNewPassword;
+    this.passwordTooShort = this.newPassword.length < 6;
+    if (this.passwordMismatch || this.passwordTooShort) return;
+
+    this.changingPassword = true;
+    this.authService.changePassword(this.currentPassword, this.newPassword).subscribe({
+      next: () => {
+        this.changingPassword = false;
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmNewPassword = '';
+        this.toastService.show(this.translateService.instant('TOAST_PASSWORD_CHANGED'), 'success');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.changingPassword = false;
+        this.toastService.show(err.error?.message || this.translateService.instant('CHANGE_PASSWORD_FAILED'), 'error');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   toggleEditInfo(): void {

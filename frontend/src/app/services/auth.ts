@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -111,6 +111,11 @@ export class Auth {
 
   resetPassword(token: string, newPassword: string): Observable<ApiResponse<null>> {
     return this.http.post<ApiResponse<null>>(`${this.apiUrl}/reset-password`, { token, newPassword });
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<ApiResponse<null>> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${this.getToken()}` });
+    return this.http.put<ApiResponse<null>>(`${this.apiUrl}/me/password`, { currentPassword, newPassword }, { headers });
   }
 
   saveToken(token: string): void {

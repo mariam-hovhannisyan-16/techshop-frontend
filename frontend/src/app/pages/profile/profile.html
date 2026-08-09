@@ -138,7 +138,55 @@
           <div class="profile-card change-password-card">
             <div class="change-password-icon"><app-icon name="lock" /></div>
             <h2>{{ 'CHANGE_PASSWORD' | translate }}</h2>
-            <p>{{ 'FEATURE_NOT_AVAILABLE' | translate }}</p>
+
+            <form (ngSubmit)="submitChangePassword()" autocomplete="off">
+              <div class="input-field">
+                <app-icon name="lock" />
+                <input
+                  type="password"
+                  name="currentPassword"
+                  [placeholder]="'CURRENT_PASSWORD' | translate"
+                  [(ngModel)]="currentPassword"
+                  autocomplete="current-password"
+                  required
+                >
+              </div>
+
+              <div class="input-field">
+                <app-icon name="lock" />
+                <input
+                  type="password"
+                  name="newPassword"
+                  [placeholder]="'NEW_PASSWORD' | translate"
+                  [(ngModel)]="newPassword"
+                  autocomplete="new-password"
+                  required
+                >
+              </div>
+
+              <div class="input-field">
+                <app-icon name="lock" />
+                <input
+                  type="password"
+                  name="confirmNewPassword"
+                  [placeholder]="'CONFIRM_PASSWORD' | translate"
+                  [(ngModel)]="confirmNewPassword"
+                  autocomplete="new-password"
+                  required
+                >
+              </div>
+
+              @if (passwordMismatch) {
+                <p class="form-error">{{ 'PASSWORDS_DO_NOT_MATCH' | translate }}</p>
+              }
+              @if (passwordTooShort) {
+                <p class="form-error">{{ 'PASSWORD_TOO_SHORT' | translate }}</p>
+              }
+
+              <button type="submit" class="save-password-btn" [disabled]="changingPassword">
+                {{ 'CHANGE_PASSWORD_SUBMIT' | translate }}
+              </button>
+            </form>
           </div>
         }
 
