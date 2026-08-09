@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -63,7 +63,8 @@ export class Profile implements OnInit {
     private cartService: CartService,
     private toastService: ToastService,
     private translateService: TranslateService,
-    public router: Router
+    public router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.userId = this.authService.getUserId() ?? 1;
     this.user = this.authService.getUser();
@@ -81,9 +82,11 @@ export class Profile implements OnInit {
       next: (response) => {
         this.orders = [...response.data].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         this.ordersLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.ordersLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

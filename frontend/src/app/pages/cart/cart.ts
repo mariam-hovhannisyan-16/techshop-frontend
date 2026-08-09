@@ -10,13 +10,14 @@ import { Icon } from '../../components/icon/icon';
 import { Toast } from '../../components/toast/toast';
 import { StarRating } from '../../components/star-rating/star-rating';
 import { WishlistButton } from '../../components/wishlist-button/wishlist-button';
+import { TrustBadges } from '../../components/trust-badges/trust-badges';
 import { PricePipe } from '../../pipes/price';
 import { FREE_SHIPPING_THRESHOLD_AMD, DELIVERY_FEE_AMD } from '../../config/delivery';
 import { formatAmd } from '../../config/currency';
 
 @Component({
   selector: 'app-cart',
-  imports: [CommonModule, AppHeader, Icon, Toast, StarRating, WishlistButton, PricePipe, TranslatePipe],
+  imports: [CommonModule, AppHeader, Icon, Toast, StarRating, WishlistButton, TrustBadges, PricePipe, TranslatePipe],
   templateUrl: './cart.html',
   styleUrl: './cart.scss',
 })

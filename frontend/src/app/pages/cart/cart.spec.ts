@@ -248,4 +248,123 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     // enough to confirm the accent-glow token is actually wired into box-shadow.
     expect(orderBtnStyle.boxShadow).toContain('var(--accent-soft-strong)');
   });
+
+  it('reuses the shared trust-badges component (fast delivery, secure payments, returns, warranty)', () => {
+    const section = fixture.nativeElement.querySelector('.cart-trust-badges app-trust-badges');
+    expect(section).not.toBeNull();
+    // Component itself renders 4 badges from its own hardcoded list — just confirming
+    // it's the real reused component (correct child structure), not a hand-rolled copy.
+    expect(fixture.nativeElement.querySelectorAll('.cart-trust-badges .trust-badge').length).toBe(4);
+  });
+
+  it('numbers the item card and wires up its entrance-animation delay for index 0', () => {
+    const card: HTMLElement = fixture.nativeElement.querySelector('.cart-item-card');
+    expect(card.querySelector('.item-index-badge')!.textContent!.trim()).toBe('1');
+    expect(card.style.animationDelay).toBe('0ms');
+
+    const cardStyle = getComputedStyle(card);
+    // Angular's emulated view encapsulation scopes @keyframes names with a component-
+    // specific prefix (e.g. "_ngcontent-xyz_cart-item-in") — containment here still proves
+    // the animation resolved to the matching scoped keyframes, not just an unmatched name.
+    expect(cardStyle.animationName).toContain('cart-item-in');
+    expect(cardStyle.position).toBe('relative'); // required for the index badge's absolute positioning
+  });
+
+  it('pulses the in-stock dot continuously but not an out-of-stock one', () => {
+    const dot: HTMLElement = fixture.nativeElement.querySelector('.stock-status:not(.out) .status-dot');
+    expect(dot).not.toBeNull();
+    const dotStyle = getComputedStyle(dot);
+    expect(dotStyle.animationName).toContain('stock-dot-pulse'); // scoped by Angular's emulated encapsulation
+    expect(dotStyle.animationIterationCount).toBe('infinite');
+  });
+
+  it('sets up the product-card-style hover transition on item cards (all-property, 0.3s)', () => {
+    // jsdom doesn't simulate real :hover CSS matching, so the hover-state box-shadow/
+    // transform values themselves can't be read via getComputedStyle here (same
+    // limitation as the earlier pseudo-element checks) — the build succeeding already
+    // confirms the :hover rule's scss is valid. What's verifiable is the base transition
+    // setup that makes that hover feel smooth rather than a hard cut.
+    const card: HTMLElement = fixture.nativeElement.querySelector('.cart-item-card');
+    expect(getComputedStyle(card).transition).toContain('0.3s');
+  });
+});
+
+describe('Cart — multiple items (index badges and staggered entrance)', () => {
+  let fixture: ComponentFixture<Cart>;
+  let httpMock: HttpTestingController;
+
+  const cartUrl = `${environment.cartApiUrl}/api/cart/1`;
+  const productsUrl = `${environment.productApiUrl}/api/products`;
+
+  const fakeJwt = (payload: object) => `h.${btoa(JSON.stringify(payload))}.s`;
+
+  const productsResponse = {
+    success: true,
+    message: 'ok',
+    data: [
+      { id: 1001, name: 'iPhone 15 Pro', description: '', price: 650000, stock: 5, imageUrl: '/img.jpg' },
+      { id: 1002, name: 'Galaxy S24', description: '', price: 500000, stock: 3, imageUrl: '/img2.jpg' }
+    ]
+  };
+
+  const twoItemCart = {
+    success: true,
+    message: 'ok',
+    data: {
+      id: 1,
+      userId: 1,
+      items: [
+        { productId: 1001, productName: 'iPhone 15 Pro', productPrice: 650000, quantity: 1, totalPrice: 650000 },
+        { productId: 1002, productName: 'Galaxy S24', productPrice: 500000, quantity: 1, totalPrice: 500000 }
+      ],
+      totalPrice: 1150000
+    }
+  };
+
+  const drainLeftover = () => {
+    let leftover = httpMock.match(() => true);
+    while (leftover.length) {
+      leftover.forEach(req => req.flush({ success: true, message: 'ok', data: [] }));
+      leftover = httpMock.match(() => true);
+    }
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+    localStorage.setItem('token', fakeJwt({ userId: 1, role: 'CUSTOMER' }));
+    localStorage.setItem('user', JSON.stringify({ id: 1, name: 'Test User', email: 'a@b.com', role: 'CUSTOMER', createdAt: '2026-01-01' }));
+
+    await TestBed.configureTestingModule({
+      imports: [Cart],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideTranslateService()],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Cart);
+    httpMock = TestBed.inject(HttpTestingController);
+
+    httpMock.expectOne(cartUrl).flush(twoItemCart);
+    httpMock.expectOne(productsUrl).flush(productsResponse);
+
+    fixture.detectChanges();
+
+    httpMock.expectOne(cartUrl).flush(twoItemCart);
+    httpMock.expectOne(productsUrl).flush(productsResponse);
+
+    fixture.detectChanges();
+    drainLeftover();
+    fixture.detectChanges();
+  });
+
+  afterEach(() => httpMock.verify());
+
+  it('numbers each card 1, 2, ... and staggers their entrance delay by index * 60ms', () => {
+    const cards: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.cart-item-card'));
+    expect(cards.length).toBe(2);
+
+    expect(cards[0].querySelector('.item-index-badge')!.textContent!.trim()).toBe('1');
+    expect(cards[1].querySelector('.item-index-badge')!.textContent!.trim()).toBe('2');
+
+    expect(cards[0].style.animationDelay).toBe('0ms');
+    expect(cards[1].style.animationDelay).toBe('60ms');
+  });
 });

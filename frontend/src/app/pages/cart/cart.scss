@@ -77,6 +77,12 @@
     gap: 2rem;
   }
 
+  // Same trust-badge row already used on the products page — fills the dead space below
+  // the item list / summary card with real, reused content instead of empty page.
+  .cart-trust-badges {
+    margin-top: 1.5rem;
+  }
+
   .cart-items-col {
     flex: 1;
     min-width: 0;
@@ -112,6 +118,7 @@
   }
 
   .cart-item-card {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 1.2rem;
@@ -119,9 +126,38 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 1.2rem;
-    transition: border 0.2s;
+    transition: all 0.3s;
+    // Staggered entrance on load — animation-delay is bound per-item in the template
+    // ([style.animationDelay.ms]="idx * 60"); `backwards` fill-mode keeps each card
+    // invisible until its turn instead of flashing in fully opaque before sliding.
+    animation-name: cart-item-in;
+    animation-duration: 0.4s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: backwards;
 
-    &:hover { border-color: var(--border-strong); }
+    // Same hover-lift used on product cards elsewhere in the app.
+    &:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px var(--accent-soft);
+    }
+
+    .item-index-badge {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--chip-bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 50%;
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
 
     .item-image {
       width: 88px;
@@ -178,6 +214,17 @@
           border-radius: 50%;
           background: currentColor;
           flex-shrink: 0;
+        }
+
+        // Subtle "live" pulse on the in-stock dot only — same timing/easing as the
+        // highlight-pulse ring used on product cards elsewhere, just looped continuously
+        // instead of firing twice, since this is an ambient status rather than a one-off
+        // highlight.
+        &:not(.out) .status-dot {
+          animation-name: stock-dot-pulse;
+          animation-duration: 1.2s;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
         }
 
         &.out { color: var(--danger); }
@@ -430,6 +477,16 @@
       &:hover { border-color: var(--accent); }
     }
   }
+}
+
+@keyframes cart-item-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes stock-dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 transparent; }
+  50% { box-shadow: 0 0 0 4px var(--success-soft); }
 }
 
 @media (max-width: 860px) {

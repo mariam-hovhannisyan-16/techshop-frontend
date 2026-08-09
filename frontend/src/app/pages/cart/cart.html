@@ -29,8 +29,9 @@
           </div>
 
           <div class="cart-items-list">
-            @for (item of cart.items; track item.productId) {
-              <div class="cart-item-card">
+            @for (item of cart.items; track item.productId; let idx = $index) {
+              <div class="cart-item-card" [style.animationDelay.ms]="idx * 60">
+                <span class="item-index-badge">{{ idx + 1 }}</span>
                 @if (imageSrc(item); as src) {
                   <img class="item-image" [src]="src" [alt]="item.productName" (error)="onImageError(item.productId)">
                 } @else {
@@ -109,6 +110,10 @@
             </p>
           </div>
         </div>
+      </div>
+
+      <div class="cart-trust-badges">
+        <app-trust-badges />
       </div>
     } @else {
       <div class="empty-cart">

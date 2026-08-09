@@ -213,7 +213,7 @@
       gap: 0.6rem;
     }
 
-    .edit-info-btn, .logout-btn {
+    .edit-info-btn {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -226,21 +226,10 @@
       cursor: pointer;
       transition: all 0.2s;
       white-space: nowrap;
-    }
-
-    .edit-info-btn {
       background: var(--accent);
       color: var(--text-on-accent);
 
       &:hover { background: var(--accent-hover); }
-    }
-
-    .logout-btn {
-      background: var(--danger-soft);
-      color: var(--danger);
-      border: 1px solid var(--danger-border-soft);
-
-      &:hover { background: var(--danger-soft-hover); }
     }
   }
 
@@ -725,7 +714,7 @@
         width: 100%;
       }
 
-      .edit-info-btn, .logout-btn { flex: 1; }
+      .edit-info-btn { flex: 1; }
     }
 
     .stats-row {
