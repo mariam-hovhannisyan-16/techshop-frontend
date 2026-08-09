@@ -101,29 +101,39 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     expect(fixture.nativeElement.querySelector('.stock-status').textContent).toContain('CART_ITEM_IN_STOCK');
   });
 
-  it('renders the free-shipping banner inside the summary sidebar, between the checkout button and the secure-payment note', () => {
-    const summaryCard = fixture.nativeElement.querySelector('.summary-card');
-    const orderBtn = summaryCard.querySelector('.order-btn');
-    const banner = summaryCard.querySelector('.shipping-banner');
-    const secureNote = summaryCard.querySelector('.secure-note');
+  it('renders the free-shipping banner full-width below both columns, at its original larger size', () => {
+    const cartContent = fixture.nativeElement.querySelector('.cart-content');
+    const cartLayout = fixture.nativeElement.querySelector('.cart-layout');
+    const banner = fixture.nativeElement.querySelector('.shipping-banner');
     expect(banner).not.toBeNull();
 
-    // Order within the sidebar: totals -> checkout button -> banner -> secure note.
-    expect(orderBtn.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(banner.compareDocumentPosition(secureNote) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    // It's no longer below the item list at all.
+    // It's a sibling of .cart-layout (not nested in either column), following it in DOM
+    // order — i.e. full-width, below both the items list and the summary sidebar.
+    expect(banner.parentElement).toBe(cartContent);
+    expect(cartLayout.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // Not nested inside either column from the sidebar-compact or items-list placements tried before.
     expect(fixture.nativeElement.querySelector('.cart-items-list .shipping-banner')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.summary-card .shipping-banner')).toBeNull();
 
     expect(banner.querySelector('.shipping-icon-badge app-icon')).not.toBeNull();
     expect(banner.querySelector('.shipping-truck-icon')).not.toBeNull();
     expect(banner.querySelector('strong').textContent.trim()).toBe('FREE_DELIVERY_TITLE');
 
-    // Component-level: the banner subtitle and the summary sidebar's delivery tooltip are
-    // both interpolated from this one property, itself derived from the shared
-    // FREE_SHIPPING_THRESHOLD_AMD constant — proving there's no second, hardcoded number.
+    // Component-level: still driven by the one shared threshold property.
     expect(fixture.componentInstance.freeShippingThresholdFormatted).toBe('֏30,000');
     const tooltip = fixture.nativeElement.querySelector('.delivery-label app-icon').getAttribute('title');
     expect(tooltip).toContain('FREE_DELIVERY_THRESHOLD');
+  });
+
+  it('restores the original larger banner sizing (not the sidebar-compact one)', () => {
+    const badge: HTMLElement = fixture.nativeElement.querySelector('.shipping-icon-badge');
+    const truckIcon: HTMLElement = fixture.nativeElement.querySelector('.shipping-truck-icon');
+    const badgeStyle = getComputedStyle(badge);
+    const truckStyle = getComputedStyle(truckIcon);
+
+    expect(badgeStyle.width).toBe('46px');
+    expect(badgeStyle.height).toBe('46px');
+    expect(truckStyle.fontSize).toBe('1.7rem');
   });
 
   it('shows a real ֏1,000 delivery fee (not "Free") and includes it in the total', () => {

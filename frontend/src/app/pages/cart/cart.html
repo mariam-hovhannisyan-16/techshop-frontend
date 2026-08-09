@@ -104,22 +104,22 @@
               {{ 'PROCEED_TO_CHECKOUT' | translate }} →
             </button>
 
-            <div class="shipping-banner">
-              <div class="shipping-icon-badge">
-                <app-icon name="shield-check" />
-              </div>
-              <div class="shipping-text">
-                <strong>{{ 'FREE_DELIVERY_TITLE' | translate }}</strong>
-                <span>{{ 'FREE_SHIPPING_BANNER_SUBTITLE' | translate:{ threshold: freeShippingThresholdFormatted } }}</span>
-              </div>
-              <app-icon name="truck" class="shipping-truck-icon" />
-            </div>
-
             <p class="secure-note">
               <app-icon name="shield-check" /> {{ 'CART_SECURE_PAYMENT_NOTE' | translate }}
             </p>
           </div>
         </div>
+      </div>
+
+      <div class="shipping-banner">
+        <div class="shipping-icon-badge">
+          <app-icon name="shield-check" />
+        </div>
+        <div class="shipping-text">
+          <strong>{{ 'FREE_DELIVERY_TITLE' | translate }}</strong>
+          <span>{{ 'FREE_SHIPPING_BANNER_SUBTITLE' | translate:{ threshold: freeShippingThresholdFormatted } }}</span>
+        </div>
+        <app-icon name="truck" class="shipping-truck-icon" />
       </div>
     } @else {
       <div class="empty-cart">
