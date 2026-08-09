@@ -6,6 +6,8 @@ import { Auth } from '../../services/auth';
 import { AuthDrawerService } from '../../services/auth-drawer';
 import { ToastService } from '../../services/toast';
 import { matchesCategory, CategoryNavItem, CATEGORY_NAV_ITEMS } from '../../services/category';
+import { LanguageService } from '../../services/language';
+import { currencyForLanguage } from '../../config/currency';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -31,6 +33,8 @@ export class Products implements OnInit {
   hasError = false;
   searchQuery = '';
   selectedCategory = 'all';
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
   userId: number = 1;
   highlightedProductId: number | null = null;
 
@@ -48,7 +52,8 @@ export class Products implements OnInit {
     private translateService: TranslateService,
     public router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private languageService: LanguageService
   ) {
     this.userId = this.authService.getUserId() ?? 1;
   }
@@ -132,14 +137,34 @@ export class Products implements OnInit {
   clearFilters(): void {
     this.searchQuery = '';
     this.selectedCategory = 'all';
+    this.minPrice = null;
+    this.maxPrice = null;
     this.applyFilters();
   }
 
-  private applyFilters(): void {
+  get currencySymbol(): string {
+    return currencyForLanguage(this.languageService.current()).symbol;
+  }
+
+  clearPriceRange(): void {
+    this.minPrice = null;
+    this.maxPrice = null;
+    this.applyFilters();
+  }
+
+  private matchesPriceRange(p: { price: number }): boolean {
+    const amdPerUnit = currencyForLanguage(this.languageService.current()).amdPerUnit;
+    if (this.minPrice != null && p.price < this.minPrice * amdPerUnit) return false;
+    if (this.maxPrice != null && p.price > this.maxPrice * amdPerUnit) return false;
+    return true;
+  }
+
+  applyFilters(): void {
     const query = this.searchQuery.toLowerCase();
     this.filteredProducts = this.products.filter(p =>
       matchesCategory(p, this.selectedCategory) &&
-      (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query))
+      (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)) &&
+      this.matchesPriceRange(p)
     );
 
     this.currentPage = 1;

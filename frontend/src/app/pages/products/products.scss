@@ -65,6 +65,86 @@
     }
   }
 
+  .price-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin: 1rem 1.5rem 0;
+    flex-wrap: wrap;
+
+    .price-filter-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .price-inputs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .price-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .currency-symbol {
+        position: absolute;
+        left: 0.8rem;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        pointer-events: none;
+      }
+
+      input {
+        width: 110px;
+        padding: 0.55rem 0.8rem 0.55rem 1.8rem;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        outline: none;
+        box-sizing: border-box;
+        transition: border 0.2s;
+
+        &::placeholder { color: var(--text-secondary); }
+        &:focus { border-color: var(--accent); }
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          opacity: 0.6;
+        }
+      }
+    }
+
+    .price-sep {
+      color: var(--text-secondary);
+    }
+
+    .clear-price-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+
+      &:hover { border-color: var(--accent); color: var(--text-primary); }
+    }
+  }
+
   .marketing-sections {
     display: flex;
     flex-direction: column;
@@ -390,6 +470,12 @@
 
     .category-pills {
       margin: 1rem 1rem 0;
+    }
+
+    .price-filter {
+      margin: 1rem 1rem 0;
+
+      .price-field input { width: 90px; }
     }
 
     .tabs-row {

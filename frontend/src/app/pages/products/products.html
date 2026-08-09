@@ -31,6 +31,40 @@
     }
   </div>
 
+  <div class="price-filter">
+    <span class="price-filter-label"><app-icon name="cash" /> {{ 'PRICE_RANGE' | translate }}</span>
+    <div class="price-inputs">
+      <div class="price-field">
+        <span class="currency-symbol">{{ currencySymbol }}</span>
+        <input
+          type="number"
+          min="0"
+          name="minPrice"
+          [placeholder]="'MIN_PRICE' | translate"
+          [(ngModel)]="minPrice"
+          (ngModelChange)="applyFilters()"
+        >
+      </div>
+      <span class="price-sep">–</span>
+      <div class="price-field">
+        <span class="currency-symbol">{{ currencySymbol }}</span>
+        <input
+          type="number"
+          min="0"
+          name="maxPrice"
+          [placeholder]="'MAX_PRICE' | translate"
+          [(ngModel)]="maxPrice"
+          (ngModelChange)="applyFilters()"
+        >
+      </div>
+    </div>
+    @if (minPrice != null || maxPrice != null) {
+      <button type="button" class="clear-price-btn" [attr.aria-label]="'CLEAR_PRICE_FILTER' | translate" (click)="clearPriceRange()">
+        <app-icon name="close" />
+      </button>
+    }
+  </div>
+
   <div class="marketing-sections">
     <app-trust-badges />
   </div>
