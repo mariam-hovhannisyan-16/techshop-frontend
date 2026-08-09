@@ -101,12 +101,18 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     expect(fixture.nativeElement.querySelector('.stock-status').textContent).toContain('CART_ITEM_IN_STOCK');
   });
 
-  it('renders the free-shipping banner below the item list with the shared dynamic threshold', () => {
-    const itemsList = fixture.nativeElement.querySelector('.cart-items-list');
-    const banner = fixture.nativeElement.querySelector('.shipping-banner');
+  it('renders the free-shipping banner inside the summary sidebar, between the checkout button and the secure-payment note', () => {
+    const summaryCard = fixture.nativeElement.querySelector('.summary-card');
+    const orderBtn = summaryCard.querySelector('.order-btn');
+    const banner = summaryCard.querySelector('.shipping-banner');
+    const secureNote = summaryCard.querySelector('.secure-note');
     expect(banner).not.toBeNull();
-    // "below the cart items list" — assert DOM order, not just presence.
-    expect(itemsList.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    // Order within the sidebar: totals -> checkout button -> banner -> secure note.
+    expect(orderBtn.compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(banner.compareDocumentPosition(secureNote) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // It's no longer below the item list at all.
+    expect(fixture.nativeElement.querySelector('.cart-items-list .shipping-banner')).toBeNull();
 
     expect(banner.querySelector('.shipping-icon-badge app-icon')).not.toBeNull();
     expect(banner.querySelector('.shipping-truck-icon')).not.toBeNull();
@@ -118,6 +124,21 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     expect(fixture.componentInstance.freeShippingThresholdFormatted).toBe('֏30,000');
     const tooltip = fixture.nativeElement.querySelector('.delivery-label app-icon').getAttribute('title');
     expect(tooltip).toContain('FREE_DELIVERY_THRESHOLD');
+  });
+
+  it('shows a real ֏1,000 delivery fee (not "Free") and includes it in the total', () => {
+    const rows = fixture.nativeElement.querySelectorAll('.summary-row');
+    const subtotalRow = rows[0];
+    const deliveryRow = rows[1];
+    const totalRow = fixture.nativeElement.querySelector('.summary-row.total-row');
+
+    // cart total from cartWith(2) is 650000 * 2 = 1,300,000
+    expect(subtotalRow.querySelector('span:last-child').textContent.trim()).toBe('֏1,300,000');
+    expect(deliveryRow.querySelector('span:last-child').textContent.trim()).toBe('֏1,000');
+    expect(totalRow.querySelector('span:last-child').textContent.trim()).toBe('֏1,301,000');
+
+    expect(fixture.componentInstance.deliveryFeeAmd).toBe(1000);
+    expect(fixture.componentInstance.cartTotalWithDelivery).toBe(1301000);
   });
 
   it('increments quantity via the + button by calling addItem with a delta of 1', () => {

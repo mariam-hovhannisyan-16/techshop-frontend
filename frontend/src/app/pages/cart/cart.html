@@ -18,9 +18,6 @@
         <h1 class="cart-heading">
           <app-icon name="cart" /> {{ 'CART_HEADING' | translate:{ count: cart.items.length } }}
         </h1>
-        <p class="cart-subtext">
-          {{ 'CART_RETENTION_PREFIX' | translate }} <span class="highlight">{{ 'CART_RETENTION_HIGHLIGHT' | translate }}</span>
-        </p>
       </div>
 
       <div class="cart-layout">
@@ -82,17 +79,6 @@
               </div>
             }
           </div>
-
-          <div class="shipping-banner">
-            <div class="shipping-icon-badge">
-              <app-icon name="shield-check" />
-            </div>
-            <div class="shipping-text">
-              <strong>{{ 'FREE_DELIVERY_TITLE' | translate }}</strong>
-              <span>{{ 'FREE_SHIPPING_BANNER_SUBTITLE' | translate:{ threshold: freeShippingThresholdFormatted } }}</span>
-            </div>
-            <app-icon name="truck" class="shipping-truck-icon" />
-          </div>
         </div>
 
         <div class="cart-summary">
@@ -107,16 +93,27 @@
                 {{ 'CART_DELIVERY' | translate }}
                 <app-icon name="info" [attr.title]="'FREE_DELIVERY_THRESHOLD' | translate:{ threshold: freeShippingThresholdFormatted }" />
               </span>
-              <span>{{ 'CART_DELIVERY_FREE' | translate }}</span>
+              <span>{{ deliveryFeeAmd | price }}</span>
             </div>
             <div class="summary-row total-row">
               <span>{{ 'CART_TOTAL' | translate }}</span>
-              <span>{{ cart.totalPrice | price }}</span>
+              <span>{{ cartTotalWithDelivery | price }}</span>
             </div>
 
             <button class="order-btn" (click)="goToCheckout()">
               {{ 'PROCEED_TO_CHECKOUT' | translate }} →
             </button>
+
+            <div class="shipping-banner">
+              <div class="shipping-icon-badge">
+                <app-icon name="shield-check" />
+              </div>
+              <div class="shipping-text">
+                <strong>{{ 'FREE_DELIVERY_TITLE' | translate }}</strong>
+                <span>{{ 'FREE_SHIPPING_BANNER_SUBTITLE' | translate:{ threshold: freeShippingThresholdFormatted } }}</span>
+              </div>
+              <app-icon name="truck" class="shipping-truck-icon" />
+            </div>
 
             <p class="secure-note">
               <app-icon name="shield-check" /> {{ 'CART_SECURE_PAYMENT_NOTE' | translate }}

@@ -4,3 +4,8 @@
 // the free-shipping threshold (cart summary tooltip, cart promo banner, etc.) stays in
 // sync instead of hardcoding the number separately.
 export const FREE_SHIPPING_THRESHOLD_AMD = 30000;
+
+// Flat delivery fee shown on the cart summary's "Առաքում" line. Not yet reconciled with
+// FREE_SHIPPING_THRESHOLD_AMD above (that threshold isn't applied to waive this fee) —
+// intentionally separate for now, see cart page task history.
+export const DELIVERY_FEE_AMD = 1000;

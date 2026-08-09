@@ -11,7 +11,7 @@ import { Toast } from '../../components/toast/toast';
 import { StarRating } from '../../components/star-rating/star-rating';
 import { WishlistButton } from '../../components/wishlist-button/wishlist-button';
 import { PricePipe } from '../../pipes/price';
-import { FREE_SHIPPING_THRESHOLD_AMD } from '../../config/delivery';
+import { FREE_SHIPPING_THRESHOLD_AMD, DELIVERY_FEE_AMD } from '../../config/delivery';
 import { formatAmd } from '../../config/currency';
 
 @Component({
@@ -29,6 +29,11 @@ export class Cart implements OnInit {
   private updatingProductIds = new Set<number>();
 
   readonly freeShippingThresholdFormatted = formatAmd(FREE_SHIPPING_THRESHOLD_AMD);
+  readonly deliveryFeeAmd = DELIVERY_FEE_AMD;
+
+  get cartTotalWithDelivery(): number {
+    return (this.cart?.totalPrice ?? 0) + this.deliveryFeeAmd;
+  }
 
   constructor(
     private cartService: CartService,
