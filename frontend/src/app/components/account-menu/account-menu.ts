@@ -30,10 +30,6 @@ export class AccountMenu {
     return !!this.authService.getToken();
   }
 
-  get isAdmin(): boolean {
-    return this.authService.isAdmin();
-  }
-
   toggleMenu(): void {
     if (!this.isLoggedIn) {
       this.authDrawerService.open('login');

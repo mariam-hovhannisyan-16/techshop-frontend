@@ -77,12 +77,6 @@
     gap: 2rem;
   }
 
-  // Same trust-badge row already used on the products page — fills the dead space below
-  // the item list / summary card with real, reused content instead of empty page.
-  .cart-trust-badges {
-    margin-top: 1.5rem;
-  }
-
   .cart-items-col {
     flex: 1;
     min-width: 0;

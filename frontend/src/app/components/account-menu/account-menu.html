@@ -9,10 +9,6 @@
   @if (menuOpen && isLoggedIn) {
     <div class="account-dropdown">
       <button (click)="goTo('/profile')"><app-icon name="user" /> {{ 'PROFILE' | translate }}</button>
-      @if (!isAdmin) {
-        <button (click)="goTo('/orders')"><app-icon name="box" /> {{ 'ORDERS' | translate }}</button>
-        <button (click)="goTo('/wishlist')"><app-icon name="heart" /> {{ 'WISHLIST' | translate }}</button>
-      }
       <button class="logout" (click)="logout()"><app-icon name="logout" /> {{ 'LOGOUT' | translate }}</button>
     </div>
   }

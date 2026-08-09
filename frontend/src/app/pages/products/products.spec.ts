@@ -76,6 +76,10 @@ describe('Products — price range filter', () => {
     expect(component.filteredProducts.map(p => p.id).sort()).toEqual([1, 2, 3, 4]);
   });
 
+  it('still renders the shared trust-badges component (kept here, removed from cart)', () => {
+    expect(fixture.nativeElement.querySelector('app-trust-badges')).not.toBeNull();
+  });
+
   it('narrows to products within [min, max], inclusive on both ends', () => {
     component.minPrice = 20000;
     component.maxPrice = 200000;

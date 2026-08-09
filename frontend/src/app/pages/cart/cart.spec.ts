@@ -249,12 +249,9 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     expect(orderBtnStyle.boxShadow).toContain('var(--accent-soft-strong)');
   });
 
-  it('reuses the shared trust-badges component (fast delivery, secure payments, returns, warranty)', () => {
-    const section = fixture.nativeElement.querySelector('.cart-trust-badges app-trust-badges');
-    expect(section).not.toBeNull();
-    // Component itself renders 4 badges from its own hardcoded list — just confirming
-    // it's the real reused component (correct child structure), not a hand-rolled copy.
-    expect(fixture.nativeElement.querySelectorAll('.cart-trust-badges .trust-badge').length).toBe(4);
+  it('does not render the shared trust-badges component (removed from cart, kept on products page)', () => {
+    expect(fixture.nativeElement.querySelector('.cart-trust-badges')).toBeNull();
+    expect(fixture.nativeElement.querySelector('app-trust-badges')).toBeNull();
   });
 
   it('numbers the item card and wires up its entrance-animation delay for index 0', () => {
