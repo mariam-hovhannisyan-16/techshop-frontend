@@ -623,6 +623,15 @@
         color: var(--danger);
         font-size: 0.85rem;
       }
+
+      .forgot-link {
+        align-self: flex-end;
+        margin-top: -0.5rem;
+        color: var(--accent);
+        font-size: 0.85rem;
+        text-decoration: underline;
+        cursor: pointer;
+      }
     }
 
     .save-password-btn {

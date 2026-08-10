@@ -8,9 +8,19 @@ export type AuthDrawerMode = 'login' | 'register';
 export class AuthDrawerService {
   readonly isOpen = signal(false);
   readonly mode = signal<AuthDrawerMode>('login');
+  readonly openInForgotView = signal(false);
 
   open(mode: AuthDrawerMode = 'login'): void {
     this.mode.set(mode);
+    this.isOpen.set(true);
+  }
+
+  // Used by entry points outside the drawer itself (e.g. the profile page's
+  // change-password form) that need to land straight on the forgot-password
+  // step instead of the login form.
+  openForgotPassword(): void {
+    this.mode.set('login');
+    this.openInForgotView.set(true);
     this.isOpen.set(true);
   }
 

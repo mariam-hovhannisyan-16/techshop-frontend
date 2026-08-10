@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener } from '@angular/core';
+import { ChangeDetectorRef, Component, effect, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -48,7 +48,14 @@ export class AuthDrawer {
     private translateService: TranslateService,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) {}
+  ) {
+    effect(() => {
+      if (this.authDrawerService.openInForgotView()) {
+        this.onForgotPassword();
+        this.authDrawerService.openInForgotView.set(false);
+      }
+    });
+  }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {

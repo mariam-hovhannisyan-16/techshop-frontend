@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Auth, UserResponse } from '../../services/auth';
+import { AuthDrawerService } from '../../services/auth-drawer';
 import { ProfileService, SavedAddress } from '../../services/profile';
 import { OrderService, OrderResponse } from '../../services/order';
 import { WishlistService } from '../../services/wishlist';
@@ -57,6 +58,7 @@ export class Profile implements OnInit {
 
   constructor(
     private authService: Auth,
+    private authDrawerService: AuthDrawerService,
     private profileService: ProfileService,
     private orderService: OrderService,
     public wishlistService: WishlistService,
@@ -117,6 +119,10 @@ export class Profile implements OnInit {
       this.passwordMismatch = false;
       this.passwordTooShort = false;
     }
+  }
+
+  openForgotPassword(): void {
+    this.authDrawerService.openForgotPassword();
   }
 
   submitChangePassword(): void {
