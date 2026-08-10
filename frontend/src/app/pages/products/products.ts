@@ -175,10 +175,6 @@ export class Products implements OnInit {
     return Math.max(1, Math.ceil(this.filteredProducts.length / this.pageSize));
   }
 
-  get pageNumbers(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
   get pagedProducts(): any[] {
     const start = (this.currentPage - 1) * this.pageSize;
     return this.filteredProducts.slice(start, start + this.pageSize);

@@ -71,14 +71,6 @@
 
   <div class="main-content">
     <div class="products-section" id="products-section">
-      <div class="breadcrumb">
-        <a (click)="selectCategory('all')">{{ 'HOME' | translate }}</a>
-        @if (selectedCategory !== 'all') {
-          <span class="sep">/</span>
-          <span class="current">{{ selectedCategory.toUpperCase() | translate }}</span>
-        }
-      </div>
-
       <div class="section-header">
         <h2>{{ currentViewTitleKey | translate }}</h2>
         <p>{{ filteredProducts.length }} {{ 'PRODUCTS_COUNT' | translate }}</p>
@@ -109,9 +101,6 @@
         @if (totalPages > 1) {
           <div class="pagination">
             <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">←</button>
-            @for (page of pageNumbers; track page) {
-              <button [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
-            }
             <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">→</button>
           </div>
         }
