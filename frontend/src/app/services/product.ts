@@ -46,9 +46,12 @@ interface ApiResponse<T> {
 
 // The live backend's raw product payload: `stock` instead of `quantity`, and
 // `imageUrl` is a path relative to environment.imageBaseUrl, not an absolute URL.
+// It also has no notion of `originalPrice` — discounts are modeled as a
+// `discountPercentage` off the current `price` instead; see normalizeProduct().
 interface BackendProductPayload extends Omit<ProductResponse, 'quantity'> {
   quantity?: number;
   stock?: number;
+  discountPercentage?: number | null;
 }
 
 interface ProductPage {
@@ -516,10 +519,15 @@ export class Product {
   }
 
   private normalizeProduct(raw: BackendProductPayload): ProductResponse {
+    const discountPercentage = raw.discountPercentage;
+    const derivedOriginalPrice = discountPercentage && discountPercentage > 0
+      ? Math.round(raw.price / (1 - discountPercentage / 100))
+      : undefined;
     return {
       ...raw,
       quantity: raw.quantity ?? raw.stock ?? 0,
       imageUrl: this.resolveImageUrl(raw.imageUrl),
+      originalPrice: raw.originalPrice ?? derivedOriginalPrice,
     };
   }
 
@@ -663,7 +671,7 @@ export class Product {
 
   updateProductDiscount(productId: number, discountPercent: number | null): Observable<ApiResponse<ProductResponse>> {
     const url = `${this.apiUrl}/${productId}/discount`;
-    return this.http.put<ApiResponse<BackendProductPayload>>(url, { discountPercent }, { headers: this.getHeaders() }).pipe(
+    return this.http.put<ApiResponse<BackendProductPayload>>(url, { discountPercentage: discountPercent }, { headers: this.getHeaders() }).pipe(
       map(response => ({ ...response, data: this.normalizeProduct(response.data) })),
       catchError(err => {
         if (this.isAdminEndpointUnavailable(err)) {
