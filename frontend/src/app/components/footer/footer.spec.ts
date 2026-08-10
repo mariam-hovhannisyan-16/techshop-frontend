@@ -23,4 +23,23 @@ describe('Footer', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('shows the 5-brand payment composite (Mastercard, ArCa, Telcell Wallet, VTB Ապառիկ, МИР) — no Visa/Idram/Amex/MyAmeria', () => {
+    fixture.detectChanges();
+    const img: HTMLImageElement = fixture.nativeElement.querySelector('.footer-payments-badges');
+    expect(img).not.toBeNull();
+    expect(img.getAttribute('src')).toBe('icons/payment/payment-methods-footer.svg');
+
+    const alt = img.getAttribute('alt') ?? '';
+    expect(alt).toContain('Mastercard');
+    expect(alt).toContain('ArCa');
+    expect(alt).toContain('Telcell Wallet');
+    expect(alt).toContain('VTB');
+    expect(alt).toContain('Ապառիկ');
+    expect(alt).toContain('МИР');
+    expect(alt).not.toContain('Visa');
+    expect(alt).not.toContain('Idram');
+    expect(alt).not.toContain('American Express');
+    expect(alt).not.toContain('MyAmeria');
+  });
 });

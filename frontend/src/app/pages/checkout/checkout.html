@@ -20,10 +20,10 @@
 
         <div class="payment-options">
           <button type="button" class="payment-option" [class.active]="paymentMethod === 'IDRAM'" (click)="selectPayment('IDRAM')">
-            <app-icon name="card" /> {{ 'PAYMENT_IDRAM' | translate }}
+            <span class="payment-logo-chip"><img src="icons/payment/idram.svg" alt="Idram" class="payment-logo" /></span>
           </button>
           <button type="button" class="payment-option" [class.active]="paymentMethod === 'TELCELL'" (click)="selectPayment('TELCELL')">
-            <app-icon name="smartphone" /> {{ 'PAYMENT_TELCELL' | translate }}
+            <span class="payment-logo-chip"><img src="icons/payment/telcell.svg" alt="Telcell Wallet" class="payment-logo" /></span>
           </button>
           <button type="button" class="payment-option" [class.active]="paymentMethod === 'ROKET_LINE'" (click)="selectPayment('ROKET_LINE')">
             <app-icon name="bolt" /> {{ 'PAYMENT_ROKET_LINE' | translate }}
@@ -32,7 +32,7 @@
             <app-icon name="calculator" /> {{ 'PAYMENT_INSTALLMENT' | translate }}
           </button>
           <button type="button" class="payment-option" [class.active]="paymentMethod === 'CARD'" (click)="selectPayment('CARD')">
-            <app-icon name="badge-check" />
+            <app-icon name="card" />
             <span class="payment-option-text">
               <span class="payment-option-label">{{ 'PAYMENT_CARD' | translate }}</span>
               <span class="payment-option-sublabel">{{ 'PAYMENT_CARD_SUBLABEL' | translate }}</span>

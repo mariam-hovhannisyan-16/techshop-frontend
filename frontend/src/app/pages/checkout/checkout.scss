@@ -287,6 +287,24 @@
         font-weight: 400;
         color: var(--text-secondary);
       }
+
+      // Real brand logos (Idram, Telcell) include white/light-colored strokes that assume a
+      // dark backdrop — a fixed-dark chip (independent of the light/dark theme) keeps them
+      // legible either way, matching how these same assets already look in the footer.
+      .payment-logo-chip {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #12151c;
+        border-radius: 6px;
+        padding: 0.4rem 0.7rem;
+      }
+
+      .payment-logo {
+        height: 20px;
+        width: auto;
+        display: block;
+      }
     }
   }
 

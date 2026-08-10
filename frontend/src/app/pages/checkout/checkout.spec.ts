@@ -107,6 +107,41 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(component.cart?.totalPrice).toBe(650000);
   });
 
+  it('shows real Idram/Telcell logo images and a proper card icon, without disturbing selection behavior', () => {
+    const nativeElement: HTMLElement = fixture.nativeElement;
+    const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
+    expect(paymentButtons.length).toBe(5);
+
+    const idramImg = paymentButtons[0].querySelector<HTMLImageElement>('.payment-logo-chip img');
+    expect(idramImg).not.toBeNull();
+    expect(idramImg!.getAttribute('src')).toBe('icons/payment/idram.svg');
+    expect(idramImg!.getAttribute('alt')).toBe('Idram');
+
+    const telcellImg = paymentButtons[1].querySelector<HTMLImageElement>('.payment-logo-chip img');
+    expect(telcellImg).not.toBeNull();
+    expect(telcellImg!.getAttribute('src')).toBe('icons/payment/telcell.svg');
+    expect(telcellImg!.getAttribute('alt')).toBe('Telcell Wallet');
+
+    // Roket Line / Installment are distinct real backend payment methods, not brand logos
+    // we have assets for — left with their existing generic (non-brand) icons untouched.
+    expect(paymentButtons[2].querySelector('img')).toBeNull();
+    expect(paymentButtons[2].querySelector('app-icon')).not.toBeNull();
+    expect(paymentButtons[2].textContent).toContain('PAYMENT_ROKET_LINE');
+    expect(paymentButtons[3].querySelector('img')).toBeNull();
+    expect(paymentButtons[3].textContent).toContain('PAYMENT_INSTALLMENT');
+
+    // Card now uses the semantically-correct generic 'card' icon (freed up now that Idram
+    // no longer misuses it) instead of the mismatched 'badge-check'.
+    expect(paymentButtons[4].querySelector('.payment-option-label')?.textContent).toContain('PAYMENT_CARD');
+
+    // Selecting is still driven by the same click handler / active-class behavior as before.
+    expect(paymentButtons[0].classList.contains('active')).toBe(false);
+    paymentButtons[0].click();
+    fixture.detectChanges();
+    expect(paymentButtons[0].classList.contains('active')).toBe(true);
+    expect(component.paymentMethod).toBe('IDRAM');
+  });
+
   it('blocks submission and surfaces validation errors when required fields are missing', () => {
     const form: HTMLFormElement = fixture.nativeElement.querySelector('form.checkout-form');
     form.dispatchEvent(new Event('submit'));
