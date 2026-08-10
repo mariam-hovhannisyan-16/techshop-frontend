@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Product, ProductResponse, StorageOption, ColorVariant } from '../../services/product';
@@ -8,6 +9,7 @@ import { Auth } from '../../services/auth';
 import { AuthDrawerService } from '../../services/auth-drawer';
 import { ToastService } from '../../services/toast';
 import { ReviewsService, Review } from '../../services/reviews';
+import { OrderService } from '../../services/order';
 import { RecentlyViewedService, RecentlyViewedEntry } from '../../services/recently-viewed';
 import { inferCategory, matchesCategory } from '../../services/category';
 import { Toast } from '../../components/toast/toast';
@@ -20,9 +22,13 @@ import { Icon } from '../../components/icon/icon';
 import { InstallmentModal, DEFAULT_INSTALLMENT_DURATION_MONTHS } from '../../components/installment-modal/installment-modal';
 import { PricePipe } from '../../pipes/price';
 
+// Matches the backend's ReviewServiceImpl.VERIFIED_PURCHASE_STATUSES exactly — REFUNDED is
+// deliberately excluded there, so it must be excluded here too.
+const VERIFIED_PURCHASE_STATUSES = ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
+
 @Component({
   selector: 'app-product-detail',
-  imports: [CommonModule, TranslatePipe, Toast, WishlistButton, AppHeader, Skeleton, StarRating, ProductCard, Icon, InstallmentModal, PricePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, Toast, WishlistButton, AppHeader, Skeleton, StarRating, ProductCard, Icon, InstallmentModal, PricePipe],
   templateUrl: './product-detail.html',
   styleUrl: './product-detail.scss',
 })
@@ -44,6 +50,13 @@ export class ProductDetail implements OnInit {
   averageRating = 0;
   reviewsLoading = true;
 
+  hasPurchased = false;
+  alreadyReviewed = false;
+  newReviewRating = 0;
+  newReviewComment = '';
+  submittingReview = false;
+  reviewSubmitError = '';
+
   constructor(
     private productService: Product,
     private cartService: CartService,
@@ -52,6 +65,7 @@ export class ProductDetail implements OnInit {
     private toastService: ToastService,
     private translateService: TranslateService,
     private reviewsService: ReviewsService,
+    private orderService: OrderService,
     private recentlyViewedService: RecentlyViewedService,
     private route: ActivatedRoute,
     public router: Router,
@@ -74,6 +88,11 @@ export class ProductDetail implements OnInit {
     this.selectedStorageOption = null;
     this.selectedSimOption = null;
     this.selectedColorVariant = null;
+    this.hasPurchased = false;
+    this.alreadyReviewed = false;
+    this.newReviewRating = 0;
+    this.newReviewComment = '';
+    this.reviewSubmitError = '';
 
     this.productService.getProductById(this.productId).subscribe({
       next: (response) => {
@@ -89,6 +108,7 @@ export class ProductDetail implements OnInit {
         this.recentlyViewedService.record({ id: this.product.id, name: this.product.name, price: this.product.price, imageUrl: this.product.imageUrl });
         this.loadRelatedProducts();
         this.loadReviews();
+        this.checkPurchaseEligibility();
       },
       error: (err) => {
         if (err.status === 404) {
@@ -123,15 +143,91 @@ export class ProductDetail implements OnInit {
     this.reviewsLoading = true;
     const productId = this.product.id;
 
-    this.reviewsService.getReviews(productId).subscribe(reviews => {
-      this.reviews = reviews;
-      this.reviewsLoading = false;
-      this.cdr.detectChanges();
+    this.reviewsService.getReviews(productId).subscribe({
+      next: (reviews) => {
+        this.reviews = reviews;
+        this.reviewsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.reviewsLoading = false;
+        this.cdr.detectChanges();
+      }
     });
 
-    this.reviewsService.getAverageRating(productId).subscribe(avg => {
-      this.averageRating = avg;
+    this.reviewsService.getAverageRating(productId).subscribe({
+      next: (avg) => {
+        this.averageRating = avg;
+        this.cdr.detectChanges();
+      },
+      error: () => this.cdr.detectChanges()
+    });
+  }
+
+  private checkPurchaseEligibility(): void {
+    if (!this.product || !this.authService.getToken()) {
       this.cdr.detectChanges();
+      return;
+    }
+    const productId = this.product.id;
+
+    this.orderService.getUserOrders(this.userId).subscribe({
+      next: (response) => {
+        this.hasPurchased = response.data.some(order =>
+          VERIFIED_PURCHASE_STATUSES.includes(order.status)
+          && order.items.some(item => item.productId === productId)
+        );
+        this.cdr.detectChanges();
+      },
+      error: () => this.cdr.detectChanges()
+    });
+  }
+
+  get canShowReviewForm(): boolean {
+    return !!this.authService.getToken() && this.hasPurchased && !this.alreadyReviewed;
+  }
+
+  setReviewRating(rating: number): void {
+    this.newReviewRating = rating;
+  }
+
+  get isReviewFormValid(): boolean {
+    return this.newReviewRating >= 1 && this.newReviewRating <= 5 && this.newReviewComment.trim().length > 0;
+  }
+
+  submitReview(): void {
+    if (!this.product || this.submittingReview || !this.isReviewFormValid) return;
+
+    this.submittingReview = true;
+    this.reviewSubmitError = '';
+
+    this.reviewsService.createReview({
+      productId: this.product.id,
+      rating: this.newReviewRating,
+      comment: this.newReviewComment.trim()
+    }).subscribe({
+      next: (response) => {
+        this.reviews = [response.data, ...this.reviews];
+        this.averageRating = this.reviews.reduce((sum, r) => sum + r.rating, 0) / this.reviews.length;
+        this.newReviewRating = 0;
+        this.newReviewComment = '';
+        this.submittingReview = false;
+        this.toastService.show(this.translateService.instant('TOAST_REVIEW_SUBMITTED'), 'success');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.submittingReview = false;
+        if (err.status === 403) {
+          this.hasPurchased = false;
+          this.reviewSubmitError = this.translateService.instant('REVIEW_NOT_PURCHASED');
+        } else if (err.status === 409) {
+          this.alreadyReviewed = true;
+          this.reviewSubmitError = this.translateService.instant('REVIEW_ALREADY_SUBMITTED');
+        } else {
+          this.reviewSubmitError = this.translateService.instant('REVIEW_SUBMIT_FAILED');
+        }
+        this.cdr.detectChanges();
+      }
     });
   }
 

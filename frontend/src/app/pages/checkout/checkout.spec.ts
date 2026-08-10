@@ -5,6 +5,7 @@ import { provideRouter, Router } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { vi } from 'vitest';
 import { environment } from '../../../environments/environment';
+import { LanguageService } from '../../services/language';
 
 import { Checkout } from './checkout';
 
@@ -214,6 +215,7 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(checkoutReq.request.body.shippingAddress.city).toBe('Yerevan');
     expect(checkoutReq.request.body.shippingAddress.state).toBe('Kentron');
     expect(checkoutReq.request.body.notes).toBe('Please call before delivery');
+    expect(checkoutReq.request.body.language).toBe('HY');
 
     // The real backend response for IDRAM/TELCELL includes a paymentRedirectUrl pointing
     // at a sandbox domain that doesn't actually resolve (confirmed: sandbox.idram.am /
@@ -235,5 +237,76 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(route).toEqual(['/order-confirmation', 555]);
     expect(extras?.state).toEqual({ justCheckedOut: true, paymentMethod: 'IDRAM' });
     expect(extras?.state).not.toHaveProperty('paymentRedirectUrl');
+  });
+
+  it('sends the site language actually selected via LanguageService, not always Armenian', () => {
+    const nativeElement: HTMLElement = fixture.nativeElement;
+
+    const setInput = (name: string, value: string) => {
+      const el = nativeElement.querySelector<HTMLInputElement | HTMLTextAreaElement>(`input[name="${name}"], textarea[name="${name}"]`);
+      if (!el) throw new Error(`input [name="${name}"] not found`);
+      el.value = value;
+      el.dispatchEvent(new Event('input'));
+    };
+    const setSelect = (name: string, value: string) => {
+      const el = nativeElement.querySelector<HTMLSelectElement>(`select[name="${name}"]`);
+      if (!el) throw new Error(`select [name="${name}"] not found`);
+      el.value = value;
+      el.dispatchEvent(new Event('change'));
+    };
+
+    // Simulates the user switching the site language (e.g. via the header language switcher)
+    // before ever reaching checkout — LanguageService is the single source of truth the rest
+    // of the app already reads from for translation/currency, so checkout should read from it too.
+    const languageService = TestBed.inject(LanguageService);
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    languageService.setLanguage('en');
+    fixture.detectChanges();
+
+    const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
+    paymentButtons[0].click(); // IDRAM
+    setInput('firstName', 'Անի');
+    setInput('lastName', 'Հակոբյան');
+    setInput('phone', '77123456');
+    setInput('email', 'ani@example.com');
+    setSelect('city', 'Yerevan');
+    setInput('cityDistrict', 'Kentron');
+    setInput('addressLine', 'Mashtots 1');
+    setInput('postalCode', '0001');
+    fixture.detectChanges();
+
+    const termsCheckbox = nativeElement.querySelector<HTMLInputElement>('input[name="agreedToTerms"]')!;
+    termsCheckbox.checked = true;
+    termsCheckbox.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(component.isFormValid).toBe(true);
+
+    const submitBtn = nativeElement.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    submitBtn.click();
+    fixture.detectChanges();
+
+    const checkoutReq = httpMock.expectOne(checkoutUrl);
+    expect(checkoutReq.request.body.language).toBe('EN');
+    checkoutReq.flush({
+      success: true,
+      message: 'ok',
+      data: { id: 556, userId: 1, items: [], totalPrice: 650000, status: 'PENDING', paymentMethod: 'IDRAM', createdAt: '2026-01-01' }
+    });
+
+    // Switching again (RU) confirms this tracks the live selection rather than a value
+    // captured once at component construction.
+    languageService.setLanguage('ru');
+    fixture.detectChanges();
+    submitBtn.click();
+    fixture.detectChanges();
+
+    const secondReq = httpMock.expectOne(checkoutUrl);
+    expect(secondReq.request.body.language).toBe('RU');
+    secondReq.flush({
+      success: true,
+      message: 'ok',
+      data: { id: 557, userId: 1, items: [], totalPrice: 650000, status: 'PENDING', paymentMethod: 'IDRAM', createdAt: '2026-01-01' }
+    });
   });
 });

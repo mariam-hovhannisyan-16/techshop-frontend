@@ -179,6 +179,47 @@
 
       <div class="reviews-section">
         <h2>{{ 'REVIEWS' | translate }}</h2>
+
+        @if (canShowReviewForm) {
+          <div class="review-form">
+            <h3>{{ 'LEAVE_REVIEW' | translate }}</h3>
+            <div class="review-form-rating">
+              <span class="review-form-rating-label">{{ 'YOUR_RATING' | translate }}</span>
+              <span class="rating-star-input">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <button
+                    type="button"
+                    class="rating-star"
+                    [class.filled]="newReviewRating >= star"
+                    [attr.aria-label]="star"
+                    (click)="setReviewRating(star)"
+                  >★</button>
+                }
+              </span>
+            </div>
+            <textarea
+              class="review-comment-input"
+              [(ngModel)]="newReviewComment"
+              name="reviewComment"
+              maxlength="1000"
+              [placeholder]="'REVIEW_COMMENT_PLACEHOLDER' | translate"
+            ></textarea>
+            @if (reviewSubmitError) {
+              <p class="review-form-error">{{ reviewSubmitError }}</p>
+            }
+            <button
+              type="button"
+              class="submit-review-btn"
+              [disabled]="!isReviewFormValid || submittingReview"
+              (click)="submitReview()"
+            >{{ 'SUBMIT_REVIEW' | translate }}</button>
+          </div>
+        } @else if (alreadyReviewed) {
+          <p class="review-form-note">{{ 'REVIEW_ALREADY_SUBMITTED' | translate }}</p>
+        } @else if (reviewSubmitError) {
+          <p class="review-form-error">{{ reviewSubmitError }}</p>
+        }
+
         @if (reviewsLoading) {
           <app-skeleton variant="row" [count]="2" />
         } @else if (reviews.length === 0) {
@@ -188,7 +229,7 @@
             @for (review of reviews; track review.id) {
               <div class="review-item">
                 <div class="review-header">
-                  <strong>{{ review.author }}</strong>
+                  <strong>{{ 'REVIEW_AUTHOR' | translate:{ id: review.userId } }}</strong>
                   <app-star-rating [rating]="review.rating" />
                 </div>
                 <p class="review-date">{{ review.createdAt | date:'dd.MM.yyyy' }}</p>

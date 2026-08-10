@@ -446,6 +446,103 @@
     color: var(--text-secondary);
   }
 
+  .review-form-note {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+  }
+
+  .review-form-error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin: 0.6rem 0 0;
+  }
+
+  .review-form {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+
+    h3 {
+      margin: 0 0 0.8rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .review-form-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+
+      .review-form-rating-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+    }
+
+    .rating-star-input {
+      display: inline-flex;
+      gap: 0.2rem;
+
+      .rating-star {
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        line-height: 1;
+        color: var(--border-strong);
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.15s;
+
+        &.filled { color: var(--warning); }
+        &:hover { color: var(--warning); }
+      }
+    }
+
+    .review-comment-input {
+      width: 100%;
+      min-height: 80px;
+      padding: 0.75rem 1rem;
+      background: var(--bg-page);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      box-sizing: border-box;
+      outline: none;
+      transition: border 0.2s;
+
+      &::placeholder { color: var(--text-secondary); }
+      &:focus { border-color: var(--accent); }
+    }
+
+    .submit-review-btn {
+      margin-top: 0.8rem;
+      padding: 0.7rem 1.6rem;
+      background: var(--accent);
+      color: var(--text-on-accent);
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) { background: var(--accent-hover); }
+
+      &:disabled {
+        background: var(--border);
+        color: var(--text-secondary);
+        cursor: not-allowed;
+      }
+    }
+  }
+
   .review-list {
     display: flex;
     flex-direction: column;

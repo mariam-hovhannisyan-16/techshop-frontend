@@ -18,6 +18,7 @@ export interface AddressPayload {
 
 export type PaymentMethod = 'IDRAM' | 'TELCELL' | 'ROKET_LINE' | 'INSTALLMENT' | 'CARD';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+export type OrderLanguage = 'HY' | 'EN' | 'RU';
 
 export interface InstallmentPlanPayload {
   bank: string;
@@ -66,6 +67,7 @@ export interface CheckoutRequest {
   notes?: string;
   paymentMethod: PaymentMethod;
   installmentPlan?: InstallmentPlanPayload;
+  language: OrderLanguage;
 }
 
 interface ApiResponse<T> {

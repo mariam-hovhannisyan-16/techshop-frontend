@@ -209,7 +209,8 @@ export class Checkout implements OnInit {
       paymentMethod: this.paymentMethod,
       installmentPlan: this.paymentMethod === 'INSTALLMENT' && this.pendingInstallmentPlan
         ? this.pendingInstallmentPlan
-        : undefined
+        : undefined,
+      language: this.languageService.current().toUpperCase() as CheckoutRequest['language']
     };
 
     this.orderService.checkout(this.userId, request).subscribe({
