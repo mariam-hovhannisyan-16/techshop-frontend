@@ -75,6 +75,7 @@
         <table class="admin-table">
           <thead>
             <tr>
+              <th class="thumb-col"></th>
               <th>{{ 'ADMIN_COL_NAME' | translate }}</th>
               <th>{{ 'ADMIN_COL_CATEGORY' | translate }}</th>
               <th>{{ 'ADMIN_COL_PRICE' | translate }}</th>
@@ -85,6 +86,13 @@
           <tbody>
             @for (product of products; track product.id) {
               <tr [class.editing]="editingId === product.id">
+                <td class="thumb-cell">
+                  @if (thumbnailSrc(product); as src) {
+                    <img [src]="src" [alt]="product.name" (error)="onThumbnailError(product.id)">
+                  } @else {
+                    <div class="thumb-fallback"><app-icon name="box" /></div>
+                  }
+                </td>
                 <td class="name-cell">{{ product.name }}</td>
                 <td class="category-cell">
                   @if (categoryLabelKey(product); as labelKey) {

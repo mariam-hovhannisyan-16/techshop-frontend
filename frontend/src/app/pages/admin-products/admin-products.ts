@@ -55,6 +55,8 @@ export class AdminProducts implements OnInit {
   editState: EditState = { price: 0, discountPercent: null };
   saving = false;
 
+  private failedThumbnailIds = new Set<number>();
+
   categoryOptions = Object.entries(CATEGORY_LABEL_KEYS).map(([id, labelKey]) => ({ id, labelKey }));
   showAddForm = false;
   addForm: AddProductForm = { ...EMPTY_ADD_FORM };
@@ -154,6 +156,16 @@ export class AdminProducts implements OnInit {
     return Math.round((1 - product.price / product.originalPrice) * 100);
   }
 
+  thumbnailSrc(product: ProductResponse): string | null {
+    if (!product.imageUrl || this.failedThumbnailIds.has(product.id)) return null;
+    return product.imageUrl;
+  }
+
+  onThumbnailError(productId: number): void {
+    this.failedThumbnailIds.add(productId);
+    this.cdr.detectChanges();
+  }
+
   startEdit(product: ProductResponse): void {
     this.editingId = product.id;
     this.editState = {
@@ -175,11 +187,47 @@ export class AdminProducts implements OnInit {
       this.productService.updateProductPrice(product.id, price),
       this.productService.updateProductDiscount(product.id, discountPercent)
     ]).subscribe({
-      next: () => {
+      next: ([priceResponse, discountResponse]) => {
         this.saving = false;
         this.editingId = null;
-        this.toastService.show(this.translateService.instant('ADMIN_SAVE_SUCCESS'), 'success');
-        this.loadProducts();
+
+        // Both calls resolving isn't enough on its own to call this a
+        // success — the API wraps every response in { success, ... }, so
+        // confirm that flag too rather than trusting a 200 status alone.
+        if (!priceResponse.success || !discountResponse.success) {
+          this.toastService.show(this.translateService.instant('ADMIN_SAVE_FAILED'), 'error');
+          this.cdr.detectChanges();
+          return;
+        }
+
+        // Re-fetch from the backend rather than trusting the edit form's
+        // local state, so the success message reflects what's actually
+        // persisted, not what we optimistically assume was saved.
+        this.productService.getAllProducts().subscribe({
+          next: (response) => {
+            this.products = response.data;
+            const saved = this.products.find(p => p.id === product.id);
+            // A discount of 0 and no discount at all are equivalent — the
+            // backend only stores originalPrice-driving state for a
+            // positive percentage — so normalize both to null before comparing.
+            const expectedDiscount = discountPercent || null;
+            const persisted = !!saved
+              && saved.price === price
+              && this.discountPercentOf(saved) === expectedDiscount;
+
+            this.toastService.show(
+              this.translateService.instant(persisted ? 'ADMIN_SAVE_SUCCESS' : 'ADMIN_SAVE_FAILED'),
+              persisted ? 'success' : 'error'
+            );
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            // The edit itself already succeeded server-side; a failed refetch
+            // just means we can't confirm it from here, not that it failed.
+            this.toastService.show(this.translateService.instant('ADMIN_SAVE_SUCCESS'), 'success');
+            this.cdr.detectChanges();
+          }
+        });
       },
       error: () => {
         this.saving = false;

@@ -194,6 +194,36 @@
       &.editing { background: var(--accent-soft-weak); }
     }
 
+    .thumb-col { width: 56px; }
+
+    .thumb-cell {
+      padding-right: 0;
+
+      img,
+      .thumb-fallback {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+      }
+
+      img {
+        object-fit: cover;
+        display: block;
+        background: var(--bg-page);
+        border: 1px solid var(--border);
+      }
+
+      .thumb-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-page);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+      }
+    }
+
     .name-cell {
       font-weight: 600;
       white-space: normal;
