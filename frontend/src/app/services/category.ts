@@ -91,6 +91,5 @@ export const CATEGORY_NAV_ITEMS: CategoryNavItem[] = [
   { id: 'games', labelKey: 'GAMES', icon: 'gamepad' },
   { id: 'tablets', labelKey: 'TABLETS', icon: 'tablet' },
   { id: 'camera', labelKey: 'CAMERA', icon: 'eye' },
-  { id: 'amplifiers', labelKey: 'AMPLIFIERS', icon: 'headphones' },
   { id: 'accessories', labelKey: 'ACCESSORIES', icon: 'plug' }
 ];
