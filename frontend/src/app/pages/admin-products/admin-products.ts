@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { forkJoin } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 import { Product, ProductResponse } from '../../services/product';
 import { inferCategory } from '../../services/category';
 import { ToastService } from '../../services/toast';
@@ -183,10 +183,17 @@ export class AdminProducts implements OnInit {
     this.saving = true;
     const { price, discountPercent } = this.editState;
 
-    forkJoin([
-      this.productService.updateProductPrice(product.id, price),
-      this.productService.updateProductDiscount(product.id, discountPercent)
-    ]).subscribe({
+    // Price and discount live on the same backend row, and each endpoint does
+    // its own read-modify-write with no locking — firing both requests in
+    // parallel (as forkJoin previously did) is a real lost-update race:
+    // whichever save() commits second overwrites the other field back to its
+    // pre-edit value. Chaining them sequentially, so the discount write only
+    // starts once the price write has fully committed, avoids that entirely.
+    this.productService.updateProductPrice(product.id, price).pipe(
+      switchMap(priceResponse => this.productService.updateProductDiscount(product.id, discountPercent).pipe(
+        map(discountResponse => [priceResponse, discountResponse] as const)
+      ))
+    ).subscribe({
       next: ([priceResponse, discountResponse]) => {
         this.saving = false;
         this.editingId = null;

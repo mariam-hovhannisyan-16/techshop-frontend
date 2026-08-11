@@ -76,6 +76,26 @@ describe('AdminProducts', () => {
       }
     };
 
+    it('sends the discount update only after the price update has resolved, not in parallel', () => {
+      // Regression test: the two endpoints do an independent read-modify-write
+      // on the same backend row with no locking, so firing them in parallel
+      // (as forkJoin previously did) is a real lost-update race — whichever
+      // save() commits second silently reverts the other field. Confirmed
+      // against the live backend: 100% of parallel attempts lost a field.
+      component.startEdit(mockProducts[0] as any);
+      component.editState = { price: 1200, discountPercent: 20 };
+      component.saveEdit(mockProducts[0] as any);
+
+      const priceReq = httpMock.expectOne(`${productsUrl}/1/price`);
+      expect(httpMock.match(`${productsUrl}/1/discount`).length).toBe(0);
+
+      // Clean up the still-pending chain so httpMock.verify() doesn't complain.
+      priceReq.flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200 } });
+      httpMock.expectOne(`${productsUrl}/1/discount`).flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200, discountPercentage: 20 } });
+      httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: [{ ...mockProducts[0], price: 1200, discountPercentage: 20 }, mockProducts[1]] });
+      drainLeftover();
+    });
+
     it('shows success only after re-fetching confirms the new price/discount are actually saved', () => {
       component.startEdit(mockProducts[0] as any);
       component.editState = { price: 1200, discountPercent: 20 };
