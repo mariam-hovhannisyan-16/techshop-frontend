@@ -52,6 +52,7 @@ interface BackendProductPayload extends Omit<ProductResponse, 'quantity'> {
   quantity?: number;
   stock?: number;
   discountPercentage?: number | null;
+  isNew?: boolean;
 }
 
 interface ProductPage {
@@ -528,6 +529,11 @@ export class Product {
       quantity: raw.quantity ?? raw.stock ?? 0,
       imageUrl: this.resolveImageUrl(raw.imageUrl),
       originalPrice: raw.originalPrice ?? derivedOriginalPrice,
+      // The backend has no notion of a "badge" — it only flags `isNew`. Map
+      // that onto the same badge mock products already use, so newly added
+      // products get a "New" badge automatically instead of needing one
+      // hardcoded per product.
+      badge: raw.badge ?? (raw.isNew ? 'new' : undefined),
     };
   }
 
