@@ -172,17 +172,27 @@ describe('Products — new arrivals surface on the first page', () => {
 
   const productsUrl = `${environment.productApiUrl}/api/products`;
 
-  // 8 older phones (fills page 1 at the current pageSize) followed by 2 new
-  // arrivals — mirrors the real bug: iPhone 17 Pro/Pro Max had the correct
-  // "Phones" category and were included in the filtered count, but the
-  // backend's arbitrary ordering placed them on page 2, so a user clicking
-  // the Phones tab never saw them without paging.
+  // Mirrors the real catalog's 13 isNew:true products, in the exact id order
+  // the backend actually returns them (id is not a recency signal here — e.g.
+  // MacBook Pro M4 has a higher id than iPhone 17 Pro/Pro Max despite being
+  // seeded earlier). With pageSize 8, the last 5 of these 13 would land on
+  // page 2 without reordering — including iPhone 17 Pro/Pro Max, which the
+  // backend happens to list last.
   const mockProducts = [
-    ...Array.from({ length: 8 }, (_, i) => ({
-      id: i + 1, name: `Old Phone ${i + 1}`, description: 'iphone', price: 100000, quantity: 5, category: 'Phones'
-    })),
-    { id: 9, name: 'iPhone 17 Pro', description: 'iphone', price: 620000, quantity: 5, category: 'Phones', isNew: true },
-    { id: 10, name: 'iPhone 17 Pro Max', description: 'iphone', price: 690000, quantity: 5, category: 'Phones', isNew: true },
+    { id: 5, name: 'Sony WH-1000XM5', description: '', price: 1, quantity: 1, category: 'Audio', isNew: true },
+    { id: 1, name: 'iPhone 15, 128GB', description: '', price: 1, quantity: 1, category: 'Phones', isNew: true },
+    { id: 2, name: 'Samsung Galaxy S24', description: '', price: 1, quantity: 1, category: 'Phones', isNew: true },
+    { id: 68, name: 'MacBook Pro M4', description: '', price: 1, quantity: 1, category: 'Laptops', isNew: true },
+    { id: 62, name: 'Steam Deck', description: '', price: 1, quantity: 1, category: 'Games', isNew: true },
+    { id: 54, name: 'Huawei P60 Pro', description: '', price: 1, quantity: 1, category: 'Phones', isNew: true },
+    { id: 43, name: 'Xiaomi Pad 6', description: '', price: 1, quantity: 1, category: 'Tablets', isNew: true },
+    { id: 34, name: 'Xiaomi TV A2 50"', description: '', price: 1, quantity: 1, category: 'TVs', isNew: true },
+    { id: 24, name: 'Google Pixel 8', description: '', price: 1, quantity: 1, category: 'Phones', isNew: true },
+    { id: 20, name: 'Microsoft Xbox Series X', description: '', price: 1, quantity: 1, category: 'Games', isNew: true },
+    { id: 14, name: 'Canon EOS Camera', description: '', price: 1, quantity: 1, category: 'Cameras', isNew: true },
+    { id: 8, name: 'iPhone 17 Pro Max', description: '', price: 1, quantity: 1, category: 'Phones', isNew: true },
+    { id: 7, name: 'iPhone 17 Pro', description: '', price: 1, quantity: 1, category: 'Phones', isNew: true },
+    { id: 100, name: 'Old Case', description: '', price: 1, quantity: 1, category: 'Accessories' },
   ];
 
   const drainLeftover = () => {
@@ -213,12 +223,26 @@ describe('Products — new arrivals surface on the first page', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('puts "new"-badged products on page 1 even when the backend orders them last', () => {
+  it('sorts the "new" group by id ascending on the "All products" view so the backend\'s last-listed new items still land on page 1', () => {
+    // component defaults to selectedCategory 'all', matching what already ran in beforeEach.
+    expect(component.filteredProducts.length).toBe(14);
+
+    const page1Ids = component.pagedProducts.map(p => p.id);
+    expect(page1Ids).toEqual([1, 2, 5, 7, 8, 14, 20, 24]);
+    expect(page1Ids).toContain(7);
+    expect(page1Ids).toContain(8);
+
+    // The 5 remaining "new" items plus the one non-"new" item fall to page 2.
+    component.goToPage(2);
+    const page2Ids = component.pagedProducts.map(p => p.id);
+    expect(page2Ids).toEqual([34, 43, 54, 62, 68, 100]);
+  });
+
+  it('also puts iPhone 17 Pro/Pro Max on page 1 when filtered to the Phones tab', () => {
     component.selectCategory('phones');
 
-    expect(component.filteredProducts.length).toBe(10);
     const page1Ids = component.pagedProducts.map(p => p.id);
-    expect(page1Ids).toContain(9);
-    expect(page1Ids).toContain(10);
+    expect(page1Ids).toContain(7);
+    expect(page1Ids).toContain(8);
   });
 });

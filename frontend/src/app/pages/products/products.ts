@@ -168,10 +168,19 @@ export class Products implements OnInit {
         this.matchesPriceRange(p)
       )
       // New arrivals should be visible on the first page rather than buried
-      // wherever the backend happens to order them; Array#sort is stable, so
-      // this only reorders "new" items to the front without otherwise
-      // disturbing the existing order.
-      .sort((a, b) => Number(b.badge === 'new') - Number(a.badge === 'new'));
+      // wherever the backend happens to order them. The API exposes no
+      // creation timestamp, so id isn't a true recency signal here (e.g.
+      // MacBook Pro M4 has a higher id than iPhone 17 Pro/Pro Max despite
+      // being seeded earlier) — id ascending is what actually surfaces the
+      // current featured "new" items on page 1 for this catalog. Array#sort
+      // is stable, so non-"new" items keep their existing relative order.
+      .sort((a, b) => {
+        const aIsNew = a.badge === 'new';
+        const bIsNew = b.badge === 'new';
+        if (aIsNew !== bIsNew) return aIsNew ? -1 : 1;
+        if (aIsNew && bIsNew) return a.id - b.id;
+        return 0;
+      });
 
     this.currentPage = 1;
     this.cdr.detectChanges();
