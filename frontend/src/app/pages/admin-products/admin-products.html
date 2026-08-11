@@ -72,6 +72,13 @@
         <button (click)="loadProducts()">{{ 'RETRY' | translate }}</button>
       </div>
     } @else {
+      <div class="stats-row">
+        <app-stat-tile icon="box" [value]="totalProductsCount" [label]="'ADMIN_PRODUCTS_STAT_TOTAL' | translate" />
+        <app-stat-tile icon="cash" [value]="totalInventoryValue | price" [label]="'ADMIN_PRODUCTS_STAT_INVENTORY_VALUE' | translate" />
+        <app-stat-tile icon="warning" [value]="outOfStockCount" [label]="'ADMIN_PRODUCTS_STAT_OUT_OF_STOCK' | translate" />
+        <app-stat-tile icon="flame" [value]="discountedCount" [label]="'ADMIN_PRODUCTS_STAT_DISCOUNTED' | translate" />
+      </div>
+
       <div class="table-wrap">
         <table class="admin-table">
           <thead>

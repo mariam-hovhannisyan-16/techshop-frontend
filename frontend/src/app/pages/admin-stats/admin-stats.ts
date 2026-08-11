@@ -6,11 +6,12 @@ import { AdminStatsService, AdminStatsSummary } from '../../services/admin-stats
 import { AppHeader } from '../../components/app-header/app-header';
 import { Icon } from '../../components/icon/icon';
 import { Toast } from '../../components/toast/toast';
+import { StatTile } from '../../components/stat-tile/stat-tile';
 import { PricePipe } from '../../pipes/price';
 
 @Component({
   selector: 'app-admin-stats',
-  imports: [CommonModule, TranslatePipe, AppHeader, Icon, Toast, PricePipe],
+  imports: [CommonModule, TranslatePipe, AppHeader, Icon, Toast, StatTile, PricePipe],
   templateUrl: './admin-stats.html',
   styleUrl: './admin-stats.scss',
 })

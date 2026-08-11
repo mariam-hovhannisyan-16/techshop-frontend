@@ -27,24 +27,9 @@
       </div>
     } @else if (stats) {
       <div class="stats-row">
-        <div class="stat-tile">
-          <div class="stat-icon"><app-icon name="box" /></div>
-          <strong>{{ stats.totalOrders }}</strong>
-          <span class="stat-underline"></span>
-          <span class="stat-label">{{ 'ADMIN_STATS_TOTAL_ORDERS' | translate }}</span>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-icon"><app-icon name="cash" /></div>
-          <strong>{{ stats.totalRevenue | price }}</strong>
-          <span class="stat-underline"></span>
-          <span class="stat-label">{{ 'ADMIN_STATS_TOTAL_REVENUE' | translate }}</span>
-        </div>
-        <div class="stat-tile">
-          <div class="stat-icon"><app-icon name="user" /></div>
-          <strong>{{ stats.totalUsers }}</strong>
-          <span class="stat-underline"></span>
-          <span class="stat-label">{{ 'ADMIN_STATS_TOTAL_USERS' | translate }}</span>
-        </div>
+        <app-stat-tile icon="box" [value]="stats.totalOrders" [label]="'ADMIN_STATS_TOTAL_ORDERS' | translate" />
+        <app-stat-tile icon="cash" [value]="stats.totalRevenue | price" [label]="'ADMIN_STATS_TOTAL_REVENUE' | translate" />
+        <app-stat-tile icon="user" [value]="stats.totalUsers" [label]="'ADMIN_STATS_TOTAL_USERS' | translate" />
       </div>
 
       <div class="top-products-card">

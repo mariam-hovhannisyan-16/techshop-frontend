@@ -10,6 +10,7 @@ import { ToastService } from '../../services/toast';
 import { AppHeader } from '../../components/app-header/app-header';
 import { Icon } from '../../components/icon/icon';
 import { Toast } from '../../components/toast/toast';
+import { StatTile } from '../../components/stat-tile/stat-tile';
 import { PricePipe } from '../../pipes/price';
 
 const CATEGORY_LABEL_KEYS: Record<string, string> = {
@@ -42,7 +43,7 @@ const EMPTY_ADD_FORM: AddProductForm = { name: '', category: '', price: null, sp
 
 @Component({
   selector: 'app-admin-products',
-  imports: [CommonModule, FormsModule, TranslatePipe, AppHeader, Icon, Toast, PricePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, AppHeader, Icon, Toast, StatTile, PricePipe],
   templateUrl: './admin-products.html',
   styleUrl: './admin-products.scss',
 })
@@ -154,6 +155,25 @@ export class AdminProducts implements OnInit {
   discountPercentOf(product: ProductResponse): number | null {
     if (!product.originalPrice || product.originalPrice <= product.price) return null;
     return Math.round((1 - product.price / product.originalPrice) * 100);
+  }
+
+  // Summary stats aggregated from the same product list already loaded for
+  // the table below — no separate backend call, same pattern as the
+  // Statistics tab's top-products list.
+  get totalProductsCount(): number {
+    return this.products.length;
+  }
+
+  get totalInventoryValue(): number {
+    return this.products.reduce((sum, p) => sum + p.price * p.quantity, 0);
+  }
+
+  get outOfStockCount(): number {
+    return this.products.filter(p => p.quantity === 0).length;
+  }
+
+  get discountedCount(): number {
+    return this.products.filter(p => this.discountPercentOf(p) !== null).length;
   }
 
   thumbnailSrc(product: ProductResponse): string | null {

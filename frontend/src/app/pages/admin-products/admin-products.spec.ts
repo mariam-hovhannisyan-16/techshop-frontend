@@ -167,4 +167,49 @@ describe('AdminProducts', () => {
       expect(httpMock.match(() => true).length).toBe(0);
     });
   });
+
+  describe('summary stat tiles — aggregated from the already-loaded product list', () => {
+    const statMockProducts = [
+      // in stock, no discount
+      { id: 1, name: 'A', description: '', price: 1000, quantity: 4, category: 'Phones' },
+      // in stock, discounted (originalPrice derived from discountPercentage by normalizeProduct)
+      { id: 2, name: 'B', description: '', price: 900, quantity: 2, category: 'Laptops', discountPercentage: 10 },
+      // out of stock, no discount
+      { id: 3, name: 'C', description: '', price: 500, quantity: 0, category: 'Audio' },
+      // out of stock, discounted
+      { id: 4, name: 'D', description: '', price: 300, quantity: 0, category: 'Games', discountPercentage: 25 },
+    ];
+
+    beforeEach(async () => {
+      localStorage.clear();
+      await TestBed.configureTestingModule({
+        imports: [AdminProducts],
+        providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideTranslateService()],
+      }).compileComponents();
+
+      fixture = TestBed.createComponent(AdminProducts);
+      component = fixture.componentInstance;
+      httpMock = TestBed.inject(HttpTestingController);
+
+      fixture.detectChanges();
+      httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: statMockProducts });
+      fixture.detectChanges();
+    });
+
+    it('computes total product count, inventory value, out-of-stock count, and discounted count', () => {
+      expect(component.totalProductsCount).toBe(4);
+      // 1000*4 + 900*2 + 500*0 + 300*0 = 5800
+      expect(component.totalInventoryValue).toBe(5800);
+      expect(component.outOfStockCount).toBe(2);
+      expect(component.discountedCount).toBe(2);
+    });
+
+    it('renders the stat tiles above the products table', () => {
+      const tiles = fixture.nativeElement.querySelectorAll('app-stat-tile');
+      expect(tiles.length).toBe(4);
+      const statsRowText = fixture.nativeElement.querySelector('.stats-row').textContent;
+      expect(statsRowText).toContain('4'); // total products
+      expect(statsRowText).toContain('2'); // out of stock / discounted
+    });
+  });
 });

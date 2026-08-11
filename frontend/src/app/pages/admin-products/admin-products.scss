@@ -158,6 +158,13 @@
 
   .error-state .error-icon { font-size: 3rem; }
 
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
   .table-wrap {
     background: var(--bg-panel);
     border: 1px solid var(--border);
@@ -350,5 +357,9 @@
 
   .admin-products-container .add-product-form .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .admin-products-container .stats-row {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
