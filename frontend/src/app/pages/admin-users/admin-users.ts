@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AdminUserService, AdminUser } from '../../services/admin-user';
-import { OrderService, OrderResponse } from '../../services/order';
+import { OrderService, OrderResponse, OrderStatus, ORDER_STATUS_TRANSITIONS } from '../../services/order';
 import { Auth } from '../../services/auth';
 import { ToastService } from '../../services/toast';
 import { AppHeader } from '../../components/app-header/app-header';
@@ -27,6 +27,7 @@ export class AdminUsers implements OnInit {
   ordersModalOrders: OrderResponse[] = [];
   ordersModalLoading = false;
   ordersModalError = '';
+  updatingOrderStatusId: number | null = null;
 
   constructor(
     private adminUserService: AdminUserService,
@@ -128,5 +129,35 @@ export class AdminUsers implements OnInit {
     this.ordersModalUser = null;
     this.ordersModalOrders = [];
     this.ordersModalError = '';
+  }
+
+  // Only offers statuses the backend's OrderStatus.canTransitionTo actually
+  // allows from the order's current status — mirrored client-side purely so
+  // the dropdown doesn't show illegal options. The PATCH call below is still
+  // what actually enforces this; the backend rejects anything invalid.
+  nextStatusOptions(order: OrderResponse): OrderStatus[] {
+    return ORDER_STATUS_TRANSITIONS[order.status] ?? [];
+  }
+
+  updateOrderStatus(order: OrderResponse, newStatus: string): void {
+    if (!newStatus || this.updatingOrderStatusId) return;
+
+    this.updatingOrderStatusId = order.id;
+    this.orderService.updateOrderStatusAdmin(order.id, newStatus as OrderStatus).subscribe({
+      next: (response) => {
+        order.status = response.data.status;
+        this.updatingOrderStatusId = null;
+        this.toastService.show(this.translateService.instant('ADMIN_ORDER_STATUS_UPDATE_SUCCESS'), 'success');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.updatingOrderStatusId = null;
+        this.toastService.show(
+          err.error?.message || this.translateService.instant('ADMIN_ORDER_STATUS_UPDATE_FAILED'),
+          'error'
+        );
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

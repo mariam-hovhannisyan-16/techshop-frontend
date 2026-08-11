@@ -20,6 +20,21 @@ export type PaymentMethod = 'IDRAM' | 'TELCELL' | 'ROKET_LINE' | 'INSTALLMENT' |
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 export type OrderLanguage = 'HY' | 'EN' | 'RU';
 
+export type OrderStatus = 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+
+// Mirrors OrderStatus's TRANSITIONS map in techshop-common exactly — used only
+// to decide which options the admin UI offers. The backend remains the
+// source of truth and will reject (409) anything not actually legal.
+export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  PENDING: ['PAID', 'CANCELLED'],
+  PAID: ['PROCESSING', 'CANCELLED', 'REFUNDED'],
+  PROCESSING: ['SHIPPED', 'CANCELLED'],
+  SHIPPED: ['DELIVERED'],
+  DELIVERED: ['REFUNDED'],
+  CANCELLED: [],
+  REFUNDED: []
+};
+
 export interface InstallmentPlanPayload {
   bank: string;
   annualRate: number;
@@ -47,7 +62,7 @@ export interface OrderResponse {
   userId: number;
   items: OrderItemResponse[];
   totalPrice: number;
-  status: string;
+  status: OrderStatus;
   shippingAddress?: AddressPayload;
   billingAddress?: AddressPayload;
   notes?: string;
@@ -226,5 +241,15 @@ export class OrderService {
     }).pipe(
       map(response => ({ ...response, data: response.data.content }))
     );
+  }
+
+  // Admin-only: PATCH /api/orders/admin/{id}/status. The backend validates
+  // the transition itself (OrderStatus.canTransitionTo in techshop-common)
+  // and rejects anything illegal with a 409 — this call doesn't attempt to
+  // replicate that server-side, only to report whatever the backend decides.
+  updateOrderStatusAdmin(orderId: number, status: OrderStatus, note?: string): Observable<ApiResponse<OrderResponse>> {
+    return this.http.patch<ApiResponse<OrderResponse>>(`${this.apiUrl}/admin/${orderId}/status`, { status, note }, {
+      headers: this.getHeaders()
+    });
   }
 }

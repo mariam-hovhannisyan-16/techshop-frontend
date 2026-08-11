@@ -129,6 +129,22 @@
                 <span>{{ 'ORDER_TOTAL_LABEL' | translate }}</span>
                 <strong>{{ order.totalPrice | price }}</strong>
               </div>
+              @if (nextStatusOptions(order).length > 0) {
+                <div class="orders-modal-status-change">
+                  <label>
+                    <span>{{ 'ADMIN_CHANGE_STATUS_LABEL' | translate }}</span>
+                    <select
+                      [disabled]="updatingOrderStatusId === order.id"
+                      (change)="updateOrderStatus(order, $any($event.target).value); $any($event.target).value = ''"
+                    >
+                      <option value="" selected disabled>{{ 'ADMIN_CHANGE_STATUS_PLACEHOLDER' | translate }}</option>
+                      @for (option of nextStatusOptions(order); track option) {
+                        <option [value]="option">{{ ('STATUS_' + option) | translate }}</option>
+                      }
+                    </select>
+                  </label>
+                </div>
+              }
             </div>
           }
         </div>

@@ -125,4 +125,57 @@ describe('AdminUsers', () => {
       expect(component.ordersModalOrders.length).toBe(0);
     });
   });
+
+  describe('order status changes', () => {
+    beforeEach(setup);
+
+    // Mirrors the exact transition map in techshop-common's OrderStatus enum.
+    it('only offers the statuses the backend actually allows next, per current status', () => {
+      expect(component.nextStatusOptions({ status: 'PENDING' } as any)).toEqual(['PAID', 'CANCELLED']);
+      expect(component.nextStatusOptions({ status: 'PAID' } as any)).toEqual(['PROCESSING', 'CANCELLED', 'REFUNDED']);
+      expect(component.nextStatusOptions({ status: 'PROCESSING' } as any)).toEqual(['SHIPPED', 'CANCELLED']);
+      expect(component.nextStatusOptions({ status: 'SHIPPED' } as any)).toEqual(['DELIVERED']);
+      expect(component.nextStatusOptions({ status: 'DELIVERED' } as any)).toEqual(['REFUNDED']);
+      // Terminal states offer nothing further.
+      expect(component.nextStatusOptions({ status: 'CANCELLED' } as any)).toEqual([]);
+      expect(component.nextStatusOptions({ status: 'REFUNDED' } as any)).toEqual([]);
+    });
+
+    it('calls the admin status endpoint and reflects the confirmed new status from the response, not optimistically', () => {
+      const order = { id: 20, userId: 2, items: [], totalPrice: 100, status: 'PAID', createdAt: '2026-05-01T12:00:00' } as any;
+
+      component.updateOrderStatus(order, 'PROCESSING');
+
+      const req = httpMock.expectOne(`${ordersAdminUrl}/20/status`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual({ status: 'PROCESSING', note: undefined });
+
+      req.flush({ success: true, message: 'ok', data: { ...order, status: 'PROCESSING' } });
+
+      expect(order.status).toBe('PROCESSING');
+      expect(component.updatingOrderStatusId).toBeNull();
+    });
+
+    it('surfaces the backend\'s real rejection message for an invalid transition instead of a generic error', () => {
+      const order = { id: 21, userId: 2, items: [], totalPrice: 100, status: 'PAID', createdAt: '2026-05-01T12:00:00' } as any;
+
+      component.updateOrderStatus(order, 'SHIPPED');
+
+      const req = httpMock.expectOne(`${ordersAdminUrl}/21/status`);
+      req.flush({ error: 'Error', message: 'Cannot transition order from PAID to SHIPPED', status: 409 }, { status: 409, statusText: 'Conflict' });
+
+      // The order's local status must NOT change on a rejected transition.
+      expect(order.status).toBe('PAID');
+      expect(component.updatingOrderStatusId).toBeNull();
+    });
+
+    it('ignores a second status-change attempt while one is already in flight', () => {
+      const order = { id: 22, userId: 2, items: [], totalPrice: 100, status: 'PAID', createdAt: '2026-05-01T12:00:00' } as any;
+
+      component.updateOrderStatus(order, 'PROCESSING');
+      component.updateOrderStatus(order, 'CANCELLED');
+
+      httpMock.expectOne(`${ordersAdminUrl}/22/status`).flush({ success: true, message: 'ok', data: { ...order, status: 'PROCESSING' } });
+    });
+  });
 });
