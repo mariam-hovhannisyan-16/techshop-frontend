@@ -95,7 +95,7 @@ export class AdminProducts implements OnInit {
     if (product.category && CATEGORY_LABEL_KEYS[product.category]) {
       return CATEGORY_LABEL_KEYS[product.category];
     }
-    const category = inferCategory({ name: product.name, description: product.description });
+    const category = inferCategory({ name: product.name, description: product.description, category: product.category });
     return category ? (CATEGORY_LABEL_KEYS[category] ?? null) : null;
   }
 

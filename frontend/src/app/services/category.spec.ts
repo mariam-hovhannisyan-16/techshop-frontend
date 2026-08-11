@@ -14,4 +14,25 @@ describe('category', () => {
     expect(inferCategory({ name: 'iPhone 15', description: 'Apple phone' })).toBe('phones');
     expect(inferCategory({ name: 'Unrelated Widget', description: '' })).toBeNull();
   });
+
+  // Regression coverage for a real bug: keyword-only matching diverted "Audio"-category
+  // products whose name/description mentioned "amp"/"speaker" into a nonexistent
+  // "Amplifiers" tab instead of the "Audio" tab, and let a phone whose description
+  // mentioned "display" leak into "Monitors". The backend `category` field, when
+  // present, must take priority over keyword guessing.
+  it('trusts the backend category field over keyword guessing', () => {
+    const sonosAmp = { name: 'Sonos Amp', description: 'Ուժեղացուցիչ՝ խելացի ձայնային համակարգի համար', category: 'Audio' };
+    expect(matchesCategory(sonosAmp, 'audio')).toBe(true);
+    expect(matchesCategory(sonosAmp, 'amplifiers')).toBe(false);
+    expect(inferCategory(sonosAmp)).toBe('audio');
+
+    const iphone = { name: 'iPhone 17 Pro Max', description: 'Titanium design with the largest display in the lineup.', category: 'Phones' };
+    expect(matchesCategory(iphone, 'monitors')).toBe(false);
+    expect(matchesCategory(iphone, 'phones')).toBe(true);
+    expect(inferCategory(iphone)).toBe('phones');
+  });
+
+  it('falls back to keyword matching when no backend category is present', () => {
+    expect(matchesCategory({ name: 'Sonos Amp', description: 'Ուժեղացուցիչ' }, 'amplifiers')).toBe(true);
+  });
 });

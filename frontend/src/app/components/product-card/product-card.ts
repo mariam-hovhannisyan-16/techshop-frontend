@@ -13,6 +13,7 @@ export interface ProductCardData {
   name: string;
   price: number;
   description?: string;
+  category?: string;
   originalPrice?: number;
   quantity?: number;
   imageUrl?: string;
@@ -72,7 +73,7 @@ export class ProductCard {
   }
 
   get categoryId(): string | null {
-    return inferCategory({ name: this.product.name, description: this.product.description ?? '' });
+    return inferCategory({ name: this.product.name, description: this.product.description ?? '', category: this.product.category });
   }
 
   badgeLabelKey(badge: string): string {
