@@ -361,53 +361,6 @@
         }
       }
 
-      .installment-info-boxes {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.25rem;
-        margin-top: 1.2rem;
-      }
-
-      .installment-info-box {
-        min-width: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        background: var(--bg-panel);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-
-        app-icon {
-          flex-shrink: 0;
-          font-size: 1.3rem;
-          color: var(--accent);
-        }
-
-        .installment-info-text {
-          display: flex;
-          flex-direction: column;
-          gap: 0.15rem;
-          min-width: 0;
-        }
-
-        .installment-info-label {
-          font-size: 0.78rem;
-          color: var(--text-secondary);
-        }
-
-        .installment-info-value {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        .installment-info-note {
-          font-size: 0.75rem;
-          color: var(--text-tertiary);
-        }
-      }
-
       .add-btn {
         align-self: flex-start;
         padding: 0.9rem 2rem;
@@ -609,11 +562,5 @@
         align-self: stretch;
       }
     }
-  }
-}
-
-@media (max-width: 560px) {
-  .product-detail-container .product-info .installment-info-boxes {
-    grid-template-columns: 1fr;
   }
 }

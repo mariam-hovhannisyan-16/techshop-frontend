@@ -426,10 +426,5 @@
   "PAYMENT_INSTALLMENT": "VTB Installment",
   "PAYMENT_CARD": "Card",
   "PAYMENT_CARD_SUBLABEL": "Visa / MasterCard / ArCa",
-  "INSTALLMENT_REQUIRES_PLAN": "Please calculate an installment plan first:",
-  "INSTALLMENT_PLAN_SUMMARY_TITLE": "Your installment plan",
-  "INSTALLMENT_SUMMARY_MONTHLY": "Monthly payment",
-  "INSTALLMENT_SUMMARY_DURATION_MONTHS": "{{months}} months",
-  "INSTALLMENT_NO_INTEREST_NOTE": "no bank interest",
-  "INSTALLMENT_MONTHLY_NOTE": "(over {{months}} months)"
+  "INSTALLMENT_REQUIRES_PLAN": "Please calculate an installment plan first:"
 }

@@ -19,7 +19,7 @@ import { Skeleton } from '../../components/skeleton/skeleton';
 import { StarRating } from '../../components/star-rating/star-rating';
 import { ProductCard } from '../../components/product-card/product-card';
 import { Icon } from '../../components/icon/icon';
-import { InstallmentModal, DEFAULT_INSTALLMENT_DURATION_MONTHS } from '../../components/installment-modal/installment-modal';
+import { InstallmentModal } from '../../components/installment-modal/installment-modal';
 import { PricePipe } from '../../pipes/price';
 
 // Matches the backend's ReviewServiceImpl.VERIFIED_PURCHASE_STATUSES exactly — REFUNDED is
@@ -270,8 +270,6 @@ export class ProductDetail implements OnInit {
     this.activeImageIndex = index;
   }
 
-  readonly installmentMonths = DEFAULT_INSTALLMENT_DURATION_MONTHS;
-
   get displayPrice(): number {
     if (!this.product) return 0;
     return this.product.price + (this.selectedStorageOption?.priceDelta ?? 0);
@@ -287,10 +285,6 @@ export class ProductDetail implements OnInit {
 
   selectColor(variant: ColorVariant): void {
     this.selectedColorVariant = variant;
-  }
-
-  get installmentMonthlyPayment(): number {
-    return Math.round(this.displayPrice / this.installmentMonths);
   }
 
   get hasDiscount(): boolean {

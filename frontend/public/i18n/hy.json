@@ -426,10 +426,5 @@
   "PAYMENT_INSTALLMENT": "ՎՏԲ Ապառիկ",
   "PAYMENT_CARD": "Քարտ",
   "PAYMENT_CARD_SUBLABEL": "Visa / MasterCard / ArCa",
-  "INSTALLMENT_REQUIRES_PLAN": "Խնդրում ենք նախ հաշվարկել ապառիկ պլանը:",
-  "INSTALLMENT_PLAN_SUMMARY_TITLE": "Ձեր ապառիկ պլանը",
-  "INSTALLMENT_SUMMARY_MONTHLY": "Ամսական վճար",
-  "INSTALLMENT_SUMMARY_DURATION_MONTHS": "{{months}} ամիս",
-  "INSTALLMENT_NO_INTEREST_NOTE": "առանց բանկի տոկոսների",
-  "INSTALLMENT_MONTHLY_NOTE": "({{months}} ամսվա ընթացքում)"
+  "INSTALLMENT_REQUIRES_PLAN": "Խնդրում ենք նախ հաշվարկել ապառիկ պլանը:"
 }
