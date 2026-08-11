@@ -164,3 +164,61 @@ describe('Products — price range filter', () => {
     expect(component.filteredProducts.length).toBe(4);
   });
 });
+
+describe('Products — new arrivals surface on the first page', () => {
+  let fixture: ComponentFixture<Products>;
+  let component: Products;
+  let httpMock: HttpTestingController;
+
+  const productsUrl = `${environment.productApiUrl}/api/products`;
+
+  // 8 older phones (fills page 1 at the current pageSize) followed by 2 new
+  // arrivals — mirrors the real bug: iPhone 17 Pro/Pro Max had the correct
+  // "Phones" category and were included in the filtered count, but the
+  // backend's arbitrary ordering placed them on page 2, so a user clicking
+  // the Phones tab never saw them without paging.
+  const mockProducts = [
+    ...Array.from({ length: 8 }, (_, i) => ({
+      id: i + 1, name: `Old Phone ${i + 1}`, description: 'iphone', price: 100000, quantity: 5, category: 'Phones'
+    })),
+    { id: 9, name: 'iPhone 17 Pro', description: 'iphone', price: 620000, quantity: 5, category: 'Phones', isNew: true },
+    { id: 10, name: 'iPhone 17 Pro Max', description: 'iphone', price: 690000, quantity: 5, category: 'Phones', isNew: true },
+  ];
+
+  const drainLeftover = () => {
+    let leftover = httpMock.match(() => true);
+    while (leftover.length) {
+      leftover.forEach(req => req.flush({ success: true, message: 'ok', data: [] }));
+      leftover = httpMock.match(() => true);
+    }
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+
+    await TestBed.configureTestingModule({
+      imports: [Products],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideTranslateService()],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Products);
+    component = fixture.componentInstance;
+    httpMock = TestBed.inject(HttpTestingController);
+
+    fixture.detectChanges();
+    httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: mockProducts });
+    drainLeftover();
+    fixture.detectChanges();
+  });
+
+  afterEach(() => httpMock.verify());
+
+  it('puts "new"-badged products on page 1 even when the backend orders them last', () => {
+    component.selectCategory('phones');
+
+    expect(component.filteredProducts.length).toBe(10);
+    const page1Ids = component.pagedProducts.map(p => p.id);
+    expect(page1Ids).toContain(9);
+    expect(page1Ids).toContain(10);
+  });
+});

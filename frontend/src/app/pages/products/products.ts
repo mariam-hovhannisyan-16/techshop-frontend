@@ -161,11 +161,17 @@ export class Products implements OnInit {
 
   applyFilters(): void {
     const query = this.searchQuery.toLowerCase();
-    this.filteredProducts = this.products.filter(p =>
-      matchesCategory(p, this.selectedCategory) &&
-      (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)) &&
-      this.matchesPriceRange(p)
-    );
+    this.filteredProducts = this.products
+      .filter(p =>
+        matchesCategory(p, this.selectedCategory) &&
+        (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)) &&
+        this.matchesPriceRange(p)
+      )
+      // New arrivals should be visible on the first page rather than buried
+      // wherever the backend happens to order them; Array#sort is stable, so
+      // this only reorders "new" items to the front without otherwise
+      // disturbing the existing order.
+      .sort((a, b) => Number(b.badge === 'new') - Number(a.badge === 'new'));
 
     this.currentPage = 1;
     this.cdr.detectChanges();
