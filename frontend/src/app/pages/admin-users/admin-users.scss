@@ -319,6 +319,17 @@
     .qty { color: var(--text-tertiary); }
   }
 
+  .orders-modal-payment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+
+    span:first-child { color: var(--text-secondary); }
+    span:last-child { color: var(--text-primary); font-weight: 600; }
+  }
+
   .orders-modal-order-total {
     display: flex;
     justify-content: space-between;

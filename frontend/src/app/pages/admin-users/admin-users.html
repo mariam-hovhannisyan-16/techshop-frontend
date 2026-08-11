@@ -11,6 +11,7 @@
       <button type="button" class="active">{{ 'ADMIN_USERS_NAV' | translate }}</button>
       <button type="button" (click)="router.navigate(['/admin/chat'])">{{ 'ADMIN_CHAT_NAV' | translate }}</button>
       <button type="button" (click)="router.navigate(['/admin/stats'])">{{ 'ADMIN_STATS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/reviews'])">{{ 'ADMIN_REVIEWS_NAV' | translate }}</button>
     </div>
 
     @if (loading) {
@@ -118,6 +119,12 @@
                   <li>{{ item.productName }} <span class="qty">× {{ item.quantity }}</span></li>
                 }
               </ul>
+              @if (order.paymentMethod) {
+                <div class="orders-modal-payment">
+                  <span>{{ 'ORDER_PAYMENT_LABEL' | translate }}</span>
+                  <span>{{ ('PAYMENT_' + order.paymentMethod) | translate }}</span>
+                </div>
+              }
               <div class="orders-modal-order-total">
                 <span>{{ 'ORDER_TOTAL_LABEL' | translate }}</span>
                 <strong>{{ order.totalPrice | price }}</strong>

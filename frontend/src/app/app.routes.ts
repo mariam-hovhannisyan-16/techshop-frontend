@@ -22,5 +22,6 @@ export const routes: Routes = [
   { path: 'admin/users', loadComponent: () => import('./pages/admin-users/admin-users').then((m) => m.AdminUsers), canActivate: [adminGuard] },
   { path: 'admin/chat', loadComponent: () => import('./pages/admin-chat/admin-chat').then((m) => m.AdminChat), canActivate: [adminGuard] },
   { path: 'admin/stats', loadComponent: () => import('./pages/admin-stats/admin-stats').then((m) => m.AdminStats), canActivate: [adminGuard] },
+  { path: 'admin/reviews', loadComponent: () => import('./pages/admin-reviews/admin-reviews').then((m) => m.AdminReviews), canActivate: [adminGuard] },
   { path: '**', loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound) },
 ];

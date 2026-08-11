@@ -1,0 +1,64 @@
+<div class="admin-reviews-container">
+  <app-header [subtitle]="'ADMIN_PANEL' | translate">
+    <div header-actions class="nav-actions">
+      <button class="back-btn" (click)="router.navigate(['/products'])">← {{ 'BACK_TO_PRODUCTS' | translate }}</button>
+    </div>
+  </app-header>
+
+  <div class="admin-reviews-content">
+    <div class="admin-tabs">
+      <button type="button" (click)="router.navigate(['/admin/products'])">{{ 'ADMIN_PRODUCTS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/users'])">{{ 'ADMIN_USERS_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/chat'])">{{ 'ADMIN_CHAT_NAV' | translate }}</button>
+      <button type="button" (click)="router.navigate(['/admin/stats'])">{{ 'ADMIN_STATS_NAV' | translate }}</button>
+      <button type="button" class="active">{{ 'ADMIN_REVIEWS_NAV' | translate }}</button>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (errorMessage) {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="warning" /></div>
+        <p>{{ errorMessage | translate }}</p>
+        <button (click)="loadReviews()">{{ 'RETRY' | translate }}</button>
+      </div>
+    } @else if (reviews.length > 0) {
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>{{ 'ADMIN_COL_REVIEWER' | translate }}</th>
+              <th>{{ 'ADMIN_COL_NAME' | translate }}</th>
+              <th>{{ 'ADMIN_COL_RATING' | translate }}</th>
+              <th>{{ 'ADMIN_COL_COMMENT' | translate }}</th>
+              <th>{{ 'DATE' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (review of reviews; track review.id) {
+              <tr>
+                <td class="reviewer-cell">{{ review.reviewerName }}</td>
+                <td class="product-cell">
+                  <a (click)="viewProduct(review.productId)">{{ review.productName }}</a>
+                </td>
+                <td class="rating-cell"><app-star-rating [rating]="review.rating" /></td>
+                <td class="comment-cell">{{ review.comment }}</td>
+                <td class="date-cell">{{ review.createdAt | date:'dd.MM.yyyy HH:mm' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="error-state">
+        <div class="error-icon"><app-icon name="box" /></div>
+        <p>{{ 'ADMIN_NO_REVIEWS' | translate }}</p>
+      </div>
+    }
+  </div>
+
+  <app-toast />
+</div>

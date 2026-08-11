@@ -84,6 +84,26 @@ describe('AdminUsers', () => {
       expect(component.ordersModalLoading).toBe(false);
     });
 
+    it('renders the payment method for each order in the modal', () => {
+      component.viewOrders(mockUsers[1] as any);
+
+      httpMock.expectOne(r => r.url === ordersAdminUrl && r.params.get('userId') === '2').flush({
+        success: true,
+        message: 'ok',
+        data: {
+          content: [
+            { id: 11, userId: 2, items: [{ productId: 1, productName: 'iPhone 15', productPrice: 450000, quantity: 1, totalPrice: 450000 }], totalPrice: 450000, status: 'PAID', paymentMethod: 'IDRAM', createdAt: '2026-05-01T12:00:00' }
+          ],
+          totalElements: 1,
+          totalPages: 1
+        }
+      });
+      fixture.detectChanges();
+
+      const modalText = fixture.nativeElement.querySelector('.orders-modal').textContent;
+      expect(modalText).toContain('PAYMENT_IDRAM');
+    });
+
     it('does not fake order data client-side on failure — surfaces a real error instead', () => {
       component.viewOrders(mockUsers[1] as any);
 
