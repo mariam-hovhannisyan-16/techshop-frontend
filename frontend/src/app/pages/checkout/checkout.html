@@ -45,23 +45,6 @@
         @if (installmentUnavailable) {
           <span class="field-error">{{ 'INSTALLMENT_REQUIRES_PLAN' | translate }}</span>
         }
-        @if (paymentMethod === 'INSTALLMENT' && pendingInstallmentPlan) {
-          <div class="installment-summary">
-            <h3>{{ 'INSTALLMENT_PLAN_SUMMARY_TITLE' | translate }}</h3>
-            <div class="summary-row">
-              <span>{{ 'INSTALLMENT_BANK' | translate }}</span>
-              <strong>{{ pendingInstallmentPlan.bank }}</strong>
-            </div>
-            <div class="summary-row">
-              <span>{{ 'INSTALLMENT_SUMMARY_MONTHLY' | translate }}</span>
-              <strong>{{ installmentMonthlyFormatted }}</strong>
-            </div>
-            <div class="summary-row">
-              <span>{{ 'INSTALLMENT_DURATION' | translate }}</span>
-              <strong>{{ 'INSTALLMENT_SUMMARY_DURATION_MONTHS' | translate:{ months: pendingInstallmentPlan.durationMonths } }}</strong>
-            </div>
-          </div>
-        }
         @if (showCurrencyNote) {
           <p class="currency-note">
             <app-icon name="cash" />

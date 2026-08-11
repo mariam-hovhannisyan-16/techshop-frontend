@@ -426,7 +426,7 @@
   "PAYMENT_INSTALLMENT": "ВТБ Рассрочка",
   "PAYMENT_CARD": "Карта",
   "PAYMENT_CARD_SUBLABEL": "Visa / MasterCard / ArCa",
-  "INSTALLMENT_REQUIRES_PLAN": "Пожалуйста, сначала рассчитайте план рассрочки на странице товара.",
+  "INSTALLMENT_REQUIRES_PLAN": "Пожалуйста, сначала рассчитайте план рассрочки:",
   "INSTALLMENT_PLAN_SUMMARY_TITLE": "Ваш план рассрочки",
   "INSTALLMENT_SUMMARY_MONTHLY": "Ежемесячный платёж",
   "INSTALLMENT_SUMMARY_DURATION_MONTHS": "{{months}} мес.",

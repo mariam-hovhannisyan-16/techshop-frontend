@@ -92,10 +92,6 @@ export class Checkout implements OnInit {
     return this.cart ? formatAmd(this.cart.totalPrice) : '';
   }
 
-  get installmentMonthlyFormatted(): string {
-    return this.pendingInstallmentPlan ? formatAmd(this.pendingInstallmentPlan.monthlyPayment) : '';
-  }
-
   ngOnInit(): void {
     const savedAddress = this.checkoutService.getAddress(this.userId);
     if (savedAddress) {
