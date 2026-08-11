@@ -601,7 +601,6 @@ export class Product {
     };
     return this.http.post<ApiResponse<BackendProductPayload>>(this.apiUrl, body, { headers: this.getHeaders() }).pipe(
       map(response => ({ ...response, data: { ...this.normalizeProduct(response.data), category: request.category, imageUrl: request.imageUrl, spec: request.spec } })),
-      tap(response => this.addLocalProduct(response.data)),
       catchError(err => {
         if (this.isUnreachable(err)) {
           console.warn(`[Product] Backend at ${this.apiUrl} is unreachable — adding this product locally for development.`);
