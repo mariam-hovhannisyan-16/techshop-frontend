@@ -305,8 +305,6 @@
   "FORGOT_PASSWORD_CONFIRMATION": "Если этот email зарегистрирован, мы отправили на него ссылку для восстановления",
   "BACK_TO_LOGIN": "Вернуться ко входу",
   "REGISTER_CTA": "Регистрация",
-  "REGISTER_AS_ADMIN": "Админ",
-  "REGISTER_AS_USER": "Пользователь",
   "AUTH_TAB_EMAIL": "Эл. почта",
   "AUTH_TAB_PHONE": "Телефон",
   "PROCEED_TO_CHECKOUT": "Перейти к оформлению",

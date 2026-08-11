@@ -305,8 +305,6 @@
   "FORGOT_PASSWORD_CONFIRMATION": "If that email address is registered, we've sent a reset link to it",
   "BACK_TO_LOGIN": "Back to login",
   "REGISTER_CTA": "Register",
-  "REGISTER_AS_ADMIN": "Admin",
-  "REGISTER_AS_USER": "User",
   "AUTH_TAB_EMAIL": "Email",
   "AUTH_TAB_PHONE": "Phone",
   "PROCEED_TO_CHECKOUT": "Proceed to Checkout",

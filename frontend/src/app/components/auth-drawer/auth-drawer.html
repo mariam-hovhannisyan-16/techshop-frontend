@@ -132,15 +132,6 @@
           </button>
         </div>
 
-        <div class="role-tabs">
-          <button type="button" [class.active]="registerRole === 'CUSTOMER'" (click)="setRegisterRole('CUSTOMER')">
-            {{ 'REGISTER_AS_USER' | translate }}
-          </button>
-          <button type="button" [class.active]="registerRole === 'ADMIN'" (click)="setRegisterRole('ADMIN')">
-            {{ 'REGISTER_AS_ADMIN' | translate }}
-          </button>
-        </div>
-
         <div class="modal-actions">
           <button type="submit" class="primary-btn" [disabled]="registerSubmitting">{{ 'REGISTER' | translate }}</button>
           <button type="button" class="secondary-btn" (click)="switchMode('login')">{{ 'LOGIN' | translate }}</button>

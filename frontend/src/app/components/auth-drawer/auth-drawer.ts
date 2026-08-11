@@ -32,8 +32,6 @@ export class AuthDrawer {
   registerError = '';
   registerSubmitting = false;
 
-  registerRole: 'ADMIN' | 'CUSTOMER' = 'CUSTOMER';
-
   forgotView = false;
   forgotEmail = '';
   forgotSubmitting = false;
@@ -84,10 +82,6 @@ export class AuthDrawer {
 
   setIdentifierType(type: 'email' | 'phone'): void {
     this.loginIdentifierType = type;
-  }
-
-  setRegisterRole(role: 'ADMIN' | 'CUSTOMER'): void {
-    this.registerRole = role;
   }
 
   onForgotPassword(): void {
@@ -169,7 +163,7 @@ export class AuthDrawer {
       name: this.registerName,
       email: this.registerEmail,
       password: this.registerPassword,
-      role: this.registerRole
+      role: 'CUSTOMER'
     }).subscribe({
       next: (response) => {
         this.registerSubmitting = false;
@@ -190,7 +184,6 @@ export class AuthDrawer {
     this.registerName = '';
     this.registerEmail = '';
     this.registerPassword = '';
-    this.registerRole = 'CUSTOMER';
     this.showPassword = false;
   }
 }

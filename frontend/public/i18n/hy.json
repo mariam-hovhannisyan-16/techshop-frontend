@@ -305,8 +305,6 @@
   "FORGOT_PASSWORD_CONFIRMATION": "Եթե այս էլ. հասցեն գրանցված է, մենք ուղարկել ենք վերականգնման հղում",
   "BACK_TO_LOGIN": "Վերադառնալ մուտք գործելուն",
   "REGISTER_CTA": "Գրանցում",
-  "REGISTER_AS_ADMIN": "Ադմին",
-  "REGISTER_AS_USER": "Օգտատեր",
   "AUTH_TAB_EMAIL": "Էլ. փոստ",
   "AUTH_TAB_PHONE": "Հեռախոս",
   "PROCEED_TO_CHECKOUT": "Անցնել վճարմանը",
