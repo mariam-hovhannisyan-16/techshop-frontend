@@ -130,7 +130,33 @@
     .email-cell { color: var(--text-secondary); }
     .muted { color: var(--text-secondary); font-size: 0.85rem; }
 
+    .registered-cell { color: var(--text-secondary); font-size: 0.85rem; }
+
     .actions-col { width: 1%; }
+
+    .actions-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .orders-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+
+      &:hover { border-color: var(--accent); color: var(--accent); }
+    }
 
     .role-badge {
       display: inline-block;
@@ -169,6 +195,140 @@
         &:hover { background: var(--danger-soft-hover); }
       }
     }
+  }
+}
+
+.orders-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-strong);
+  z-index: 500;
+}
+
+.orders-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 640px;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  z-index: 501;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  box-sizing: border-box;
+  box-shadow: 0 24px 60px var(--overlay-strong);
+
+  .orders-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { background: var(--bg-hover); color: var(--text-primary); }
+    }
+  }
+
+  .orders-modal-empty {
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .orders-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .orders-modal-order {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+  }
+
+  .orders-modal-order-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+
+    .order-id {
+      font-weight: 700;
+      margin-right: 0.6rem;
+    }
+
+    .order-date {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .order-status {
+      padding: 0.25rem 0.7rem;
+      border-radius: 6px;
+      background: var(--border);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+
+      &.paid, &.delivered { background: var(--success-soft); color: var(--success); }
+      &.cancelled, &.refunded { background: var(--danger-soft); color: var(--danger); }
+      &.pending, &.processing, &.shipped { background: var(--accent-soft); color: var(--accent); }
+    }
+  }
+
+  .orders-modal-items {
+    list-style: none;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+
+    .qty { color: var(--text-tertiary); }
+  }
+
+  .orders-modal-order-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+
+    span { color: var(--text-secondary); }
+    strong { color: var(--text-primary); }
   }
 }
 

@@ -32,6 +32,7 @@
               <th>{{ 'NAME' | translate }}</th>
               <th>{{ 'EMAIL' | translate }}</th>
               <th>{{ 'ROLE' | translate }}</th>
+              <th>{{ 'ADMIN_COL_REGISTERED' | translate }}</th>
               <th class="actions-col"></th>
             </tr>
           </thead>
@@ -45,7 +46,17 @@
                     {{ (isAdminRole(user.role) ? 'ADMIN_PANEL' : 'ROLE_CUSTOMER') | translate }}
                   </span>
                 </td>
+                <td class="registered-cell">
+                  @if (user.createdAt) {
+                    {{ user.createdAt | date:'dd.MM.yyyy HH:mm' }}
+                  } @else {
+                    <span class="muted">—</span>
+                  }
+                </td>
                 <td class="actions-cell">
+                  <button type="button" class="orders-btn" (click)="viewOrders(user)">
+                    <app-icon name="box" /> {{ 'ADMIN_VIEW_ORDERS_BTN' | translate }}
+                  </button>
                   @if (isSelf(user)) {
                     <span class="muted">{{ 'ADMIN_SELF_NOTE' | translate }}</span>
                   } @else {
@@ -67,6 +78,58 @@
       </div>
     }
   </div>
+
+  @if (ordersModalUser; as modalUser) {
+    <div class="orders-modal-overlay" (click)="closeOrdersModal()"></div>
+    <div class="orders-modal" role="dialog" aria-modal="true">
+      <div class="orders-modal-header">
+        <h2>{{ 'ADMIN_USER_ORDERS_TITLE' | translate:{ name: modalUser.name } }}</h2>
+        <button type="button" class="close-btn" (click)="closeOrdersModal()" [attr.aria-label]="'CLOSE' | translate">
+          <app-icon name="close" />
+        </button>
+      </div>
+
+      @if (ordersModalLoading) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>{{ 'LOADING' | translate }}</p>
+        </div>
+      } @else if (ordersModalError) {
+        <div class="error-state">
+          <div class="error-icon"><app-icon name="warning" /></div>
+          <p>{{ ordersModalError | translate }}</p>
+          <button (click)="viewOrders(modalUser)">{{ 'RETRY' | translate }}</button>
+        </div>
+      } @else if (ordersModalOrders.length > 0) {
+        <div class="orders-modal-list">
+          @for (order of ordersModalOrders; track order.id) {
+            <div class="orders-modal-order">
+              <div class="orders-modal-order-header">
+                <div>
+                  <span class="order-id">#{{ order.id }}</span>
+                  <span class="order-date">{{ order.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+                </div>
+                <div class="order-status" [class]="order.status.toLowerCase()">
+                  {{ ('STATUS_' + order.status) | translate }}
+                </div>
+              </div>
+              <ul class="orders-modal-items">
+                @for (item of order.items; track item.productId) {
+                  <li>{{ item.productName }} <span class="qty">× {{ item.quantity }}</span></li>
+                }
+              </ul>
+              <div class="orders-modal-order-total">
+                <span>{{ 'ORDER_TOTAL_LABEL' | translate }}</span>
+                <strong>{{ order.totalPrice | price }}</strong>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="orders-modal-empty">{{ 'ADMIN_NO_ORDERS_FOR_USER' | translate }}</p>
+      }
+    </div>
+  }
 
   <app-toast />
 </div>

@@ -76,6 +76,12 @@ interface ApiResponse<T> {
   data: T;
 }
 
+interface OrderPage {
+  content: OrderResponse[];
+  totalElements: number;
+  totalPages: number;
+}
+
 const LOCAL_ORDERS_KEY_PREFIX = 'local_orders_';
 
 @Injectable({
@@ -207,6 +213,18 @@ export class OrderService {
         }
         return throwError(() => err);
       })
+    );
+  }
+
+  // Admin-only: every order placed by a specific user, regardless of who's
+  // currently logged in. Backed by GET /api/orders/admin?userId=..., which
+  // requires the ADMIN role server-side.
+  getOrdersForUserAdmin(userId: number): Observable<ApiResponse<OrderResponse[]>> {
+    return this.http.get<ApiResponse<OrderPage>>(`${this.apiUrl}/admin`, {
+      headers: this.getHeaders(),
+      params: { userId: String(userId), page: '0', size: '100' }
+    }).pipe(
+      map(response => ({ ...response, data: response.data.content }))
     );
   }
 }
