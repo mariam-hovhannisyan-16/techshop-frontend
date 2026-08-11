@@ -153,6 +153,7 @@
   "ADMIN_COL_DISCOUNT": "Скидка",
   "ADMIN_SAVE_SUCCESS": "Товар обновлён",
   "ADMIN_SAVE_FAILED": "Не удалось обновить товар",
+  "ADMIN_DISCOUNT_OUT_OF_RANGE": "Скидка должна быть от 0 до 100",
   "ADMIN_PRODUCTS_NAV": "Товары",
   "ADMIN_USERS_NAV": "Пользователи",
   "EMAIL": "Email",

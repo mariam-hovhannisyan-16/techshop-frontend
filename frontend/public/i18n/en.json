@@ -153,6 +153,7 @@
   "ADMIN_COL_DISCOUNT": "Discount",
   "ADMIN_SAVE_SUCCESS": "Product updated",
   "ADMIN_SAVE_FAILED": "Failed to update product",
+  "ADMIN_DISCOUNT_OUT_OF_RANGE": "Discount must be between 0 and 100",
   "ADMIN_PRODUCTS_NAV": "Products",
   "ADMIN_USERS_NAV": "Users",
   "EMAIL": "Email",

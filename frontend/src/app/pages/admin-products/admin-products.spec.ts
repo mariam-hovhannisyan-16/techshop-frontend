@@ -3,6 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
+import { vi } from 'vitest';
 import { environment } from '../../../environments/environment';
 
 import { AdminProducts } from './admin-products';
@@ -137,6 +138,33 @@ describe('AdminProducts', () => {
       // which the toast decision is based on.
       const saved = component.products.find(p => p.id === 1)!;
       expect(component.discountPercentOf(saved)).toBeNull();
+    });
+  });
+
+  describe('discount edit field', () => {
+    beforeEach(setup);
+
+    it('selects the pre-filled text on focus, so typing replaces it instead of appending', () => {
+      const input = document.createElement('input');
+      input.value = '15';
+      const event = { target: input } as unknown as Event;
+      const selectSpy = vi.spyOn(input, 'select');
+
+      component.selectInputText(event);
+
+      expect(selectSpy).toHaveBeenCalled();
+    });
+
+    it('rejects an out-of-range discount client-side instead of sending it to the backend', () => {
+      // Regression test: a pre-filled discount input (e.g. "15") without
+      // select-on-focus lets a user's keystrokes append rather than replace
+      // it (typing "20" after "15" produces "1520"). The backend correctly
+      // 400s that, but this guard catches it before the request is even sent.
+      component.startEdit(mockProducts[0] as any);
+      component.editState = { price: 1000, discountPercent: 1520 };
+      component.saveEdit(mockProducts[0] as any);
+
+      expect(httpMock.match(() => true).length).toBe(0);
     });
   });
 });

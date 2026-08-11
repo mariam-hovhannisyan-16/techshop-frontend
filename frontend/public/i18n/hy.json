@@ -153,6 +153,7 @@
   "ADMIN_COL_DISCOUNT": "Զեղչ",
   "ADMIN_SAVE_SUCCESS": "Ապրանքը թարմացվեց",
   "ADMIN_SAVE_FAILED": "Չհաջողվեց թարմացնել ապրանքը",
+  "ADMIN_DISCOUNT_OUT_OF_RANGE": "Զեղչը պետք է լինի 0-ից 100 միջակայքում",
   "ADMIN_PRODUCTS_NAV": "Ապրանքներ",
   "ADMIN_USERS_NAV": "Օգտատերեր",
   "EMAIL": "Էլ. փոստ",

@@ -13,7 +13,28 @@ import { ToastService } from '../services/toast';
 // here until that backend bug is fixed.
 const SESSION_EXPIRY_EXCLUDED_PREFIXES = [environment.wishlistApiUrl];
 
+// This interceptor only makes sense for calls to our own backend APIs. It must
+// not run for other requests (e.g. the i18n translation loader's own GET of
+// /i18n/{lang}.json) — besides being semantically wrong (no auth/session
+// concept applies to a static asset), injecting TranslateService here would
+// make TranslateService's own translation-file request depend on
+// TranslateService itself via this interceptor, an circular dependency that
+// surfaces as NG0200 ("failed to load '<lang>' ... Cause: NG0200").
+const API_BASE_URLS = [
+  environment.usersApiUrl,
+  environment.cartApiUrl,
+  environment.orderApiUrl,
+  environment.productApiUrl,
+  environment.notificationApiUrl,
+  environment.wishlistApiUrl,
+  environment.chatApiUrl
+];
+
 export const authErrorInterceptor: HttpInterceptorFn = (req, next) => {
+  if (!API_BASE_URLS.some(base => req.url.startsWith(base))) {
+    return next(req);
+  }
+
   const authService = inject(Auth);
   const authDrawerService = inject(AuthDrawerService);
   const toastService = inject(ToastService);

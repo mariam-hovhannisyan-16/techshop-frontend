@@ -111,6 +111,7 @@
                       class="edit-input"
                       [(ngModel)]="editState.price"
                       [attr.aria-label]="'ADMIN_COL_PRICE' | translate"
+                      (focus)="selectInputText($event)"
                     >
                   </td>
                   <td>
@@ -123,6 +124,7 @@
                       placeholder="0"
                       [(ngModel)]="editState.discountPercent"
                       [attr.aria-label]="'ADMIN_COL_DISCOUNT' | translate"
+                      (focus)="selectInputText($event)"
                     >
                     <span class="percent-sign">%</span>
                   </td>

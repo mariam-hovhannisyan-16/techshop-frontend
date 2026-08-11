@@ -78,6 +78,22 @@ describe('authErrorInterceptor', () => {
     expect(authDrawerService.open).not.toHaveBeenCalled();
   });
 
+  it('passes through untouched for non-API requests (e.g. the i18n translation loader), never injecting any service', () => {
+    // Regression test: this interceptor previously injected TranslateService
+    // unconditionally for every request, including the i18n loader's own GET
+    // of /i18n/{lang}.json — which made TranslateService's own translation
+    // load depend on TranslateService via this interceptor, a circular
+    // dependency that surfaced as NG0200. It must now skip entirely for
+    // anything that isn't one of our backend API base URLs.
+    httpClient.get('/i18n/hy.json').subscribe();
+
+    httpMock.expectOne('/i18n/hy.json').flush({ SOME_KEY: 'value' });
+
+    expect(authService.logout).not.toHaveBeenCalled();
+    expect(toastService.show).not.toHaveBeenCalled();
+    expect(authDrawerService.open).not.toHaveBeenCalled();
+  });
+
   it('still propagates the error to the caller after handling it', () => {
     let caughtStatus: number | undefined;
 

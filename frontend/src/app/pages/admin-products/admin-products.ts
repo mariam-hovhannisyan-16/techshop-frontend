@@ -178,10 +178,28 @@ export class AdminProducts implements OnInit {
     this.editingId = null;
   }
 
+  // The price/discount inputs are pre-filled with the product's current
+  // value when edit mode opens. Selecting the text on focus means the first
+  // keystroke replaces it — without this, clicking in and typing appends to
+  // the existing value instead (e.g. a pre-filled "15" plus a typed "20"
+  // becomes "1520"), which the backend correctly rejects as out of range.
+  selectInputText(event: Event): void {
+    (event.target as HTMLInputElement).select();
+  }
+
   saveEdit(product: ProductResponse): void {
     if (this.saving) return;
-    this.saving = true;
     const { price, discountPercent } = this.editState;
+
+    // Defense in depth: catch an out-of-range discount client-side with a
+    // clear message instead of sending it to the backend and surfacing a
+    // raw 400 as a generic "failed to update" toast.
+    if (discountPercent != null && (discountPercent < 0 || discountPercent > 100)) {
+      this.toastService.show(this.translateService.instant('ADMIN_DISCOUNT_OUT_OF_RANGE'), 'error');
+      return;
+    }
+
+    this.saving = true;
 
     // Price and discount live on the same backend row, and each endpoint does
     // its own read-modify-write with no locking — firing both requests in
