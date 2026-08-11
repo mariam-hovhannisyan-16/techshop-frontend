@@ -9,6 +9,11 @@ import { Toast } from '../../components/toast/toast';
 import { StatTile } from '../../components/stat-tile/stat-tile';
 import { PricePipe } from '../../pipes/price';
 
+// Below this many distinct days with orders, a "revenue over time" chart would
+// just be 1-2 bars — not a trend, and easy to misread as one. Skip it rather
+// than render something that looks like a real time series but isn't yet.
+const MIN_DAYS_FOR_TREND_CHART = 3;
+
 @Component({
   selector: 'app-admin-stats',
   imports: [CommonModule, TranslatePipe, AppHeader, Icon, Toast, StatTile, PricePipe],
@@ -45,5 +50,29 @@ export class AdminStats implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  get topProductsMax(): number {
+    if (!this.stats?.topProducts.length) return 0;
+    return Math.max(...this.stats.topProducts.map(p => p.quantitySold));
+  }
+
+  barWidthPercent(quantitySold: number): number {
+    if (this.topProductsMax === 0) return 0;
+    return Math.round((quantitySold / this.topProductsMax) * 100);
+  }
+
+  get hasTrendChart(): boolean {
+    return (this.stats?.ordersByDay.length ?? 0) >= MIN_DAYS_FOR_TREND_CHART;
+  }
+
+  get ordersByDayMax(): number {
+    if (!this.stats?.ordersByDay.length) return 0;
+    return Math.max(...this.stats.ordersByDay.map(d => d.revenue));
+  }
+
+  columnHeightPercent(revenue: number): number {
+    if (this.ordersByDayMax === 0) return 0;
+    return Math.round((revenue / this.ordersByDayMax) * 100);
   }
 }

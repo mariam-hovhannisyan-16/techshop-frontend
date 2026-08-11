@@ -119,23 +119,19 @@
     }
   }
 
-  .top-products-list {
+  // Horizontal bar chart — top-selling products. Single series (units sold),
+  // so one accent hue and no legend; value sits outside the bar's tip since
+  // these bars are often too short/tied to fit a label inside comfortably.
+  .bar-chart {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    gap: 0.6rem;
+  }
 
-    li {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-      padding: 0.8rem 0.9rem;
-      background: var(--bg-page);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-    }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 
     .rank {
       display: flex;
@@ -151,16 +147,126 @@
       font-weight: 700;
     }
 
-    .product-name {
-      flex: 1;
+    .bar-row-label {
+      flex: 0 0 140px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .quantity {
+    .bar-row-track {
+      flex: 1;
+      height: 18px;
+      background: var(--bg-page);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-row-fill {
+      height: 100%;
+      min-width: 4px;
+      background: var(--accent);
+      border-radius: 0 4px 4px 0;
+      transition: width 0.3s ease, background 0.15s ease;
+    }
+
+    .bar-row-value {
+      flex: 0 0 auto;
+      min-width: 64px;
+      text-align: right;
       color: var(--text-secondary);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    &:hover .bar-row-fill,
+    &:focus-visible .bar-row-fill {
+      background: var(--accent-hover);
+    }
+
+    &:hover .bar-row-value,
+    &:focus-visible .bar-row-value {
+      color: var(--text-primary);
+    }
+  }
+
+  .trend-chart-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.05rem;
+      margin: 0 0 1.25rem;
+    }
+  }
+
+  // Vertical column chart — revenue per day. Order count rides along as a
+  // direct label rather than a second encoded axis (never dual-axis).
+  .column-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.25rem;
+    height: 180px;
+    padding: 0 0.5rem;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 72px;
+    height: 100%;
+
+    .column-value {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.3rem;
       white-space: nowrap;
+    }
+
+    .column-track {
+      flex: 1;
+      width: 24px;
+      display: flex;
+      align-items: flex-end;
+      background: var(--bg-page);
+      border-radius: 4px 4px 0 0;
+      overflow: hidden;
+    }
+
+    .column-fill {
+      width: 100%;
+      min-height: 4px;
+      background: var(--accent);
+      border-radius: 4px 4px 0 0;
+      transition: height 0.3s ease, background 0.15s ease;
+    }
+
+    .column-label {
+      margin-top: 0.5rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .column-count {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+
+    &:hover .column-fill,
+    &:focus-visible .column-fill {
+      background: var(--accent-hover);
     }
   }
 }

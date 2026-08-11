@@ -36,11 +36,21 @@ export interface TopProduct {
   quantitySold: number;
 }
 
+export interface OrdersByDay {
+  date: string;
+  orderCount: number;
+  revenue: number;
+}
+
 export interface AdminStatsSummary {
   totalOrders: number;
   totalRevenue: number;
   totalUsers: number;
   topProducts: TopProduct[];
+  // One entry per distinct calendar day that actually has an order — never
+  // zero-filled/padded to a fixed range. The component decides whether there's
+  // enough of a real spread to plot as a trend.
+  ordersByDay: OrdersByDay[];
 }
 
 @Injectable({
@@ -66,7 +76,8 @@ export class AdminStatsService {
         totalOrders: statistics.data.totalOrders,
         totalRevenue: statistics.data.totalRevenue,
         totalUsers: users.data.length,
-        topProducts: this.computeTopProducts(orders.data.content)
+        topProducts: this.computeTopProducts(orders.data.content),
+        ordersByDay: this.computeOrdersByDay(orders.data.content)
       }))
     );
   }
@@ -86,5 +97,20 @@ export class AdminStatsService {
     return Array.from(totals.values())
       .sort((a, b) => b.quantitySold - a.quantitySold)
       .slice(0, 5);
+  }
+
+  private computeOrdersByDay(orders: OrderResponse[]): OrdersByDay[] {
+    const totals = new Map<string, OrdersByDay>();
+    for (const order of orders) {
+      const date = order.createdAt.slice(0, 10); // YYYY-MM-DD, local to the stored timestamp
+      const existing = totals.get(date);
+      if (existing) {
+        existing.orderCount += 1;
+        existing.revenue += order.totalPrice;
+      } else {
+        totals.set(date, { date, orderCount: 1, revenue: order.totalPrice });
+      }
+    }
+    return Array.from(totals.values()).sort((a, b) => a.date.localeCompare(b.date));
   }
 }

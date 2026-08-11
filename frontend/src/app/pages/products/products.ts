@@ -187,10 +187,12 @@ export class Products implements OnInit {
   }
 
   get totalPages(): number {
+    if (this.selectedCategory !== 'all') return 1;
     return Math.max(1, Math.ceil(this.filteredProducts.length / this.pageSize));
   }
 
   get pagedProducts(): any[] {
+    if (this.selectedCategory !== 'all') return this.filteredProducts;
     const start = (this.currentPage - 1) * this.pageSize;
     return this.filteredProducts.slice(start, start + this.pageSize);
   }

@@ -216,6 +216,8 @@
   "ADMIN_STATS_TOP_PRODUCTS": "Best-selling products",
   "ADMIN_STATS_NO_SALES": "No sales yet",
   "ADMIN_STATS_UNITS_SOLD": "{{count}} sold",
+  "ADMIN_STATS_REVENUE_TREND": "Revenue over time",
+  "ADMIN_STATS_ORDERS_ON_DAY": "{{count}} orders",
   "FAILED_TO_LOAD_STATS": "Failed to load statistics. Try again.",
   "FAILED_TO_LOAD_USERS": "Failed to load users. Please try again.",
   "SAVED": "Saved",

@@ -217,6 +217,8 @@
   "ADMIN_STATS_TOP_PRODUCTS": "Լավագույն վաճառվող ապրանքներ",
   "ADMIN_STATS_NO_SALES": "Վաճառքներ դեռ չկան",
   "ADMIN_STATS_UNITS_SOLD": "{{count}} վաճառված միավոր",
+  "ADMIN_STATS_REVENUE_TREND": "Եկամուտը ժամանակի ընթացքում",
+  "ADMIN_STATS_ORDERS_ON_DAY": "{{count}} պատվեր",
   "FAILED_TO_LOAD_STATS": "Չհաջողվեց բեռնել վիճակագրությունը։ Փորձեք կրկին։",
   "SAVED": "Պահպանված է",
   "NO_ADDRESSES": "Պահպանված հասցեներ դեռ չկան։",

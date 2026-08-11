@@ -38,17 +38,47 @@
         @if (stats.topProducts.length === 0) {
           <p class="empty-note">{{ 'ADMIN_STATS_NO_SALES' | translate }}</p>
         } @else {
-          <ol class="top-products-list">
+          <div class="bar-chart" role="img" [attr.aria-label]="'ADMIN_STATS_TOP_PRODUCTS' | translate">
             @for (product of stats.topProducts; track product.productId) {
-              <li>
+              <div
+                class="bar-row"
+                tabindex="0"
+                [attr.aria-label]="product.productName + ': ' + ('ADMIN_STATS_UNITS_SOLD' | translate:{ count: product.quantitySold })"
+              >
                 <span class="rank">{{ $index + 1 }}</span>
-                <span class="product-name">{{ product.productName }}</span>
-                <span class="quantity">{{ 'ADMIN_STATS_UNITS_SOLD' | translate:{ count: product.quantitySold } }}</span>
-              </li>
+                <span class="bar-row-label" [title]="product.productName">{{ product.productName }}</span>
+                <div class="bar-row-track">
+                  <div class="bar-row-fill" [style.width.%]="barWidthPercent(product.quantitySold)"></div>
+                </div>
+                <span class="bar-row-value">{{ 'ADMIN_STATS_UNITS_SOLD' | translate:{ count: product.quantitySold } }}</span>
+              </div>
             }
-          </ol>
+          </div>
         }
       </div>
+
+      @if (hasTrendChart) {
+        <div class="trend-chart-card">
+          <h2><app-icon name="cash" /> {{ 'ADMIN_STATS_REVENUE_TREND' | translate }}</h2>
+
+          <div class="column-chart" role="img" [attr.aria-label]="'ADMIN_STATS_REVENUE_TREND' | translate">
+            @for (day of stats.ordersByDay; track day.date) {
+              <div
+                class="column"
+                tabindex="0"
+                [attr.aria-label]="(day.date | date:'dd.MM') + ': ' + (day.revenue | price) + ', ' + ('ADMIN_STATS_ORDERS_ON_DAY' | translate:{ count: day.orderCount })"
+              >
+                <span class="column-value">{{ day.revenue | price }}</span>
+                <div class="column-track">
+                  <div class="column-fill" [style.height.%]="columnHeightPercent(day.revenue)"></div>
+                </div>
+                <span class="column-label">{{ day.date | date:'dd.MM' }}</span>
+                <span class="column-count">{{ 'ADMIN_STATS_ORDERS_ON_DAY' | translate:{ count: day.orderCount } }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
     }
   </div>
 

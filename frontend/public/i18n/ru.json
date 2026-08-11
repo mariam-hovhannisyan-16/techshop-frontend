@@ -216,6 +216,8 @@
   "ADMIN_STATS_TOP_PRODUCTS": "Самые продаваемые товары",
   "ADMIN_STATS_NO_SALES": "Продаж пока нет",
   "ADMIN_STATS_UNITS_SOLD": "продано: {{count}}",
+  "ADMIN_STATS_REVENUE_TREND": "Динамика выручки",
+  "ADMIN_STATS_ORDERS_ON_DAY": "заказов: {{count}}",
   "FAILED_TO_LOAD_STATS": "Не удалось загрузить статистику. Попробуйте снова.",
   "FAILED_TO_LOAD_USERS": "Не удалось загрузить пользователей. Попробуйте снова.",
   "SAVED": "Сохранено",
