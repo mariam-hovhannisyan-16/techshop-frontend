@@ -98,6 +98,10 @@ export class ChatService {
     localStorage.setItem(this.conversationIdKey(), String(id));
   }
 
+  clearSavedConversationId(): void {
+    localStorage.removeItem(this.conversationIdKey());
+  }
+
   private readLocalState(): LocalChatState | null {
     try {
       const raw = localStorage.getItem(this.localKey());

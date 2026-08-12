@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ChatService, MessageResponse } from '../../services/chat';
@@ -123,10 +124,25 @@ export class ChatWidget implements OnInit, OnDestroy {
           this.hasUnread = true;
         }
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
+        if (this.isStaleConversation(err)) {
+          this.resetConversation();
+        }
       }
     });
+  }
+
+  private isStaleConversation(err: unknown): boolean {
+    return err instanceof HttpErrorResponse && err.status === 404;
+  }
+
+  private resetConversation(): void {
+    this.stopPolling();
+    this.chatService.clearSavedConversationId();
+    this.conversationId = null;
+    this.messages = [];
+    this.lastSeenId = 0;
   }
 
   private markAllSeen(): void {
@@ -152,7 +168,24 @@ export class ChatWidget implements OnInit, OnDestroy {
 
   send(): void {
     const text = this.draft.trim();
-    if (!text || this.conversationId === null || this.sending) return;
+    if (!text || this.sending) return;
+
+    if (this.conversationId === null) {
+      this.sending = true;
+      this.chatService.startConversation().subscribe({
+        next: (response) => {
+          this.conversationId = response.data.id;
+          this.lastSeenId = this.readLastSeenId();
+          this.startPolling();
+          this.sending = false;
+          this.send();
+        },
+        error: () => {
+          this.sending = false;
+        }
+      });
+      return;
+    }
 
     const conversationId = this.conversationId;
     const optimistic: MessageResponse = {
@@ -177,8 +210,12 @@ export class ChatWidget implements OnInit, OnDestroy {
         if (response.data.botReply) this.scrollToBottom();
       },
 
-      error: () => {
+      error: (err) => {
         this.sending = false;
+        if (this.isStaleConversation(err)) {
+          this.messages = this.messages.filter(m => m !== optimistic);
+          this.resetConversation();
+        }
       }
     });
   }
