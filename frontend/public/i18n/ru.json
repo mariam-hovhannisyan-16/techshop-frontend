@@ -240,6 +240,7 @@
   "TRUST_WARRANTY_SUB": "До 2 лет",
   "ALL_PRODUCTS": "Все товары",
   "PRICE_RANGE": "Диапазон цен",
+  "PRICE": "Цена",
   "MIN_PRICE": "Мин",
   "MAX_PRICE": "Макс",
   "CLEAR_PRICE_FILTER": "Сбросить фильтр цены",

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Product } from '../../services/product';
 import { CartService } from '../../services/cart';
@@ -34,8 +34,6 @@ export class Products implements OnInit {
   hasError = false;
   searchQuery = '';
   selectedCategory = 'all';
-  minPrice: number | null = null;
-  maxPrice: number | null = null;
   userId: number = 1;
   highlightedProductId: number | null = null;
 
@@ -55,10 +53,20 @@ export class Products implements OnInit {
     private filtersPanelService: ProductFiltersPanelService
   ) {
     this.userId = this.authService.getUserId() ?? 1;
+
+    effect(() => {
+      this.filtersPanelService.minPrice();
+      this.filtersPanelService.maxPrice();
+      this.applyFilters();
+    });
   }
 
-  get filtersPanelOpen(): boolean {
-    return this.filtersPanelService.isOpen();
+  get minPrice(): number | null {
+    return this.filtersPanelService.minPrice();
+  }
+
+  get maxPrice(): number | null {
+    return this.filtersPanelService.maxPrice();
   }
 
   ngOnInit(): void {
@@ -140,18 +148,12 @@ export class Products implements OnInit {
   clearFilters(): void {
     this.searchQuery = '';
     this.selectedCategory = 'all';
-    this.minPrice = null;
-    this.maxPrice = null;
+    this.filtersPanelService.clear();
     this.applyFilters();
   }
 
-  get currencySymbol(): string {
-    return currencyForLanguage(this.languageService.current()).symbol;
-  }
-
   clearPriceRange(): void {
-    this.minPrice = null;
-    this.maxPrice = null;
+    this.filtersPanelService.clear();
     this.applyFilters();
   }
 

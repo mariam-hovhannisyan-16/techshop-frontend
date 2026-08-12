@@ -20,6 +20,7 @@ import { Auth } from '../../services/auth';
 export class AppHeader {
   @Input() subtitle = '';
   @Input() brandRoute = '/products';
+  @Input() showFiltersToggle = false;
 
   menuOpen = false;
 

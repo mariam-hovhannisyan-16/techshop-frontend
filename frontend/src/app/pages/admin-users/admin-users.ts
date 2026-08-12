@@ -48,10 +48,6 @@ export class AdminUsers implements OnInit {
     this.errorMessage = '';
     this.adminUserService.getAllUsers().subscribe({
       next: (response) => {
-        // Newest registrations first, so the admin can see who just signed
-        // up at a glance. Accounts with no createdAt (a handful of legacy
-        // rows predating this field) sort last — we have no way to rank
-        // them chronologically against the rest.
         this.users = [...response.data].sort((a, b) => {
           if (!a.createdAt && !b.createdAt) return 0;
           if (!a.createdAt) return 1;
@@ -131,10 +127,6 @@ export class AdminUsers implements OnInit {
     this.ordersModalError = '';
   }
 
-  // Only offers statuses the backend's OrderStatus.canTransitionTo actually
-  // allows from the order's current status — mirrored client-side purely so
-  // the dropdown doesn't show illegal options. The PATCH call below is still
-  // what actually enforces this; the backend rejects anything invalid.
   nextStatusOptions(order: OrderResponse): OrderStatus[] {
     return ORDER_STATUS_TRANSITIONS[order.status] ?? [];
   }

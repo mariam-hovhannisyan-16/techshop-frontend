@@ -240,6 +240,7 @@
   "TRUST_WARRANTY_SUB": "Մինչև 2 տարի",
   "ALL_PRODUCTS": "Բոլոր ապրանքները",
   "PRICE_RANGE": "Գնային միջակայք",
+  "PRICE": "Գին",
   "MIN_PRICE": "Նվազագույնը",
   "MAX_PRICE": "Առավելագույնը",
   "CLEAR_PRICE_FILTER": "Մաքրել գնային զտիչը",

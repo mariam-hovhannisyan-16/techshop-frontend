@@ -36,7 +36,7 @@ describe('AdminUsers', () => {
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
 
-    fixture.detectChanges(); // ngOnInit -> loadUsers()
+    fixture.detectChanges();
     httpMock.expectOne(usersUrl).flush({ success: true, message: 'ok', data: mockUsers });
     fixture.detectChanges();
   };

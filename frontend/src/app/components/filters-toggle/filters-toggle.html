@@ -1,4 +1,4 @@
-@if (isProductsPage) {
+<div class="filters-toggle-wrap">
   <button
     type="button"
     class="filters-toggle-btn"
@@ -9,4 +9,40 @@
   >
     <app-icon name="filter" />
   </button>
-}
+
+  @if (isOpen) {
+    <div class="filters-dropdown">
+      <div class="filters-row">
+        <span class="filters-row-label"><app-icon name="cash" /> {{ 'PRICE' | translate }}</span>
+        <div class="price-pill-inputs">
+          <div class="price-pill">
+            <span class="currency-symbol">{{ currencySymbol }}</span>
+            <input
+              type="number"
+              min="0"
+              name="minPrice"
+              [placeholder]="'MIN_PRICE' | translate"
+              [(ngModel)]="minPrice"
+            >
+          </div>
+          <span class="price-pill-sep">–</span>
+          <div class="price-pill">
+            <span class="currency-symbol">{{ currencySymbol }}</span>
+            <input
+              type="number"
+              min="0"
+              name="maxPrice"
+              [placeholder]="'MAX_PRICE' | translate"
+              [(ngModel)]="maxPrice"
+            >
+          </div>
+        </div>
+        @if (minPrice != null || maxPrice != null) {
+          <button type="button" class="clear-price-btn" [attr.aria-label]="'CLEAR_PRICE_FILTER' | translate" (click)="clearPrice()">
+            <app-icon name="close" />
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

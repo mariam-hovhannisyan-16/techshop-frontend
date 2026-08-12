@@ -32,6 +32,7 @@ describe('Products — price range filter', () => {
   let fixture: ComponentFixture<Products>;
   let component: Products;
   let httpMock: HttpTestingController;
+  let filtersPanelService: ProductFiltersPanelService;
 
   const productsUrl = `${environment.productApiUrl}/api/products`;
 
@@ -61,6 +62,7 @@ describe('Products — price range filter', () => {
     fixture = TestBed.createComponent(Products);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
+    filtersPanelService = TestBed.inject(ProductFiltersPanelService);
 
     fixture.detectChanges();
     httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: mockProducts });
@@ -79,8 +81,8 @@ describe('Products — price range filter', () => {
   });
 
   it('narrows to products within [min, max], inclusive on both ends', () => {
-    component.minPrice = 20000;
-    component.maxPrice = 200000;
+    filtersPanelService.setMinPrice(20000);
+    filtersPanelService.setMaxPrice(200000);
     component.applyFilters();
     fixture.detectChanges();
 
@@ -88,13 +90,13 @@ describe('Products — price range filter', () => {
   });
 
   it('supports an open-ended range with only min or only max set', () => {
-    component.minPrice = 500000;
+    filtersPanelService.setMinPrice(500000);
     component.applyFilters();
     fixture.detectChanges();
     expect(component.filteredProducts.map(p => p.id)).toEqual([3]);
 
-    component.minPrice = null;
-    component.maxPrice = 20000;
+    filtersPanelService.setMinPrice(null);
+    filtersPanelService.setMaxPrice(20000);
     component.applyFilters();
     fixture.detectChanges();
     expect(component.filteredProducts.map(p => p.id)).toEqual([4]);
@@ -102,7 +104,7 @@ describe('Products — price range filter', () => {
 
   it('composes with the category filter — both narrow the result set together', () => {
     component.selectCategory('phones');
-    component.minPrice = 100000;
+    filtersPanelService.setMinPrice(100000);
     component.applyFilters();
     fixture.detectChanges();
 
@@ -111,7 +113,7 @@ describe('Products — price range filter', () => {
 
   it('clearPriceRange resets bounds to null and restores the rest of the result set (category stays applied)', () => {
     component.selectCategory('phones');
-    component.maxPrice = 50000;
+    filtersPanelService.setMaxPrice(50000);
     component.applyFilters();
     fixture.detectChanges();
     expect(component.filteredProducts.map(p => p.id)).toEqual([1]);
@@ -126,7 +128,7 @@ describe('Products — price range filter', () => {
 
   it('clearFilters (global reset) also clears the price range alongside category/search', () => {
     component.selectCategory('phones');
-    component.minPrice = 100000;
+    filtersPanelService.setMinPrice(100000);
     component.applyFilters();
     fixture.detectChanges();
 
@@ -139,8 +141,8 @@ describe('Products — price range filter', () => {
     expect(component.filteredProducts.length).toBe(4);
   });
 
-  it('renders real min/max price inputs that auto-apply on input, same as category pills auto-apply on click', () => {
-    TestBed.inject(ProductFiltersPanelService).toggle();
+  it('renders real min/max price inputs (in the header Filters dropdown) that auto-apply on input, same as category pills auto-apply on click', () => {
+    filtersPanelService.toggle();
     fixture.detectChanges();
 
     const nativeElement: HTMLElement = fixture.nativeElement;

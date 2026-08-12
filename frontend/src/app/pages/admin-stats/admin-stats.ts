@@ -9,9 +9,6 @@ import { Toast } from '../../components/toast/toast';
 import { StatTile } from '../../components/stat-tile/stat-tile';
 import { PricePipe } from '../../pipes/price';
 
-// Below this many distinct days with orders, a "revenue over time" chart would
-// just be 1-2 bars — not a trend, and easy to misread as one. Skip it rather
-// than render something that looks like a real time series but isn't yet.
 const MIN_DAYS_FOR_TREND_CHART = 3;
 
 @Component({

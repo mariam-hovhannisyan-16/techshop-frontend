@@ -29,7 +29,9 @@
 
       <div class="nav-actions" [class.open]="menuOpen">
         <ng-content select="[header-actions]" />
-        <app-filters-toggle />
+        @if (showFiltersToggle) {
+          <app-filters-toggle />
+        }
         @if (isAdmin) {
           <button type="button" class="admin-panel-btn" (click)="goToAdmin()">
             <app-icon name="shield-check" />

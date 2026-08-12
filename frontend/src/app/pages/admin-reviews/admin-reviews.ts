@@ -55,12 +55,6 @@ export class AdminReviews implements OnInit {
       next: ({ products, users }) => {
         const userNameById = new Map(users.data.map(u => [u.id, u.name]));
         const productNameById = new Map(products.data.map(p => [p.id, p.name]));
-
-        // There's no admin/all-reviews endpoint on the backend — GET /api/reviews
-        // requires a productId. So this aggregates across every product's real
-        // reviews rather than fabricating a combined view. A review-fetch
-        // failing for one product doesn't block the rest — it just contributes
-        // no rows for that product.
         const reviewRequests = products.data.map(p =>
           this.reviewsService.getReviews(p.id).pipe(catchError(() => of([] as Review[])))
         );

@@ -92,7 +92,6 @@ describe('AdminStats', () => {
 
       expect(component.hasTrendChart).toBe(true);
       expect(component.stats?.ordersByDay.length).toBe(3);
-      // Aug 10 combines two orders: 200000 + 50000 = 250000
       const aug10 = component.stats?.ordersByDay.find(d => d.date === '2026-08-10');
       expect(aug10?.revenue).toBe(250000);
       expect(aug10?.orderCount).toBe(2);
