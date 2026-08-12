@@ -31,10 +31,12 @@ describe('Wishlist — empty-state layout and delivery-threshold interpolation',
   let fixture: ComponentFixture<Wishlist>;
   let httpMock: HttpTestingController;
 
-  const wishlistUrl = `${environment.wishlistApiUrl}/api/v1/wishlist`;
+  const wishlistUrl = `${environment.wishlistApiUrl}/wishlist`;
   const productsUrl = `${environment.productApiUrl}/api/products`;
 
   const fakeJwt = (payload: object) => `h.${btoa(JSON.stringify(payload))}.s`;
+
+  const emptyWishlistResponse = { success: true, message: 'ok', data: { id: 1, userId: 1, items: [], createdAt: '2026-01-01T00:00:00' } };
 
   const productsResponse = {
     success: true,
@@ -48,7 +50,7 @@ describe('Wishlist — empty-state layout and delivery-threshold interpolation',
   const drainLeftover = () => {
     let leftover = httpMock.match(() => true);
     while (leftover.length) {
-      leftover.forEach(req => req.flush({ success: true, message: 'ok', data: [] }));
+      leftover.forEach(req => req.flush(req.request.url === wishlistUrl ? emptyWishlistResponse : { success: true, message: 'ok', data: [] }));
       leftover = httpMock.match(() => true);
     }
   };
@@ -66,13 +68,13 @@ describe('Wishlist — empty-state layout and delivery-threshold interpolation',
     fixture = TestBed.createComponent(Wishlist);
     httpMock = TestBed.inject(HttpTestingController);
 
-    httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [] });
+    httpMock.expectOne(wishlistUrl).flush(emptyWishlistResponse);
     httpMock.expectOne(req => req.url === `${environment.cartApiUrl}/api/cart/1` && req.method === 'GET')
       .flush({ success: true, message: 'ok', data: { id: 1, userId: 1, items: [], totalPrice: 0 } });
 
     fixture.detectChanges();
 
-    httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [] });
+    httpMock.expectOne(wishlistUrl).flush(emptyWishlistResponse);
     httpMock.expectOne(productsUrl).flush(productsResponse);
 
     fixture.detectChanges();
@@ -129,20 +131,21 @@ describe('Wishlist — price-drop notification preference (real backend, not loc
   let component: Wishlist;
   let httpMock: HttpTestingController;
 
-  const wishlistUrl = `${environment.wishlistApiUrl}/api/v1/wishlist`;
+  const wishlistUrl = `${environment.wishlistApiUrl}/wishlist`;
   const productsUrl = `${environment.productApiUrl}/api/products`;
   const preferencesUrl = `${environment.usersApiUrl}/api/users/me/preferences`;
 
   const fakeJwt = (payload: object) => `h.${btoa(JSON.stringify(payload))}.s`;
 
   const wishlistItem = {
-    productId: 1001, productName: 'iPhone 15 Pro', productPrice: 650000, quantity: 1, totalPrice: 650000
+    id: 1, product: { id: 1001, name: 'iPhone 15 Pro', description: '', price: 650000, stock: 5, category: 'Phones', imageUrl: '/img.jpg', isNew: false, discountPercentage: null }, addedAt: '2026-01-01T00:00:00'
   };
+  const wishlistResponse = { success: true, message: 'ok', data: { id: 1, userId: 1, items: [wishlistItem], createdAt: '2026-01-01T00:00:00' } };
 
   const drainLeftoverExcept = (excludeUrl: string) => {
     let leftover = httpMock.match(req => req.url !== excludeUrl);
     while (leftover.length) {
-      leftover.forEach(req => req.flush({ success: true, message: 'ok', data: [] }));
+      leftover.forEach(req => req.flush(req.request.url === wishlistUrl ? wishlistResponse : { success: true, message: 'ok', data: [] }));
       leftover = httpMock.match(req => req.url !== excludeUrl);
     }
   };
@@ -160,13 +163,13 @@ describe('Wishlist — price-drop notification preference (real backend, not loc
     fixture = TestBed.createComponent(Wishlist);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
-    httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [wishlistItem] });
+    httpMock.expectOne(wishlistUrl).flush(wishlistResponse);
     httpMock.expectOne(req => req.url === `${environment.cartApiUrl}/api/cart/1` && req.method === 'GET')
       .flush({ success: true, message: 'ok', data: { id: 1, userId: 1, items: [], totalPrice: 0 } });
 
     fixture.detectChanges();
 
-    httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [wishlistItem] });
+    httpMock.expectOne(wishlistUrl).flush(wishlistResponse);
     httpMock.expectOne(productsUrl).flush({
       success: true, message: 'ok',
       data: [{ id: 1001, name: 'iPhone 15 Pro', description: '', price: 650000, stock: 5, imageUrl: '/img.jpg' }]

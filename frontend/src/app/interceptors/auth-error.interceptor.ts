@@ -7,10 +7,12 @@ import { Auth } from '../services/auth';
 import { AuthDrawerService } from '../services/auth-drawer';
 import { ToastService } from '../services/toast';
 
-// The wishlist backend has a known bug where it rejects even fresh, valid tokens with 401
-// (unrelated to session expiry — see WishlistService.isFallbackEligible). Forcing a logout
-// on every wishlist 401 would log out users with perfectly valid sessions, so it's excluded
-// here until that backend bug is fixed.
+// WishlistService previously called a path the backend never mapped, which made every
+// wishlist request 401 regardless of token validity (see WishlistService.isFallbackEligible
+// for the full story) — that's fixed now, so this exclusion is no longer masking a real bug.
+// Left in place as a defensive measure matching WishlistService's own 401 tolerance; safe to
+// remove once the fix has been confirmed in the running app (a genuine 401 here should now
+// mean an actually-expired session, same as every other service).
 const SESSION_EXPIRY_EXCLUDED_PREFIXES = [environment.wishlistApiUrl];
 
 // This interceptor only makes sense for calls to our own backend APIs. It must

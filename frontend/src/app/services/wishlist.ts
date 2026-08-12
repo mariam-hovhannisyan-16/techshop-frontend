@@ -18,13 +18,31 @@ interface ApiResponse<T> {
   data: T;
 }
 
+// Shape actually returned by the backend (techshop-wishlist's WishlistResponse/
+// WishlistItemResponse DTOs) — each item embeds the full product, not a flat
+// productId/productName/productPrice record. Mapped down to WishlistItemResponse
+// in this service so every other consumer (wishlist page, badge, button, etc.)
+// can keep using the simpler flat shape.
+interface BackendWishlistItem {
+  id: number;
+  product: { id: number; name: string; price: number; stock: number };
+  addedAt: string;
+}
+
+interface BackendWishlistResponse {
+  id: number | null;
+  userId: number;
+  items: BackendWishlistItem[];
+  createdAt: string | null;
+}
+
 const LOCAL_WISHLIST_KEY_PREFIX = 'local_wishlist_';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WishlistService {
-  private apiUrl = `${environment.wishlistApiUrl}/api/v1/wishlist`;
+  private apiUrl = `${environment.wishlistApiUrl}/wishlist`;
 
   private readonly productIds = signal<Set<number>>(new Set());
   readonly count = computed(() => this.productIds().size);
@@ -48,13 +66,23 @@ export class WishlistService {
   }
 
   private isFallbackEligible(err: unknown): boolean {
-    // The wishlist backend rejects even freshly-issued, otherwise-valid tokens with 401
-    // (confirmed: the same token that succeeds against /api/orders gets 401 here), so a
-    // real backend bug — not an expired/invalid session — is the normal case for this
-    // service today. Treat 401 like the unreachable/404 cases so the feature still works
-    // via local storage instead of silently failing on every click.
+    // Historical note: this service used to call a path the backend never mapped
+    // (/api/v1/wishlist instead of /wishlist), which made Spring Security's catch-all
+    // "authenticated()" rule reject the request as 401 before routing ever got a chance
+    // to 404 — so 401 looked like a real auth bug. That's fixed now (see apiUrl above);
+    // 401 stays in the fallback set purely as a defensive safety net for a genuinely
+    // down/misbehaving wishlist service, not because real 401s are expected.
     return this.isUnreachable(err)
       || (err instanceof HttpErrorResponse && (err.status === 404 || err.status === 401));
+  }
+
+  private toWishlistItems(response: BackendWishlistResponse): WishlistItemResponse[] {
+    return response.items.map(item => ({
+      productId: item.product.id,
+      productName: item.product.name,
+      productPrice: item.product.price,
+      quantity: item.product.stock
+    }));
   }
 
   private localKey(): string {
@@ -114,7 +142,8 @@ export class WishlistService {
   }
 
   getWishlist(): Observable<ApiResponse<WishlistItemResponse[]>> {
-    return this.http.get<ApiResponse<WishlistItemResponse[]>>(this.apiUrl, { headers: this.getHeaders() }).pipe(
+    return this.http.get<ApiResponse<BackendWishlistResponse>>(this.apiUrl, { headers: this.getHeaders() }).pipe(
+      map(response => ({ ...response, data: this.toWishlistItems(response.data) })),
       catchError(err => {
         if (this.isFallbackEligible(err)) {
           console.warn(`[Wishlist] Backend at ${this.apiUrl} is unreachable, has no wishlist route, or rejected the request (401) — using local wishlist for development.`);
@@ -126,7 +155,8 @@ export class WishlistService {
   }
 
   addToWishlist(productId: number): Observable<ApiResponse<WishlistItemResponse[]>> {
-    return this.http.post<ApiResponse<WishlistItemResponse[]>>(`${this.apiUrl}/${productId}`, {}, { headers: this.getHeaders() }).pipe(
+    return this.http.post<ApiResponse<BackendWishlistResponse>>(`${this.apiUrl}/products/${productId}`, {}, { headers: this.getHeaders() }).pipe(
+      map(response => ({ ...response, data: this.toWishlistItems(response.data) })),
       tap(() => this.productIds.update(ids => new Set(ids).add(productId))),
       catchError(err => {
         if (this.isFallbackEligible(err)) {
@@ -143,7 +173,8 @@ export class WishlistService {
   }
 
   removeFromWishlist(productId: number): Observable<ApiResponse<WishlistItemResponse[]>> {
-    return this.http.delete<ApiResponse<WishlistItemResponse[]>>(`${this.apiUrl}/${productId}`, { headers: this.getHeaders() }).pipe(
+    return this.http.delete<ApiResponse<BackendWishlistResponse>>(`${this.apiUrl}/products/${productId}`, { headers: this.getHeaders() }).pipe(
+      map(response => ({ ...response, data: this.toWishlistItems(response.data) })),
       tap(() => this.productIds.update(ids => {
         const next = new Set(ids);
         next.delete(productId);

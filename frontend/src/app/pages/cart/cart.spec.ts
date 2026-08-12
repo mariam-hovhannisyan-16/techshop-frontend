@@ -34,7 +34,7 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
   const cartUrl = `${environment.cartApiUrl}/api/cart/1`;
   const itemsUrl = `${environment.cartApiUrl}/api/cart/1/items`;
   const productsUrl = `${environment.productApiUrl}/api/products`;
-  const wishlistItemUrl = `${environment.wishlistApiUrl}/api/v1/wishlist/1001`;
+  const wishlistItemUrl = `${environment.wishlistApiUrl}/wishlist/products/1001`;
 
   const fakeJwt = (payload: object) => `h.${btoa(JSON.stringify(payload))}.s`;
 
@@ -213,7 +213,10 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     wishlistBtn.click();
 
     const req = httpMock.expectOne(req => req.url === wishlistItemUrl && req.method === 'POST');
-    req.flush({ success: true, message: 'ok', data: [{ productId: 1001, productName: 'iPhone 15 Pro', productPrice: 650000, quantity: 1 }] });
+    req.flush({
+      success: true, message: 'ok',
+      data: { id: 1, userId: 1, items: [{ id: 1, product: { id: 1001, name: 'iPhone 15 Pro', description: '', price: 650000, stock: 5, category: 'Phones', imageUrl: '/img.jpg', isNew: false, discountPercentage: null }, addedAt: '2026-01-01T00:00:00' }], createdAt: '2026-01-01T00:00:00' }
+    });
     fixture.detectChanges();
 
     expect(wishlistBtn.classList.contains('active')).toBe(true);
