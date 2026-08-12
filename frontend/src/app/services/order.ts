@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, of, throwError } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { Auth } from './auth';
 import { CartService } from './cart';
 import { environment } from '../../environments/environment';
@@ -150,7 +150,7 @@ export class OrderService {
 
   private createLocalOrder(userId: number, request: CheckoutRequest): Observable<ApiResponse<OrderResponse>> {
     return this.cartService.getCart(userId).pipe(
-      map(cartResponse => {
+      switchMap(cartResponse => {
         const now = new Date().toISOString();
         const order: OrderResponse = {
           id: Date.now(),
@@ -170,8 +170,15 @@ export class OrderService {
         const orders = this.readLocalOrders(userId);
         orders.unshift(order);
         this.writeLocalOrders(userId, orders);
-        this.cartService.clearCart(userId);
-        return { success: true, message: 'mock', data: order };
+        // This order is a client-only mock (the backend doesn't support this payment
+        // method yet), but the user's real backend cart still needs to be emptied —
+        // otherwise the "purchased" items would still be sitting there on next load.
+        // The local order record above is already written either way, so a cart-clear
+        // failure here shouldn't make the checkout itself look like it failed.
+        return this.cartService.clearCart(userId).pipe(
+          map(() => ({ success: true, message: 'mock', data: order })),
+          catchError(() => of({ success: true, message: 'mock', data: order }))
+        );
       })
     );
   }

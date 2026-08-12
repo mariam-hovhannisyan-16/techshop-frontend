@@ -21,7 +21,6 @@ import { FREE_SHIPPING_THRESHOLD_AMD } from '../../config/delivery';
 import { formatAmd } from '../../config/currency';
 
 const RECOMMENDED_COUNT = 6;
-const NOTIFY_PRICE_KEY = 'wishlist_notify_price_changes';
 
 @Component({
   selector: 'app-wishlist',
@@ -37,6 +36,7 @@ export class Wishlist implements OnInit {
 
   recommendedProducts: ProductResponse[] = [];
   notifyPriceChanges = false;
+  notifyPriceChangesSaving = false;
   loading = true;
   errorMessage = '';
   userId: number = 1;
@@ -56,11 +56,21 @@ export class Wishlist implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.userId = this.authService.getUserId() ?? 1;
-    this.notifyPriceChanges = localStorage.getItem(NOTIFY_PRICE_KEY) === 'true';
   }
 
   ngOnInit(): void {
     this.loadWishlist();
+    this.loadNotificationPreferences();
+  }
+
+  private loadNotificationPreferences(): void {
+    this.authService.getNotificationPreferences().subscribe({
+      next: (response) => {
+        this.notifyPriceChanges = response.data.notifyPriceDrops;
+        this.cdr.detectChanges();
+      },
+      error: () => this.cdr.detectChanges()
+    });
   }
 
   loadWishlist(): void {
@@ -190,12 +200,31 @@ export class Wishlist implements OnInit {
   }
 
   toggleNotifyPriceChanges(): void {
-    this.notifyPriceChanges = !this.notifyPriceChanges;
-    localStorage.setItem(NOTIFY_PRICE_KEY, String(this.notifyPriceChanges));
-    this.toastService.show(
-      this.translateService.instant(this.notifyPriceChanges ? 'TOAST_PRICE_NOTIFY_ON' : 'TOAST_PRICE_NOTIFY_OFF'),
-      'success'
-    );
+    if (this.notifyPriceChangesSaving) return;
+
+    const next = !this.notifyPriceChanges;
+    const previous = this.notifyPriceChanges;
+    this.notifyPriceChanges = next;
+    this.notifyPriceChangesSaving = true;
+    this.cdr.detectChanges();
+
+    this.authService.updateNotificationPreferences(next).subscribe({
+      next: (response) => {
+        this.notifyPriceChanges = response.data.notifyPriceDrops;
+        this.notifyPriceChangesSaving = false;
+        this.toastService.show(
+          this.translateService.instant(this.notifyPriceChanges ? 'TOAST_PRICE_NOTIFY_ON' : 'TOAST_PRICE_NOTIFY_OFF'),
+          'success'
+        );
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.notifyPriceChanges = previous;
+        this.notifyPriceChangesSaving = false;
+        this.toastService.show(this.translateService.instant('TOAST_PRICE_NOTIFY_FAILED'), 'error');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   openChat(): void {

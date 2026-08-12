@@ -42,7 +42,25 @@
   <div class="footer-payments">
     <p class="footer-payments-note">{{ 'FOOTER_PAYMENT_NOTE' | translate }}</p>
     <h3 class="footer-payments-title">{{ 'FOOTER_PAYMENT_METHODS' | translate }}</h3>
-    <img class="footer-payments-badges" [src]="paymentMethodsLogo" alt="Mastercard, ArCa, Telcell Wallet, VTB Ապառիկ, МИР" loading="lazy" />
+    <div class="footer-payment-methods">
+      <span class="footer-payment-method">
+        <app-icon name="cash" />
+        {{ 'PAYMENT_ROKET_LINE' | translate }}
+      </span>
+      <span class="footer-payment-method">
+        <app-icon name="card" />
+        {{ 'PAYMENT_CARD_SUBLABEL' | translate }}
+      </span>
+      <span class="footer-payment-method payment-logo-chip">
+        <img src="icons/payment/idram.svg" alt="Idram" class="payment-logo" loading="lazy" />
+      </span>
+      <span class="footer-payment-method payment-logo-chip">
+        <img src="icons/payment/telcell.svg" alt="Telcell Wallet" class="payment-logo" loading="lazy" />
+      </span>
+      <span class="footer-payment-method payment-logo-chip">
+        <img src="icons/payment/vtb.svg" alt="VTB Ապառիկ" class="payment-logo" loading="lazy" />
+      </span>
+    </div>
   </div>
 
   <div class="footer-divider"></div>

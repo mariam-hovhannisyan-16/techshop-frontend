@@ -74,7 +74,7 @@
                 <span>{{ 'PRICE_NOTIFY_DESC' | translate }}</span>
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" [checked]="notifyPriceChanges" (change)="toggleNotifyPriceChanges()">
+                <input type="checkbox" [checked]="notifyPriceChanges" [disabled]="notifyPriceChangesSaving" (change)="toggleNotifyPriceChanges()">
                 <span class="toggle-slider"></span>
               </label>
             </div>

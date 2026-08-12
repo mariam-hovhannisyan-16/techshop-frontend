@@ -36,8 +36,15 @@ describe('Checkout — single-page end-to-end submission', () => {
   let router: Router;
 
   const cartUrl = `${environment.cartApiUrl}/api/cart/1`;
+  const clearCartUrl = `${environment.cartApiUrl}/api/cart/1/clear`;
   const productsUrl = `${environment.productApiUrl}/api/products`;
   const checkoutUrl = `${environment.orderApiUrl}/api/orders/checkout`;
+
+  const flushCartClear = () => {
+    const clearReq = httpMock.expectOne(clearCartUrl);
+    expect(clearReq.request.method).toBe('DELETE');
+    clearReq.flush({ success: true, message: 'ok', data: null });
+  };
 
   const fakeJwt = (payload: object) =>
     `h.${btoa(JSON.stringify(payload))}.s`;
@@ -213,6 +220,7 @@ describe('Checkout — single-page end-to-end submission', () => {
         paymentRedirectUrl: 'https://sandbox.idram.am/payment?ref=fake&amount=650000&merchant_id=sandbox-merchant'
       }
     });
+    flushCartClear();
 
     expect(component.placingOrder).toBe(false);
     expect(component.placeOrderError).toBe('');
@@ -274,6 +282,7 @@ describe('Checkout — single-page end-to-end submission', () => {
       message: 'ok',
       data: { id: 556, userId: 1, items: [], totalPrice: 650000, status: 'PENDING', paymentMethod: 'IDRAM', createdAt: '2026-01-01' }
     });
+    flushCartClear();
 
     languageService.setLanguage('ru');
     fixture.detectChanges();
@@ -287,5 +296,6 @@ describe('Checkout — single-page end-to-end submission', () => {
       message: 'ok',
       data: { id: 557, userId: 1, items: [], totalPrice: 650000, status: 'PENDING', paymentMethod: 'IDRAM', createdAt: '2026-01-01' }
     });
+    flushCartClear();
   });
 });

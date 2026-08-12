@@ -24,8 +24,6 @@ export class Footer {
     { id: 'games', labelKey: 'GAMES' }
   ];
 
-  readonly paymentMethodsLogo = 'icons/payment/payment-methods-footer.svg';
-
   readonly supportLinkKeys = ['FOOTER_RETURNS', 'FOOTER_WARRANTY', 'FOOTER_CONTACT', 'FOOTER_FAQ'];
   readonly companyLinkKeys = ['FOOTER_ABOUT', 'FOOTER_CAREERS', 'FOOTER_BLOG', 'FOOTER_PRIVACY', 'FOOTER_TERMS'];
 

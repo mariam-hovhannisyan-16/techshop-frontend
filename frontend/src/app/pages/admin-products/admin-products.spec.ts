@@ -178,7 +178,6 @@ describe('AdminProducts', () => {
 
     it('computes total product count, inventory value, out-of-stock count, and discounted count', () => {
       expect(component.totalProductsCount).toBe(4);
-      // 1000*4 + 900*2 + 500*0 + 300*0 = 5800
       expect(component.totalInventoryValue).toBe(5800);
       expect(component.outOfStockCount).toBe(2);
       expect(component.discountedCount).toBe(2);

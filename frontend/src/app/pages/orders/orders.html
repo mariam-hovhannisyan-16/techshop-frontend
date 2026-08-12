@@ -38,6 +38,12 @@
               <span class="label">{{ 'DATE' | translate }}</span>
               <span>{{ order.createdAt | date:'dd.MM.yyyy' }}</span>
             </div>
+            @if (order.paymentMethod) {
+              <div class="detail">
+                <span class="label">{{ 'ORDER_PAYMENT_LABEL' | translate }}</span>
+                <span>{{ ('PAYMENT_' + order.paymentMethod) | translate }}</span>
+              </div>
+            }
           </div>
           <button class="view-details-btn" (click)="viewOrder(order.id)">{{ 'VIEW_DETAILS' | translate }}</button>
         </div>

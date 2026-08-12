@@ -60,9 +60,6 @@ describe('ProductDetail — real-backend reviews with purchase gating', () => {
     }
   };
 
-  // loadReviews() fires two concurrent GETs to the same URL (one for the list, one for
-  // getAverageRating()'s own separate fetch) — both are already pending by the time we get
-  // here, so expectOne() (which requires exactly one match) can't be called twice in a row.
   const flushBothReviewRequests = (httpMock: HttpTestingController) => {
     const reqs = httpMock.match(r => r.url === reviewsUrl);
     expect(reqs.length).toBe(2);
@@ -95,7 +92,7 @@ describe('ProductDetail — real-backend reviews with purchase gating', () => {
       localStorage.setItem('user', JSON.stringify({ id: 36, name: 'Reviewer', email: 'reviewer@example.com', role: 'CUSTOMER', createdAt: '2026-01-01' }));
 
       await setup();
-      fixture.detectChanges(); // ngOnInit -> loadProduct()
+      fixture.detectChanges();
 
       httpMock.expectOne(productUrl).flush(productResponse);
       httpMock.expectOne(allProductsUrl).flush({ success: true, message: 'ok', data: [] });

@@ -123,3 +123,104 @@ describe('Wishlist — empty-state layout and delivery-threshold interpolation',
     expect(fixture.nativeElement.querySelector('.secure-card')).not.toBeNull();
   });
 });
+
+describe('Wishlist — price-drop notification preference (real backend, not localStorage)', () => {
+  let fixture: ComponentFixture<Wishlist>;
+  let component: Wishlist;
+  let httpMock: HttpTestingController;
+
+  const wishlistUrl = `${environment.wishlistApiUrl}/api/v1/wishlist`;
+  const productsUrl = `${environment.productApiUrl}/api/products`;
+  const preferencesUrl = `${environment.usersApiUrl}/api/users/me/preferences`;
+
+  const fakeJwt = (payload: object) => `h.${btoa(JSON.stringify(payload))}.s`;
+
+  const wishlistItem = {
+    productId: 1001, productName: 'iPhone 15 Pro', productPrice: 650000, quantity: 1, totalPrice: 650000
+  };
+
+  const drainLeftoverExcept = (excludeUrl: string) => {
+    let leftover = httpMock.match(req => req.url !== excludeUrl);
+    while (leftover.length) {
+      leftover.forEach(req => req.flush({ success: true, message: 'ok', data: [] }));
+      leftover = httpMock.match(req => req.url !== excludeUrl);
+    }
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+    localStorage.setItem('token', fakeJwt({ userId: 1, role: 'CUSTOMER' }));
+    localStorage.setItem('user', JSON.stringify({ id: 1, name: 'Test User', email: 'a@b.com', role: 'CUSTOMER', createdAt: '2026-01-01' }));
+
+    await TestBed.configureTestingModule({
+      imports: [Wishlist],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideTranslateService()],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Wishlist);
+    component = fixture.componentInstance;
+    httpMock = TestBed.inject(HttpTestingController);
+    httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [wishlistItem] });
+    httpMock.expectOne(req => req.url === `${environment.cartApiUrl}/api/cart/1` && req.method === 'GET')
+      .flush({ success: true, message: 'ok', data: { id: 1, userId: 1, items: [], totalPrice: 0 } });
+
+    fixture.detectChanges();
+
+    httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [wishlistItem] });
+    httpMock.expectOne(productsUrl).flush({
+      success: true, message: 'ok',
+      data: [{ id: 1001, name: 'iPhone 15 Pro', description: '', price: 650000, stock: 5, imageUrl: '/img.jpg' }]
+    });
+
+    fixture.detectChanges();
+    drainLeftoverExcept(preferencesUrl);
+    fixture.detectChanges();
+  });
+
+  afterEach(() => httpMock.verify());
+
+  it('fetches the real saved preference on load (GET /api/users/me/preferences) instead of reading localStorage', () => {
+    const req = httpMock.expectOne(preferencesUrl);
+    expect(req.request.method).toBe('GET');
+    req.flush({ success: true, message: 'ok', data: { notifyPriceDrops: true } });
+    fixture.detectChanges();
+
+    expect(component.notifyPriceChanges).toBe(true);
+    const checkbox: HTMLInputElement = fixture.nativeElement.querySelector('.notify-row input[type="checkbox"]');
+    expect(checkbox.checked).toBe(true);
+  });
+
+  it('PATCHes notifyPriceDrops on toggle and reflects the persisted value back', () => {
+    httpMock.expectOne(preferencesUrl).flush({ success: true, message: 'ok', data: { notifyPriceDrops: false } });
+    fixture.detectChanges();
+    expect(component.notifyPriceChanges).toBe(false);
+
+    component.toggleNotifyPriceChanges();
+    fixture.detectChanges();
+
+    const patchReq = httpMock.expectOne(preferencesUrl);
+    expect(patchReq.request.method).toBe('PATCH');
+    expect(patchReq.request.body).toEqual({ notifyPriceDrops: true });
+    patchReq.flush({ success: true, message: 'ok', data: { notifyPriceDrops: true } });
+    fixture.detectChanges();
+
+    expect(component.notifyPriceChanges).toBe(true);
+    expect(component.notifyPriceChangesSaving).toBe(false);
+  });
+
+  it('reverts the toggle and leaves it usable again if the PATCH fails', () => {
+    httpMock.expectOne(preferencesUrl).flush({ success: true, message: 'ok', data: { notifyPriceDrops: false } });
+    fixture.detectChanges();
+
+    component.toggleNotifyPriceChanges();
+    fixture.detectChanges();
+    expect(component.notifyPriceChanges).toBe(true);
+
+    const patchReq = httpMock.expectOne(preferencesUrl);
+    patchReq.flush({ success: false, message: 'error' }, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    expect(component.notifyPriceChanges).toBe(false);
+    expect(component.notifyPriceChangesSaving).toBe(false);
+  });
+});

@@ -44,6 +44,12 @@
             <span class="label">{{ 'DATE' | translate }}</span>
             <span>{{ order.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
           </div>
+          @if (order.paymentMethod) {
+            <div class="meta-item">
+              <span class="label">{{ 'ORDER_PAYMENT_LABEL' | translate }}</span>
+              <span>{{ ('PAYMENT_' + order.paymentMethod) | translate }}</span>
+            </div>
+          }
         </div>
 
         <div class="tracking-section">

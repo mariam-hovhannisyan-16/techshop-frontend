@@ -36,6 +36,10 @@ interface ApiResponse<T> {
   data: T;
 }
 
+export interface NotificationPreferences {
+  notifyPriceDrops: boolean;
+}
+
 const USER_STORAGE_KEY = 'user';
 
 @Injectable({
@@ -116,6 +120,16 @@ export class Auth {
   changePassword(currentPassword: string, newPassword: string): Observable<ApiResponse<null>> {
     const headers = new HttpHeaders({ Authorization: `Bearer ${this.getToken()}` });
     return this.http.put<ApiResponse<null>>(`${this.apiUrl}/me/password`, { currentPassword, newPassword }, { headers });
+  }
+
+  getNotificationPreferences(): Observable<ApiResponse<NotificationPreferences>> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${this.getToken()}` });
+    return this.http.get<ApiResponse<NotificationPreferences>>(`${this.apiUrl}/me/preferences`, { headers });
+  }
+
+  updateNotificationPreferences(notifyPriceDrops: boolean): Observable<ApiResponse<NotificationPreferences>> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${this.getToken()}` });
+    return this.http.patch<ApiResponse<NotificationPreferences>>(`${this.apiUrl}/me/preferences`, { notifyPriceDrops }, { headers });
   }
 
   saveToken(token: string): void {

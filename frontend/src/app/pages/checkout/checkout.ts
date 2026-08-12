@@ -212,8 +212,7 @@ export class Checkout implements OnInit {
     this.orderService.checkout(this.userId, request).subscribe({
       next: (response) => {
         this.placingOrder = false;
-
-        this.cartService.clearCart(this.userId);
+        this.cartService.clearCart(this.userId).subscribe({ error: () => {} });
         this.installmentCheckoutService.clear();
         this.router.navigate(['/order-confirmation', response.data.id], {
           state: {

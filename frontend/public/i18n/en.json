@@ -40,6 +40,7 @@
   "PRICE_NOTIFY_DESC": "Enable notifications and receive alerts when wishlist item prices drop",
   "TOAST_PRICE_NOTIFY_ON": "Price notifications enabled",
   "TOAST_PRICE_NOTIFY_OFF": "Price notifications disabled",
+  "TOAST_PRICE_NOTIFY_FAILED": "Failed to save preference. Please try again.",
   "YOU_MIGHT_ALSO_LIKE": "You Might Also Like",
   "VIEW_ALL": "View All",
   "FREE_DELIVERY_TITLE": "Free Delivery",

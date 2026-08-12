@@ -22,8 +22,6 @@ import { Icon } from '../../components/icon/icon';
 import { InstallmentModal } from '../../components/installment-modal/installment-modal';
 import { PricePipe } from '../../pipes/price';
 
-// Matches the backend's ReviewServiceImpl.VERIFIED_PURCHASE_STATUSES exactly — REFUNDED is
-// deliberately excluded there, so it must be excluded here too.
 const VERIFIED_PURCHASE_STATUSES = ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 
 @Component({

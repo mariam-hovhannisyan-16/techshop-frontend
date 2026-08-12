@@ -147,9 +147,27 @@ export class CartService {
     this.itemCountSignal.set(0);
   }
 
-  clearCart(userId: number): void {
+  private clearLocalCartState(userId: number): void {
     this.writeLocalCart(userId, []);
     this.itemCountSignal.set(0);
+  }
+
+  // Empties the cart server-side (DELETE /api/cart/{userId}/clear) so a
+  // completed purchase doesn't leave the just-bought items sitting in the
+  // cart on the next load — falls back to clearing only the local dev cache
+  // when the backend can't be reached, same fallback pattern as the other methods here.
+  clearCart(userId: number): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${userId}/clear`, { headers: this.getHeaders() }).pipe(
+      tap(() => this.clearLocalCartState(userId)),
+      catchError(err => {
+        if (this.isFallbackEligible(err)) {
+          console.warn(`[Cart] Backend at ${this.apiUrl} is unreachable or doesn't recognize this cart — clearing local cart for development.`);
+          this.clearLocalCartState(userId);
+          return of({ success: true, message: 'mock', data: null });
+        }
+        return throwError(() => err);
+      })
+    );
   }
 
   getCart(userId: number): Observable<ApiResponse<CartResponse>> {
