@@ -1,0 +1,12 @@
+@if (isProductsPage) {
+  <button
+    type="button"
+    class="filters-toggle-btn"
+    [class.active]="isOpen"
+    (click)="toggle()"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-label]="'TOGGLE_FILTERS' | translate"
+  >
+    <app-icon name="filter" />
+  </button>
+}

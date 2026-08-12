@@ -66,31 +66,23 @@ describe('Wishlist — empty-state layout and delivery-threshold interpolation',
     fixture = TestBed.createComponent(Wishlist);
     httpMock = TestBed.inject(HttpTestingController);
 
-    // WishlistService and CartService (both injected by Wishlist's constructor) eagerly
-    // refresh from their own constructors when a token is present — this fires here,
-    // before ngOnInit even runs.
     httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [] });
     httpMock.expectOne(req => req.url === `${environment.cartApiUrl}/api/cart/1` && req.method === 'GET')
       .flush({ success: true, message: 'ok', data: { id: 1, userId: 1, items: [], totalPrice: 0 } });
 
-    fixture.detectChanges(); // ngOnInit -> loadWishlist()
+    fixture.detectChanges();
 
-    // loadWishlist()'s forkJoin({ wishlist, catalog }) — empty wishlist, populated catalog
-    // so the recommended-products sidebar card has real content (matching production).
     httpMock.expectOne(wishlistUrl).flush({ success: true, message: 'ok', data: [] });
     httpMock.expectOne(productsUrl).flush(productsResponse);
 
     fixture.detectChanges();
-    drainLeftover(); // app-header's wishlist/notifications badges
+    drainLeftover();
     fixture.detectChanges();
   });
 
   afterEach(() => httpMock.verify());
 
   it('interpolates the free-shipping threshold instead of leaving a literal {{threshold}}', () => {
-    // Previously wishlist.html called `'FREE_DELIVERY_THRESHOLD' | translate` with no params
-    // object at all, so ngx-translate had nothing to substitute into {{threshold}} — the
-    // fix wires in the same freeShippingThresholdFormatted value the cart page already uses.
     expect(fixture.componentInstance.freeShippingThresholdFormatted).toBe('֏30,000');
 
     const deliveryItems: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.delivery-card .check-list li'));

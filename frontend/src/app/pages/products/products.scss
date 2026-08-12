@@ -392,28 +392,6 @@
         .current { color: var(--text-primary); }
       }
 
-      .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 0.4rem;
-        padding: 1.5rem 0;
-
-        button {
-          min-width: 36px;
-          height: 36px;
-          padding: 0 0.5rem;
-          background: var(--bg-panel);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          color: var(--text-secondary);
-          cursor: pointer;
-          transition: all 0.2s;
-
-          &:hover:not(:disabled) { border-color: var(--accent); color: var(--text-primary); }
-          &.active { background: var(--accent); border-color: var(--accent); color: var(--text-on-accent); }
-          &:disabled { opacity: 0.4; cursor: not-allowed; }
-        }
-      }
     }
   }
 

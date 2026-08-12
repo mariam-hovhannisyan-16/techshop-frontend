@@ -64,11 +64,9 @@ describe('Checkout — single-page end-to-end submission', () => {
     httpMock = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
 
-    // CartService's constructor eagerly refreshes the cart badge count when a token is
-    // present; give it an empty cart so it doesn't also try to fetch the product catalog.
     httpMock.expectOne(cartUrl).flush({ success: true, message: 'ok', data: { id: 1, userId: 1, items: [], totalPrice: 0 } });
 
-    fixture.detectChanges(); // runs ngOnInit -> loadCart()
+    fixture.detectChanges();
 
     httpMock.expectOne(cartUrl).flush({
       success: true,
@@ -89,9 +87,6 @@ describe('Checkout — single-page end-to-end submission', () => {
 
     fixture.detectChanges();
 
-    // app-header also renders the wishlist/notifications badges, which fetch their own
-    // counts on init — irrelevant to checkout itself, just drain them so they don't leak
-    // into the assertions below or trip httpMock.verify().
     let leftover = httpMock.match(() => true);
     while (leftover.length) {
       leftover.forEach(req => req.flush({ success: true, message: 'ok', data: [] }));
@@ -113,13 +108,10 @@ describe('Checkout — single-page end-to-end submission', () => {
     const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
     expect(paymentButtons.length).toBe(5);
 
-    // Cash (backend value still ROKET_LINE — display label only changed).
     expect(paymentButtons[0].querySelector('img')).toBeNull();
     expect(paymentButtons[0].querySelector('app-icon')).not.toBeNull();
     expect(paymentButtons[0].textContent).toContain('PAYMENT_ROKET_LINE');
 
-    // Card now uses the semantically-correct generic 'card' icon (freed up now that Idram
-    // no longer misuses it) instead of the mismatched 'badge-check'.
     expect(paymentButtons[1].querySelector('.payment-option-label')?.textContent).toContain('PAYMENT_CARD');
 
     const idramImg = paymentButtons[2].querySelector<HTMLImageElement>('.payment-logo-chip img');
@@ -132,12 +124,10 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(telcellImg!.getAttribute('src')).toBe('icons/payment/telcell.svg');
     expect(telcellImg!.getAttribute('alt')).toBe('Telcell Wallet');
 
-    // VTB Ապառիկ (backend value still INSTALLMENT — display label/logo only changed).
     const vtbImg = paymentButtons[4].querySelector<HTMLImageElement>('.payment-logo-chip img');
     expect(vtbImg).not.toBeNull();
     expect(vtbImg!.getAttribute('src')).toBe('icons/payment/vtb.svg');
 
-    // Selecting is still driven by the same click handler / active-class behavior as before.
     expect(paymentButtons[2].classList.contains('active')).toBe(false);
     paymentButtons[2].click();
     fixture.detectChanges();
@@ -161,13 +151,11 @@ describe('Checkout — single-page end-to-end submission', () => {
   it('places the order end-to-end once every field is filled in and submitted via the DOM', () => {
     const nativeElement: HTMLElement = fixture.nativeElement;
 
-    // 1. Payment method — click the actual button, as a user would.
     const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
-    paymentButtons[2].click(); // IDRAM
+    paymentButtons[2].click();
     fixture.detectChanges();
     expect(component.paymentMethod).toBe('IDRAM');
 
-    // 2. Delivery details — fill every field through its real input element.
     const setInput = (name: string, value: string) => {
       const el = nativeElement.querySelector<HTMLInputElement | HTMLTextAreaElement>(`input[name="${name}"], textarea[name="${name}"]`);
       if (!el) throw new Error(`input [name="${name}"] not found`);
@@ -192,7 +180,6 @@ describe('Checkout — single-page end-to-end submission', () => {
     setInput('notes', 'Please call before delivery');
     fixture.detectChanges();
 
-    // 3. Terms checkbox.
     const termsCheckbox = nativeElement.querySelector<HTMLInputElement>('input[name="agreedToTerms"]')!;
     termsCheckbox.checked = true;
     termsCheckbox.dispatchEvent(new Event('change'));
@@ -202,7 +189,6 @@ describe('Checkout — single-page end-to-end submission', () => {
 
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
-    // 4. Submit the form as a user clicking "Գնել" would.
     const submitBtn = nativeElement.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     expect(submitBtn.disabled).toBe(false);
     submitBtn.click();
@@ -219,10 +205,6 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(checkoutReq.request.body.notes).toBe('Please call before delivery');
     expect(checkoutReq.request.body.language).toBe('HY');
 
-    // The real backend response for IDRAM/TELCELL includes a paymentRedirectUrl pointing
-    // at a sandbox domain that doesn't actually resolve (confirmed: sandbox.idram.am /
-    // sandbox.telcellwallet.am both DNS_PROBE_FINISHED_NXDOMAIN) — flush one here to prove
-    // checkout.ts no longer forwards it into the navigation state at all.
     checkoutReq.flush({
       success: true,
       message: 'ok',
@@ -257,16 +239,13 @@ describe('Checkout — single-page end-to-end submission', () => {
       el.dispatchEvent(new Event('change'));
     };
 
-    // Simulates the user switching the site language (e.g. via the header language switcher)
-    // before ever reaching checkout — LanguageService is the single source of truth the rest
-    // of the app already reads from for translation/currency, so checkout should read from it too.
     const languageService = TestBed.inject(LanguageService);
     vi.spyOn(router, 'navigate').mockResolvedValue(true);
     languageService.setLanguage('en');
     fixture.detectChanges();
 
     const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
-    paymentButtons[2].click(); // IDRAM
+    paymentButtons[2].click();
     setInput('firstName', 'Անի');
     setInput('lastName', 'Հակոբյան');
     setInput('phone', '77123456');
@@ -296,8 +275,6 @@ describe('Checkout — single-page end-to-end submission', () => {
       data: { id: 556, userId: 1, items: [], totalPrice: 650000, status: 'PENDING', paymentMethod: 'IDRAM', createdAt: '2026-01-01' }
     });
 
-    // Switching again (RU) confirms this tracks the live selection rather than a value
-    // captured once at component construction.
     languageService.setLanguage('ru');
     fixture.detectChanges();
     submitBtn.click();

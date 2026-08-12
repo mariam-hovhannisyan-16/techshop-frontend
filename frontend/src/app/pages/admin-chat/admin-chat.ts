@@ -81,10 +81,6 @@ export class AdminChat implements OnInit {
             )
           )
         ).subscribe(summaries => {
-          // Escalated (human-requested) conversations surface above
-          // still-bot-handled ones regardless of recency, so an admin
-          // scanning the list sees the ones waiting on a person first;
-          // recency still breaks ties within each group.
           this.conversations = summaries.sort((a, b) =>
             Number(b.conversation.escalated) - Number(a.conversation.escalated)
             || b.lastMessageAt.localeCompare(a.lastMessageAt)

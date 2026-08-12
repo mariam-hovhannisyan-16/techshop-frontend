@@ -36,8 +36,6 @@ describe('Profile — recent orders / stats resolve, and only one logout control
 
   const fakeJwt = (payload: object) => `h.${btoa(JSON.stringify(payload))}.s`;
 
-  // Shaped like the real response confirmed against the live backend for a fresh test
-  // account (userId 36, order id 7) during this investigation.
   const realOrderResponse = {
     success: true,
     message: 'Success',
@@ -80,20 +78,14 @@ describe('Profile — recent orders / stats resolve, and only one logout control
   afterEach(() => httpMock.verify());
 
   it('resolves the spinner and shows the real order + orders stat once the request completes (previously stuck forever)', () => {
-    fixture.detectChanges(); // ngOnInit -> loadOrders(), plus CartService/WishlistService ctor eager refreshes
+    fixture.detectChanges();
 
-    // Spinner shows while the request is in flight, matching the reported bug's starting state.
     expect(fixture.nativeElement.querySelector('.inline-loading .spinner')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.recent-order-list')).toBeNull();
 
     httpMock.expectOne(ordersUrl).flush(realOrderResponse);
-    drainLeftover(); // cart/wishlist/notifications badges' own eager refreshes
+    drainLeftover();
 
-    // Deliberately no extra fixture.detectChanges() call here before asserting — flush()
-    // runs the subscribe() callback synchronously, so if loadOrders() didn't call
-    // this.cdr.detectChanges() internally (the actual bug), the view would still show the
-    // stale spinner/zero-count state right now even though the component's own fields
-    // (this.orders, this.ordersLoading) are already correct underneath.
     expect(fixture.nativeElement.querySelector('.inline-loading')).toBeNull();
     const orderItem = fixture.nativeElement.querySelector('.recent-order-item');
     expect(orderItem).not.toBeNull();
@@ -142,7 +134,6 @@ describe('Profile — recent orders / stats resolve, and only one logout control
       Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.sidebar-nav .sidebar-item'))
         .find(el => el.textContent?.includes(label))!;
 
-    // My Info -> in-page overview section (already the default, so first move elsewhere then back)
     sidebarItem('ADDRESS_BOOK').click();
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.profile-card.change-password-card')).toBeNull();
@@ -152,20 +143,16 @@ describe('Profile — recent orders / stats resolve, and only one logout control
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.welcome-banner')).not.toBeNull();
 
-    // Order History -> cross-page navigation
     sidebarItem('ORDER_HISTORY').click();
     expect(navigateSpy).toHaveBeenCalledWith(['/orders']);
 
-    // Wishlist -> cross-page navigation
     sidebarItem('WISHLIST').click();
     expect(navigateSpy).toHaveBeenCalledWith(['/wishlist']);
 
-    // Address Book -> in-page section
     sidebarItem('ADDRESS_BOOK').click();
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.address-list, .no-addresses')).not.toBeNull();
 
-    // Change Password -> in-page section
     sidebarItem('CHANGE_PASSWORD').click();
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.profile-card.change-password-card')).not.toBeNull();

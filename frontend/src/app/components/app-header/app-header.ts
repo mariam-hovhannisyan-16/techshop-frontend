@@ -7,12 +7,13 @@ import { NotificationsBadge } from '../notifications-badge/notifications-badge';
 import { WishlistBadge } from '../wishlist-badge/wishlist-badge';
 import { CartBadge } from '../cart-badge/cart-badge';
 import { ThemeToggle } from '../theme-toggle/theme-toggle';
+import { FiltersToggle } from '../filters-toggle/filters-toggle';
 import { Icon } from '../icon/icon';
 import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-header',
-  imports: [TopBar, AccountMenu, NotificationsBadge, WishlistBadge, CartBadge, ThemeToggle, Icon, TranslatePipe],
+  imports: [TopBar, AccountMenu, NotificationsBadge, WishlistBadge, CartBadge, ThemeToggle, FiltersToggle, Icon, TranslatePipe],
   templateUrl: './app-header.html',
   styleUrl: './app-header.scss',
 })

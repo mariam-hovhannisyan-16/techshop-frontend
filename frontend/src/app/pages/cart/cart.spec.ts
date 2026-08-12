@@ -78,17 +78,16 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     fixture = TestBed.createComponent(Cart);
     httpMock = TestBed.inject(HttpTestingController);
 
-    // CartService's constructor eagerly refreshes the badge count.
     httpMock.expectOne(cartUrl).flush(cartWith(2));
     httpMock.expectOne(productsUrl).flush(productsResponse);
 
-    fixture.detectChanges(); // ngOnInit -> loadCart()
+    fixture.detectChanges();
 
     httpMock.expectOne(cartUrl).flush(cartWith(2));
     httpMock.expectOne(productsUrl).flush(productsResponse);
 
     fixture.detectChanges();
-    drainLeftover(); // app-header's wishlist/notifications badges, WishlistService's own refresh()
+    drainLeftover();
     fixture.detectChanges();
   });
 
@@ -108,8 +107,6 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
   });
 
   it('still shows the shared free-shipping threshold on the delivery-row tooltip', () => {
-    // The banner is gone, but the delivery row's info tooltip still references the same
-    // threshold — freeShippingThresholdFormatted / FREE_SHIPPING_THRESHOLD_AMD must stay.
     expect(fixture.componentInstance.freeShippingThresholdFormatted).toBe('֏30,000');
     const tooltip = fixture.nativeElement.querySelector('.delivery-label app-icon').getAttribute('title');
     expect(tooltip).toContain('FREE_DELIVERY_THRESHOLD');
@@ -121,7 +118,6 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     const deliveryRow = rows[1];
     const totalRow = fixture.nativeElement.querySelector('.summary-row.total-row');
 
-    // cart total from cartWith(2) is 650000 * 2 = 1,300,000
     expect(subtotalRow.querySelector('span:last-child').textContent.trim()).toBe('֏1,300,000');
     expect(deliveryRow.querySelector('span:last-child').textContent.trim()).toBe('֏1,000');
     expect(totalRow.querySelector('span:last-child').textContent.trim()).toBe('֏1,301,000');
@@ -224,28 +220,19 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
   });
 
   it('adds the three visual-polish accents: heading glow, summary top edge, and CTA glow', () => {
-    // jsdom doesn't implement getComputedStyle for pseudo-elements ("Not implemented:
-    // Window's getComputedStyle() method: with pseudo-elements"), so the ::before
-    // gradients themselves can't be inspected here — the compiled build succeeding
-    // already confirms that scss is valid. What we *can* verify in this environment is
-    // that the real elements hosting those pseudo-elements are wired up correctly, which
-    // is what actually determines whether the glow renders in the right place.
     const header: HTMLElement = fixture.nativeElement.querySelector('.cart-page-header');
     expect(getComputedStyle(header).position).toBe('relative');
     const heading: HTMLElement = fixture.nativeElement.querySelector('.cart-heading');
-    expect(getComputedStyle(heading).position).toBe('relative'); // stacks above the glow
+    expect(getComputedStyle(heading).position).toBe('relative');
 
     const summaryCard: HTMLElement = fixture.nativeElement.querySelector('.summary-card');
     const summaryStyle = getComputedStyle(summaryCard);
-    expect(summaryStyle.overflow).toBe('hidden'); // clips the top-edge bar to the rounded corners
-    expect(summaryStyle.position).toBe('sticky'); // unaffected by the new overflow/edge
+    expect(summaryStyle.overflow).toBe('hidden');
+    expect(summaryStyle.position).toBe('sticky');
 
     const orderBtn: HTMLElement = fixture.nativeElement.querySelector('.order-btn');
     const orderBtnStyle = getComputedStyle(orderBtn);
     expect(orderBtnStyle.boxShadow).not.toBe('none');
-    // jsdom doesn't resolve var() inside shorthand properties, so this stays as the raw
-    // custom-property reference rather than the resolved rgba(0, 102, 255, ...) — still
-    // enough to confirm the accent-glow token is actually wired into box-shadow.
     expect(orderBtnStyle.boxShadow).toContain('var(--accent-soft-strong)');
   });
 
@@ -260,27 +247,19 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     expect(card.style.animationDelay).toBe('0ms');
 
     const cardStyle = getComputedStyle(card);
-    // Angular's emulated view encapsulation scopes @keyframes names with a component-
-    // specific prefix (e.g. "_ngcontent-xyz_cart-item-in") — containment here still proves
-    // the animation resolved to the matching scoped keyframes, not just an unmatched name.
     expect(cardStyle.animationName).toContain('cart-item-in');
-    expect(cardStyle.position).toBe('relative'); // required for the index badge's absolute positioning
+    expect(cardStyle.position).toBe('relative');
   });
 
   it('pulses the in-stock dot continuously but not an out-of-stock one', () => {
     const dot: HTMLElement = fixture.nativeElement.querySelector('.stock-status:not(.out) .status-dot');
     expect(dot).not.toBeNull();
     const dotStyle = getComputedStyle(dot);
-    expect(dotStyle.animationName).toContain('stock-dot-pulse'); // scoped by Angular's emulated encapsulation
+    expect(dotStyle.animationName).toContain('stock-dot-pulse');
     expect(dotStyle.animationIterationCount).toBe('infinite');
   });
 
   it('sets up the product-card-style hover transition on item cards (all-property, 0.3s)', () => {
-    // jsdom doesn't simulate real :hover CSS matching, so the hover-state box-shadow/
-    // transform values themselves can't be read via getComputedStyle here (same
-    // limitation as the earlier pseudo-element checks) — the build succeeding already
-    // confirms the :hover rule's scss is valid. What's verifiable is the base transition
-    // setup that makes that hover feel smooth rather than a hard cut.
     const card: HTMLElement = fixture.nativeElement.querySelector('.cart-item-card');
     expect(getComputedStyle(card).transition).toContain('0.3s');
   });

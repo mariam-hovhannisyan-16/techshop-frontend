@@ -7,6 +7,7 @@ import { AuthDrawerService } from '../../services/auth-drawer';
 import { ToastService } from '../../services/toast';
 import { matchesCategory, CategoryNavItem, CATEGORY_NAV_ITEMS } from '../../services/category';
 import { LanguageService } from '../../services/language';
+import { ProductFiltersPanelService } from '../../services/product-filters-panel';
 import { currencyForLanguage } from '../../config/currency';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -40,9 +41,6 @@ export class Products implements OnInit {
 
   readonly categoryPills: CategoryNavItem[] = CATEGORY_NAV_ITEMS;
 
-  currentPage = 1;
-  readonly pageSize = 8;
-
   constructor(
     private productService: Product,
     private cartService: CartService,
@@ -53,9 +51,14 @@ export class Products implements OnInit {
     public router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private filtersPanelService: ProductFiltersPanelService
   ) {
     this.userId = this.authService.getUserId() ?? 1;
+  }
+
+  get filtersPanelOpen(): boolean {
+    return this.filtersPanelService.isOpen();
   }
 
   ngOnInit(): void {
@@ -167,13 +170,6 @@ export class Products implements OnInit {
         (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)) &&
         this.matchesPriceRange(p)
       )
-      // New arrivals should be visible on the first page rather than buried
-      // wherever the backend happens to order them. The API exposes no
-      // creation timestamp, so id isn't a true recency signal here (e.g.
-      // MacBook Pro M4 has a higher id than iPhone 17 Pro/Pro Max despite
-      // being seeded earlier) — id ascending is what actually surfaces the
-      // current featured "new" items on page 1 for this catalog. Array#sort
-      // is stable, so non-"new" items keep their existing relative order.
       .sort((a, b) => {
         const aIsNew = a.badge === 'new';
         const bIsNew = b.badge === 'new';
@@ -182,25 +178,11 @@ export class Products implements OnInit {
         return 0;
       });
 
-    this.currentPage = 1;
     this.cdr.detectChanges();
-  }
-
-  get totalPages(): number {
-    if (this.selectedCategory !== 'all') return 1;
-    return Math.max(1, Math.ceil(this.filteredProducts.length / this.pageSize));
   }
 
   get pagedProducts(): any[] {
-    if (this.selectedCategory !== 'all') return this.filteredProducts;
-    const start = (this.currentPage - 1) * this.pageSize;
-    return this.filteredProducts.slice(start, start + this.pageSize);
-  }
-
-  goToPage(page: number): void {
-    if (page < 1 || page > this.totalPages) return;
-    this.currentPage = page;
-    this.cdr.detectChanges();
+    return this.filteredProducts;
   }
 
   viewProduct(productId: number): void {
