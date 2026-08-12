@@ -36,12 +36,7 @@ const NUMBER_FORMAT = new Intl.NumberFormat('en-US');
 })
 export class InstallmentModal {
   @Input({ required: true }) price!: number;
-  // Required when the modal adds a product to the cart itself (product-detail usage).
-  // Omitted when skipCartMutation is true (checkout usage, where the cart is already final).
   @Input() productId?: number;
-  // Checkout is already looking at a finalized cart — proceeding there should just record
-  // the calculated plan and let the caller pick INSTALLMENT as the payment method, instead
-  // of adding another item to the cart and navigating to /checkout (the product-detail flow).
   @Input() skipCartMutation = false;
   @Output() planConfirmed = new EventEmitter<PendingInstallmentPlan>();
 

@@ -15,9 +15,6 @@ import { Icon } from '../icon/icon';
 })
 export class WishlistButton {
   @Input({ required: true }) productId!: number;
-  // Default (false) overlays the button in the corner of a product image, as used on
-  // product cards/detail. Set true to lay it out inline instead (e.g. in a cart row's
-  // action group), matching the surrounding flex layout instead of floating over it.
   @Input() inline = false;
 
   constructor(

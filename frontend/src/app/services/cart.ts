@@ -152,10 +152,6 @@ export class CartService {
     this.itemCountSignal.set(0);
   }
 
-  // Empties the cart server-side (DELETE /api/cart/{userId}/clear) so a
-  // completed purchase doesn't leave the just-bought items sitting in the
-  // cart on the next load — falls back to clearing only the local dev cache
-  // when the backend can't be reached, same fallback pattern as the other methods here.
   clearCart(userId: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${userId}/clear`, { headers: this.getHeaders() }).pipe(
       tap(() => this.clearLocalCartState(userId)),
@@ -224,9 +220,6 @@ export class CartService {
     );
   }
 
-  // The backend has no dedicated "set quantity" endpoint — addItem is additive (increments
-  // the existing line) and removeItem drops the line entirely. Compose those two primitives
-  // to reach an arbitrary target quantity instead of adding new backend surface.
   updateItemQuantity(userId: number, productId: number, currentQuantity: number, newQuantity: number): Observable<ApiResponse<CartResponse>> {
     if (newQuantity <= 0) {
       return this.removeItem(userId, productId);

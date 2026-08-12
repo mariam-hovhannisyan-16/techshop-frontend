@@ -170,9 +170,11 @@ export class ChatWidget implements OnInit, OnDestroy {
 
     this.chatService.sendMessage(conversationId, text).subscribe({
       next: (response) => {
-        this.messages = this.messages.map(m => m === optimistic ? response.data : m);
+        const sent = this.messages.map(m => m === optimistic ? response.data.message : m);
+        this.messages = response.data.botReply ? [...sent, response.data.botReply] : sent;
         this.sending = false;
         this.markAllSeen();
+        if (response.data.botReply) this.scrollToBottom();
       },
 
       error: () => {

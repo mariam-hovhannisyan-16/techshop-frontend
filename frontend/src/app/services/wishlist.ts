@@ -18,11 +18,6 @@ interface ApiResponse<T> {
   data: T;
 }
 
-// Shape actually returned by the backend (techshop-wishlist's WishlistResponse/
-// WishlistItemResponse DTOs) — each item embeds the full product, not a flat
-// productId/productName/productPrice record. Mapped down to WishlistItemResponse
-// in this service so every other consumer (wishlist page, badge, button, etc.)
-// can keep using the simpler flat shape.
 interface BackendWishlistItem {
   id: number;
   product: { id: number; name: string; price: number; stock: number };
@@ -66,12 +61,6 @@ export class WishlistService {
   }
 
   private isFallbackEligible(err: unknown): boolean {
-    // Historical note: this service used to call a path the backend never mapped
-    // (/api/v1/wishlist instead of /wishlist), which made Spring Security's catch-all
-    // "authenticated()" rule reject the request as 401 before routing ever got a chance
-    // to 404 — so 401 looked like a real auth bug. That's fixed now (see apiUrl above);
-    // 401 stays in the fallback set purely as a defensive safety net for a genuinely
-    // down/misbehaving wishlist service, not because real 401s are expected.
     return this.isUnreachable(err)
       || (err instanceof HttpErrorResponse && (err.status === 404 || err.status === 401));
   }

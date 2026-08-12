@@ -183,10 +183,6 @@
     }
   }
 
-  // Bot-handled by default (muted); flips to the accent/escalated look the
-  // moment a conversation's `escalated` flag is set, so a scan down this list
-  // (already sorted escalated-first, see admin-chat.ts) shows at a glance
-  // which threads are still waiting on a person.
   .status-badge {
     flex-shrink: 0;
     padding: 0.15rem 0.5rem;
@@ -318,9 +314,6 @@
       }
     }
 
-    // Same "assistant, not a colleague" treatment as the customer-facing
-    // widget (see chat-widget.scss) — admins need to tell a bot reply apart
-    // from a human SUPPORT one just as much as customers do.
     &.bot {
       align-self: flex-start;
       align-items: flex-start;

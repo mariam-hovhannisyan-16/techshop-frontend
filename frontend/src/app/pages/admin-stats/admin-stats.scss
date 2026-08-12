@@ -119,9 +119,6 @@
     }
   }
 
-  // Horizontal bar chart — top-selling products. Single series (units sold),
-  // so one accent hue and no legend; value sits outside the bar's tip since
-  // these bars are often too short/tied to fit a label inside comfortably.
   .bar-chart {
     display: flex;
     flex-direction: column;
@@ -208,8 +205,6 @@
     }
   }
 
-  // Vertical column chart — revenue per day. Order count rides along as a
-  // direct label rather than a second encoded axis (never dual-axis).
   .column-chart {
     display: flex;
     align-items: flex-end;

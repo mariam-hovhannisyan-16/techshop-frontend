@@ -162,9 +162,6 @@
       }
     }
 
-    // Distinct from a human SUPPORT reply — a soft accent tint plus the
-    // sender-label above (rather than just a differently-colored bubble) is
-    // what actually tells a customer "this was the assistant" at a glance.
     &.bot {
       align-self: flex-start;
       align-items: flex-start;

@@ -44,9 +44,6 @@
     position: relative;
     margin-bottom: 1.5rem;
 
-    // Same soft accent-glow technique used behind the profile page's welcome banner
-    // (radial-gradient fading to transparent) — just enough to break up the flat
-    // background behind the heading, not a hard shape.
     &::before {
       content: '';
       position: absolute;
@@ -121,15 +118,11 @@
     border-radius: 16px;
     padding: 1.2rem;
     transition: all 0.3s;
-    // Staggered entrance on load — animation-delay is bound per-item in the template
-    // ([style.animationDelay.ms]="idx * 60"); `backwards` fill-mode keeps each card
-    // invisible until its turn instead of flashing in fully opaque before sliding.
     animation-name: cart-item-in;
     animation-duration: 0.4s;
     animation-timing-function: ease-out;
     animation-fill-mode: backwards;
 
-    // Same hover-lift used on product cards elsewhere in the app.
     &:hover {
       border-color: var(--accent);
       transform: translateY(-4px);
@@ -210,10 +203,6 @@
           flex-shrink: 0;
         }
 
-        // Subtle "live" pulse on the in-stock dot only — same timing/easing as the
-        // highlight-pulse ring used on product cards elsewhere, just looped continuously
-        // instead of firing twice, since this is an ambient status rather than a one-off
-        // highlight.
         &:not(.out) .status-dot {
           animation-name: stock-dot-pulse;
           animation-duration: 1.2s;
@@ -330,8 +319,6 @@
       top: 2rem;
       overflow: hidden;
 
-      // Accent-to-transparent top edge so the summary card reads as the page's primary
-      // card rather than another flat rectangle like the item rows.
       &::before {
         content: '';
         position: absolute;
@@ -400,9 +387,6 @@
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
-      // Same accent-glow language as the hover treatment on product cards elsewhere in
-      // the app (box-shadow: ... var(--accent-soft)) — kept on at rest here since this is
-      // the page's primary CTA, then deepened slightly on hover.
       box-shadow: 0 8px 24px -10px var(--accent-soft-strong);
 
       &:hover {

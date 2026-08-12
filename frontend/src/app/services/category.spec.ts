@@ -15,11 +15,6 @@ describe('category', () => {
     expect(inferCategory({ name: 'Unrelated Widget', description: '' })).toBeNull();
   });
 
-  // Regression coverage for a real bug: keyword-only matching diverted "Audio"-category
-  // products whose name/description mentioned "amp"/"speaker" into a nonexistent
-  // "Amplifiers" tab instead of the "Audio" tab, and let a phone whose description
-  // mentioned "display" leak into "Monitors". The backend `category` field, when
-  // present, must take priority over keyword guessing.
   it('trusts the backend category field over keyword guessing', () => {
     const sonosAmp = { name: 'Sonos Amp', description: 'Ուժեղացուցիչ՝ խելացի ձայնային համակարգի համար', category: 'Audio' };
     expect(matchesCategory(sonosAmp, 'audio')).toBe(true);

@@ -15,9 +15,6 @@ export class AuthDrawerService {
     this.isOpen.set(true);
   }
 
-  // Used by entry points outside the drawer itself (e.g. the profile page's
-  // change-password form) that need to land straight on the forgot-password
-  // step instead of the login form.
   openForgotPassword(): void {
     this.mode.set('login');
     this.openInForgotView.set(true);

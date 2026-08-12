@@ -18,7 +18,5 @@ export type IconName =
 })
 export class Icon {
   @Input({ required: true }) name!: IconName;
-  // Only meaningful for 'heart' — filled red when a product is favorited,
-  // outline otherwise. Every other icon is a plain currentColor outline.
   @Input() filled = false;
 }

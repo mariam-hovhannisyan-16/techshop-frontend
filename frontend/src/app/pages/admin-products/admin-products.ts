@@ -32,8 +32,6 @@ interface EditState {
   quantity: number;
 }
 
-// What a "back in stock" toggle sets quantity to when flipped on from 0 — the
-// admin can then refine it to an exact count via the quantity input.
 const DEFAULT_RESTOCK_QUANTITY = 10;
 
 interface AddProductForm {
@@ -207,8 +205,6 @@ export class AdminProducts implements OnInit {
     (event.target as HTMLInputElement).select();
   }
 
-  // Quick shortcut alongside the exact-quantity input: flips between out of
-  // stock (0) and a sensible default the admin can then refine by typing.
   toggleStock(): void {
     this.editState.quantity = this.editState.quantity > 0 ? 0 : DEFAULT_RESTOCK_QUANTITY;
   }
@@ -228,15 +224,8 @@ export class AdminProducts implements OnInit {
 
     this.saving = true;
 
-    // Only touch the stock endpoint if the admin actually changed the quantity — it's a
-    // brand-new endpoint that older backend deployments won't have yet, and a plain
-    // price/discount edit shouldn't start failing just because stock isn't touched.
     const stockChanged = quantity !== this.editOriginalQuantity;
 
-    // Price, discount, and stock all live on the same backend row with no locking on any of
-    // these read-modify-write endpoints — chaining them sequentially (rather than firing in
-    // parallel) avoids a lost-update race where a later save clobbers an earlier one back to
-    // its pre-edit value.
     this.productService.updateProductPrice(product.id, price).pipe(
       switchMap(priceResponse => this.productService.updateProductDiscount(product.id, discountPercent).pipe(
         switchMap(discountResponse => {

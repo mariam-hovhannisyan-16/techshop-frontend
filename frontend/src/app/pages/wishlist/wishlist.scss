@@ -96,10 +96,6 @@
 
   .wishlist-layout {
     display: flex;
-    // Stretch (the default) so .wishlist-main and .wishlist-sidebar match height when one
-    // is much taller than the other — the empty-state case centers within that full height
-    // via .wishlist-main.is-empty below. Plain block content (the loaded items list) is
-    // unaffected by the taller container since it doesn't stretch itself.
     align-items: stretch;
     gap: 2rem;
   }

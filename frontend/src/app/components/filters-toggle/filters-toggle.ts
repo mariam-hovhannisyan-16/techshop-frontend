@@ -51,7 +51,6 @@ export class FiltersToggle {
     this.filtersPanelService.clear();
   }
 
-  // Closes the dropdown when clicking anywhere outside it, standard popover behavior.
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (this.isOpen && !this.elementRef.nativeElement.contains(event.target as Node)) {

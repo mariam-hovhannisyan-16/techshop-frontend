@@ -17,14 +17,16 @@ export interface MessageResponse {
   createdAt: string;
 }
 
+export interface SendMessageResult {
+  message: MessageResponse;
+  botReply: MessageResponse | null;
+}
+
 export interface ConversationResponse {
   id: number;
   userId: number | null;
   guestSessionId: string | null;
   status: ConversationStatus;
-  // Surfaced only in the admin panel (see admin-chat.ts/html) — customers
-  // have no way to set this from the widget; the AI assistant always
-  // handles their messages automatically.
   escalated: boolean;
   createdAt: string;
 }
@@ -158,12 +160,12 @@ export class ChatService {
     );
   }
 
-  sendMessage(conversationId: number, text: string): Observable<ApiResponse<MessageResponse>> {
+  sendMessage(conversationId: number, text: string): Observable<ApiResponse<SendMessageResult>> {
     if (conversationId < 0) {
       return of(this.sendLocalMessage(conversationId, text));
     }
 
-    return this.http.post<ApiResponse<MessageResponse>>(`${this.apiUrl}/conversations/${conversationId}/messages`, { text }, { headers: this.getHeaders() }).pipe(
+    return this.http.post<ApiResponse<SendMessageResult>>(`${this.apiUrl}/conversations/${conversationId}/messages`, { text }, { headers: this.getHeaders() }).pipe(
       catchError(err => {
         if (this.isUnreachable(err)) {
           console.warn(`[Chat] Backend unreachable at ${this.apiUrl} — using local conversation for development.`);
@@ -174,7 +176,7 @@ export class ChatService {
     );
   }
 
-  private sendLocalMessage(conversationId: number, text: string): ApiResponse<MessageResponse> {
+  private sendLocalMessage(conversationId: number, text: string): ApiResponse<SendMessageResult> {
     const state = this.readLocalState() ?? { conversation: this.getOrCreateLocalConversation(), messages: [] };
     const message: MessageResponse = {
       id: Date.now(),
@@ -186,6 +188,6 @@ export class ChatService {
     };
     state.messages.push(message);
     this.writeLocalState(state);
-    return { success: true, message: 'mock', data: message };
+    return { success: true, message: 'mock', data: { message, botReply: null } };
   }
 }

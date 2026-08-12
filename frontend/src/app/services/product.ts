@@ -29,11 +29,7 @@ export interface ProductResponse {
   badge?: 'bestseller' | 'new' | 'top-rated' | 'hot-deal';
   spec?: string;
   warrantyYears?: number;
-  // Only populated for phone/tablet-type mock products — the live backend has
-  // no notion of storage variants, so this is undefined for real products and
-  // the storage selector on product-detail simply doesn't render for those.
   storageOptions?: StorageOption[];
-  // Phone-only, mock-only, same reasoning as storageOptions above.
   simOptions?: string[];
   colorVariants?: ColorVariant[];
 }
@@ -44,10 +40,6 @@ interface ApiResponse<T> {
   data: T;
 }
 
-// The live backend's raw product payload: `stock` instead of `quantity`, and
-// `imageUrl` is a path relative to environment.imageBaseUrl, not an absolute URL.
-// It also has no notion of `originalPrice` — discounts are modeled as a
-// `discountPercentage` off the current `price` instead; see normalizeProduct().
 interface BackendProductPayload extends Omit<ProductResponse, 'quantity'> {
   quantity?: number;
   stock?: number;
@@ -512,7 +504,6 @@ export class Product {
     return [...localAdditions, ...withoutDeleted];
   }
 
-  // Relative imageUrl paths are resolved against the product API's own origin.
   private resolveImageUrl(imageUrl?: string): string | undefined {
     if (!imageUrl) return imageUrl;
     if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
@@ -530,17 +521,10 @@ export class Product {
       quantity: raw.quantity ?? raw.stock ?? 0,
       imageUrl: this.resolveImageUrl(raw.imageUrl),
       originalPrice: raw.originalPrice ?? derivedOriginalPrice,
-      // The backend has no notion of a "badge" — it only flags `isNew`. Map
-      // that onto the same badge mock products already use, so newly added
-      // products get a "New" badge automatically instead of needing one
-      // hardcoded per product.
       badge: raw.badge ?? (raw.isNew ? 'new' : undefined),
     };
   }
 
-  // The live backend paginates list responses as { content: [...], pageNumber, pageSize,
-  // totalPages, ... } instead of returning a bare array; accept either shape. A bare array
-  // is treated as already being the complete list (totalPages: 1).
   private extractPage(data: unknown): { content: BackendProductPayload[]; totalPages: number } | null {
     if (Array.isArray(data)) return { content: data as BackendProductPayload[], totalPages: 1 };
     if (data && typeof data === 'object' && Array.isArray((data as ProductPage).content)) {
@@ -557,9 +541,6 @@ export class Product {
     return response;
   }
 
-  // The backend paginates with a default page size (20), so a single unparameterized
-  // request only returns the first page. Fetch the first page, then use its totalPages
-  // to pull the remaining pages in parallel and concatenate them into the full catalog.
   getAllProducts(): Observable<ApiResponse<ProductResponse[]>> {
     return this.http.get<ApiResponse<unknown>>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       switchMap(response => {

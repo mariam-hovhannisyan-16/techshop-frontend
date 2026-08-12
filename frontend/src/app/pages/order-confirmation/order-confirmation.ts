@@ -47,9 +47,6 @@ export class OrderConfirmation implements OnInit {
 
     if (navState?.justCheckedOut) {
       this.paymentMethod = navState.paymentMethod ?? null;
-      // No payment method here has a real external gateway — checkout.ts creates the
-      // order (either via the backend or a local mock) and this page just confirms it,
-      // the same way it already did for Cash/Card. There's nothing to redirect to.
       this.verifyPayment();
     } else {
       this.loadExistingOrder();

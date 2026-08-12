@@ -47,9 +47,6 @@ export interface AdminStatsSummary {
   totalRevenue: number;
   totalUsers: number;
   topProducts: TopProduct[];
-  // One entry per distinct calendar day that actually has an order — never
-  // zero-filled/padded to a fixed range. The component decides whether there's
-  // enough of a real spread to plot as a trend.
   ordersByDay: OrdersByDay[];
 }
 

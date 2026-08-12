@@ -18,15 +18,7 @@ const LAST_SEEN_KEY_PREFIX = 'admin_chat_last_seen_';
 })
 export class AdminChatService {
   private apiUrl = `${environment.chatApiUrl}/api/chat`;
-  // Listing every conversation only ever made sense as an admin operation —
-  // it used to also exist on the customer-facing ChatController as a
-  // leftover duplicate, but that copy was removed in a backend cleanup, so
-  // this now has to go through AdminChatController's own route instead.
-  // Confirmed directly: GET /api/chat/conversations now 405s regardless of
-  // role, while GET /api/admin/chat/conversations 200s for an admin JWT.
-  // Per-conversation messages/reply below are unaffected by that cleanup —
-  // confirmed directly they still work fine at the original /api/chat path
-  // for an admin token, so only the list endpoint moved.
+
   private adminApiUrl = `${environment.chatApiUrl}/api/admin/chat`;
 
   constructor(private http: HttpClient, private authService: Auth) {}

@@ -115,9 +115,6 @@
       font-weight: 600;
     }
 
-    // Real brand logos (Idram, Telcell, VTB) include white/light-colored strokes that
-    // assume a dark backdrop — a fixed-dark chip (independent of the light/dark theme)
-    // keeps them legible either way, matching the same treatment on the checkout page.
     .payment-logo-chip {
       background: var(--brand-chip-bg);
       border-radius: 6px;

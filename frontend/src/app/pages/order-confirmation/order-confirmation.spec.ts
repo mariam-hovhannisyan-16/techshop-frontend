@@ -50,17 +50,11 @@ describe('OrderConfirmation — no fake external payment redirect', () => {
     }
   };
 
-  // Real sandbox URLs confirmed to not resolve (DNS_PROBE_FINISHED_NXDOMAIN) for the two
-  // methods whose backend response actually carries a paymentRedirectUrl.
   const fakeRedirectUrlFor: Partial<Record<PaymentMethod, string>> = {
     IDRAM: 'https://sandbox.idram.am/payment?ref=fake&amount=650000&merchant_id=sandbox-merchant',
     TELCELL: 'https://sandbox.telcellwallet.am/payment?ref=fake&amount=650000&merchant_id=sandbox-merchant'
   };
 
-  // Pushes a history-state object that still includes paymentRedirectUrl for IDRAM/TELCELL
-  // — deliberately worse than what the fixed checkout.ts actually sends (it strips the
-  // field entirely, see checkout.spec.ts) — to prove the fixed component ignores any such
-  // value outright rather than merely relying on checkout.ts never sending one.
   const setNavState = (paymentMethod: PaymentMethod) => {
     history.pushState(
       { justCheckedOut: true, paymentMethod, paymentRedirectUrl: fakeRedirectUrlFor[paymentMethod] ?? null },
@@ -102,8 +96,6 @@ describe('OrderConfirmation — no fake external payment redirect', () => {
 
       fixture.detectChanges(); // ngOnInit -> straight to verifyPayment(), no redirecting interstitial
 
-      // Right after the initial render, the component should already be in 'verifying' —
-      // never 'redirecting' (that state/case no longer exists in the component at all).
       expect(component.state).toBe('verifying');
       expect(fixture.nativeElement.querySelector('.inline-loading h2').textContent).toContain('VERIFYING_PAYMENT_TITLE');
 

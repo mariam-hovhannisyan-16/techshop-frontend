@@ -1,8 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 
-// Shared so the header's Filters dropdown (rendered outside the products
-// page's own component tree, anchored under the header button) can hold the
-// price-range bounds that the products page reads to filter its list.
 @Injectable({
   providedIn: 'root'
 })

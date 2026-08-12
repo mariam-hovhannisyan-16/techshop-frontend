@@ -53,7 +53,7 @@ describe('AccountMenu — simplified dropdown (logged in)', () => {
     fixture = TestBed.createComponent(AccountMenu);
     httpMock = TestBed.inject(HttpTestingController);
 
-    fixture.detectChanges(); // ctor eager refreshes (cart/wishlist/notifications)
+    fixture.detectChanges();
     drainLeftover();
   });
 
