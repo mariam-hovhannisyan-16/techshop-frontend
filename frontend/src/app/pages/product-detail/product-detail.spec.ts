@@ -120,7 +120,6 @@ describe('ProductDetail — real-backend reviews with purchase gating', () => {
       const submitBtn = nativeElement.querySelector<HTMLButtonElement>('.submit-review-btn')!;
       expect(submitBtn.disabled).toBe(true);
 
-      // Pick 4 stars via the real star buttons a user would click.
       const stars = nativeElement.querySelectorAll<HTMLButtonElement>('.rating-star');
       stars[3].click();
       fixture.detectChanges();
@@ -224,7 +223,6 @@ describe('ProductDetail — real-backend reviews with purchase gating', () => {
       httpMock.expectOne(productUrl).flush(productResponse);
       httpMock.expectOne(allProductsUrl).flush({ success: true, message: 'ok', data: [] });
       flushBothReviewRequests(httpMock);
-      // No orders request should fire at all — there's no token to check eligibility with.
       drainLeftover(httpMock);
       fixture.detectChanges();
     });

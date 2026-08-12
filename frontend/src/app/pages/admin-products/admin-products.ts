@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { map, switchMap } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 import { Product, ProductResponse } from '../../services/product';
 import { inferCategory } from '../../services/category';
 import { ToastService } from '../../services/toast';
@@ -29,7 +29,12 @@ const CATEGORY_LABEL_KEYS: Record<string, string> = {
 interface EditState {
   price: number;
   discountPercent: number | null;
+  quantity: number;
 }
+
+// What a "back in stock" toggle sets quantity to when flipped on from 0 — the
+// admin can then refine it to an exact count via the quantity input.
+const DEFAULT_RESTOCK_QUANTITY = 10;
 
 interface AddProductForm {
   name: string;
@@ -53,7 +58,8 @@ export class AdminProducts implements OnInit {
   errorMessage = '';
 
   editingId: number | null = null;
-  editState: EditState = { price: 0, discountPercent: null };
+  editState: EditState = { price: 0, discountPercent: null, quantity: 0 };
+  private editOriginalQuantity = 0;
   saving = false;
 
   private failedThumbnailIds = new Set<number>();
@@ -187,8 +193,10 @@ export class AdminProducts implements OnInit {
     this.editingId = product.id;
     this.editState = {
       price: product.price,
-      discountPercent: this.discountPercentOf(product)
+      discountPercent: this.discountPercentOf(product),
+      quantity: product.quantity
     };
+    this.editOriginalQuantity = product.quantity;
   }
 
   cancelEdit(): void {
@@ -199,27 +207,51 @@ export class AdminProducts implements OnInit {
     (event.target as HTMLInputElement).select();
   }
 
+  // Quick shortcut alongside the exact-quantity input: flips between out of
+  // stock (0) and a sensible default the admin can then refine by typing.
+  toggleStock(): void {
+    this.editState.quantity = this.editState.quantity > 0 ? 0 : DEFAULT_RESTOCK_QUANTITY;
+  }
+
   saveEdit(product: ProductResponse): void {
     if (this.saving) return;
-    const { price, discountPercent } = this.editState;
+    const { price, discountPercent, quantity } = this.editState;
 
     if (discountPercent != null && (discountPercent < 0 || discountPercent > 100)) {
       this.toastService.show(this.translateService.instant('ADMIN_DISCOUNT_OUT_OF_RANGE'), 'error');
       return;
     }
+    if (quantity < 0) {
+      this.toastService.show(this.translateService.instant('ADMIN_STOCK_OUT_OF_RANGE'), 'error');
+      return;
+    }
 
     this.saving = true;
 
+    // Only touch the stock endpoint if the admin actually changed the quantity — it's a
+    // brand-new endpoint that older backend deployments won't have yet, and a plain
+    // price/discount edit shouldn't start failing just because stock isn't touched.
+    const stockChanged = quantity !== this.editOriginalQuantity;
+
+    // Price, discount, and stock all live on the same backend row with no locking on any of
+    // these read-modify-write endpoints — chaining them sequentially (rather than firing in
+    // parallel) avoids a lost-update race where a later save clobbers an earlier one back to
+    // its pre-edit value.
     this.productService.updateProductPrice(product.id, price).pipe(
       switchMap(priceResponse => this.productService.updateProductDiscount(product.id, discountPercent).pipe(
-        map(discountResponse => [priceResponse, discountResponse] as const)
+        switchMap(discountResponse => {
+          const stock$ = stockChanged
+            ? this.productService.updateProductStock(product.id, quantity)
+            : of({ success: true, message: 'unchanged', data: product });
+          return stock$.pipe(map(stockResponse => [priceResponse, discountResponse, stockResponse] as const));
+        })
       ))
     ).subscribe({
-      next: ([priceResponse, discountResponse]) => {
+      next: ([priceResponse, discountResponse, stockResponse]) => {
         this.saving = false;
         this.editingId = null;
 
-        if (!priceResponse.success || !discountResponse.success) {
+        if (!priceResponse.success || !discountResponse.success || !stockResponse.success) {
           this.toastService.show(this.translateService.instant('ADMIN_SAVE_FAILED'), 'error');
           this.cdr.detectChanges();
           return;
@@ -232,7 +264,8 @@ export class AdminProducts implements OnInit {
             const expectedDiscount = discountPercent || null;
             const persisted = !!saved
               && saved.price === price
-              && this.discountPercentOf(saved) === expectedDiscount;
+              && this.discountPercentOf(saved) === expectedDiscount
+              && saved.quantity === quantity;
 
             this.toastService.show(
               this.translateService.instant(persisted ? 'ADMIN_SAVE_SUCCESS' : 'ADMIN_SAVE_FAILED'),

@@ -88,6 +88,7 @@
               <th>{{ 'ADMIN_COL_CATEGORY' | translate }}</th>
               <th>{{ 'ADMIN_COL_PRICE' | translate }}</th>
               <th>{{ 'ADMIN_COL_DISCOUNT' | translate }}</th>
+              <th>{{ 'ADMIN_COL_STOCK' | translate }}</th>
               <th class="actions-col"></th>
             </tr>
           </thead>
@@ -136,6 +137,26 @@
                     >
                     <span class="percent-sign">%</span>
                   </td>
+                  <td class="stock-edit-cell">
+                    <label class="toggle-switch">
+                      <input
+                        type="checkbox"
+                        [checked]="editState.quantity > 0"
+                        [attr.aria-label]="(editState.quantity > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK') | translate"
+                        (change)="toggleStock()"
+                      >
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      class="edit-input stock-input"
+                      [(ngModel)]="editState.quantity"
+                      [attr.aria-label]="'ADMIN_COL_STOCK' | translate"
+                      (focus)="selectInputText($event)"
+                    >
+                  </td>
                   <td class="actions-cell">
                     <button type="button" class="save-btn" [disabled]="saving" (click)="saveEdit(product)">
                       {{ 'SAVE' | translate }}
@@ -152,6 +173,11 @@
                     } @else {
                       <span class="muted">—</span>
                     }
+                  </td>
+                  <td class="stock-cell">
+                    <span class="stock-badge" [class.in-stock]="product.quantity > 0" [class.out-of-stock]="product.quantity === 0">
+                      {{ (product.quantity > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK') | translate }}
+                    </span>
                   </td>
                   <td class="actions-cell">
                     <button type="button" class="edit-btn" (click)="startEdit(product)">

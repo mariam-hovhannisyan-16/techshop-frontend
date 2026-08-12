@@ -254,6 +254,62 @@
       font-weight: 700;
     }
 
+    .stock-badge {
+      display: inline-block;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+
+      &.in-stock { background: var(--success-soft); color: var(--success); }
+      &.out-of-stock { background: var(--danger-soft); color: var(--danger); }
+    }
+
+    .stock-edit-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+
+      input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .toggle-slider {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        background: var(--border-strong);
+        border-radius: 999px;
+        transition: background 0.2s;
+
+        &::before {
+          content: '';
+          position: absolute;
+          height: 16px;
+          width: 16px;
+          left: 3px;
+          bottom: 3px;
+          background: #fff;
+          border-radius: 50%;
+          transition: transform 0.2s;
+        }
+      }
+
+      input:checked + .toggle-slider { background: var(--accent); }
+      input:checked + .toggle-slider::before { transform: translateX(18px); }
+    }
+
     .actions-col { width: 1%; }
 
     .actions-cell {
@@ -275,6 +331,7 @@
       &:focus { border-color: var(--accent); }
 
       &.discount-input { width: 70px; }
+      &.stock-input { width: 80px; }
     }
 
     .percent-sign {

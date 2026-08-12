@@ -77,9 +77,9 @@ describe('AdminProducts', () => {
       }
     };
 
-    it('sends the discount update only after the price update has resolved, not in parallel', () => {
+    it('sends the discount update only after the price update has resolved, not in parallel — and never touches the stock endpoint when quantity is unchanged', () => {
       component.startEdit(mockProducts[0] as any);
-      component.editState = { price: 1200, discountPercent: 20 };
+      component.editState = { price: 1200, discountPercent: 20, quantity: 1 };
       component.saveEdit(mockProducts[0] as any);
 
       const priceReq = httpMock.expectOne(`${productsUrl}/1/price`);
@@ -87,13 +87,15 @@ describe('AdminProducts', () => {
 
       priceReq.flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200 } });
       httpMock.expectOne(`${productsUrl}/1/discount`).flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200, discountPercentage: 20 } });
+      expect(httpMock.match(`${productsUrl}/1/stock`).length).toBe(0);
+
       httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: [{ ...mockProducts[0], price: 1200, discountPercentage: 20 }, mockProducts[1]] });
       drainLeftover();
     });
 
     it('shows success only after re-fetching confirms the new price/discount are actually saved', () => {
       component.startEdit(mockProducts[0] as any);
-      component.editState = { price: 1200, discountPercent: 20 };
+      component.editState = { price: 1200, discountPercent: 20, quantity: 1 };
       component.saveEdit(mockProducts[0] as any);
 
       const priceReq = httpMock.expectOne(`${productsUrl}/1/price`);
@@ -114,7 +116,7 @@ describe('AdminProducts', () => {
 
     it('does not report success if the refetch shows the edit was not actually persisted', () => {
       component.startEdit(mockProducts[0] as any);
-      component.editState = { price: 1200, discountPercent: 20 };
+      component.editState = { price: 1200, discountPercent: 20, quantity: 1 };
       component.saveEdit(mockProducts[0] as any);
 
       httpMock.expectOne(`${productsUrl}/1/price`).flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200 } });
@@ -126,6 +128,54 @@ describe('AdminProducts', () => {
 
       const saved = component.products.find(p => p.id === 1)!;
       expect(component.discountPercentOf(saved)).toBeNull();
+    });
+  });
+
+  describe('stock toggle', () => {
+    beforeEach(setup);
+
+    const drainLeftover = () => {
+      let leftover = httpMock.match(() => true);
+      while (leftover.length) {
+        leftover.forEach(r => r.flush({ success: true, message: 'ok', data: [] }));
+        leftover = httpMock.match(() => true);
+      }
+    };
+
+    it('toggling an in-stock product sets quantity to 0, and toggling back restores a positive default', () => {
+      component.startEdit(mockProducts[0] as any); // quantity: 1
+      expect(component.editState.quantity).toBe(1);
+
+      component.toggleStock();
+      expect(component.editState.quantity).toBe(0);
+
+      component.toggleStock();
+      expect(component.editState.quantity).toBeGreaterThan(0);
+    });
+
+    it('sends the toggled quantity to PUT /api/products/{id}/stock on save', () => {
+      component.startEdit(mockProducts[0] as any);
+      component.toggleStock(); // now out of stock
+      component.saveEdit(mockProducts[0] as any);
+
+      httpMock.expectOne(`${productsUrl}/1/price`).flush({ success: true, message: 'ok', data: mockProducts[0] });
+      httpMock.expectOne(`${productsUrl}/1/discount`).flush({ success: true, message: 'ok', data: mockProducts[0] });
+
+      const stockReq = httpMock.expectOne(`${productsUrl}/1/stock`);
+      expect(stockReq.request.method).toBe('PUT');
+      expect(stockReq.request.body).toEqual({ quantity: 0 });
+      stockReq.flush({ success: true, message: 'ok', data: { ...mockProducts[0], quantity: 0 } });
+
+      httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: [{ ...mockProducts[0], quantity: 0 }, mockProducts[1]] });
+      drainLeftover();
+    });
+
+    it('rejects a negative stock value client-side instead of sending it to the backend', () => {
+      component.startEdit(mockProducts[0] as any);
+      component.editState = { price: 1000, discountPercent: null, quantity: -5 };
+      component.saveEdit(mockProducts[0] as any);
+
+      expect(httpMock.match(() => true).length).toBe(0);
     });
   });
 
@@ -145,7 +195,7 @@ describe('AdminProducts', () => {
 
     it('rejects an out-of-range discount client-side instead of sending it to the backend', () => {
       component.startEdit(mockProducts[0] as any);
-      component.editState = { price: 1000, discountPercent: 1520 };
+      component.editState = { price: 1000, discountPercent: 1520, quantity: 1 };
       component.saveEdit(mockProducts[0] as any);
 
       expect(httpMock.match(() => true).length).toBe(0);

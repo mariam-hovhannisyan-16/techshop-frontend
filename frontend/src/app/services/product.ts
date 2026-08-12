@@ -439,7 +439,7 @@ export class Product {
     return this.isUnreachable(err) || (err instanceof HttpErrorResponse && err.status === 404);
   }
 
-  private readOverrides(): Record<number, { price?: number; originalPrice?: number | null }> {
+  private readOverrides(): Record<number, { price?: number; originalPrice?: number | null; quantity?: number }> {
     try {
       const raw = localStorage.getItem(ADMIN_OVERRIDES_KEY);
       return raw ? JSON.parse(raw) : {};
@@ -448,7 +448,7 @@ export class Product {
     }
   }
 
-  private writeOverrides(overrides: Record<number, { price?: number; originalPrice?: number | null }>): void {
+  private writeOverrides(overrides: Record<number, { price?: number; originalPrice?: number | null; quantity?: number }>): void {
     localStorage.setItem(ADMIN_OVERRIDES_KEY, JSON.stringify(overrides));
   }
 
@@ -461,7 +461,8 @@ export class Product {
       return {
         ...product,
         price: override.price ?? product.price,
-        originalPrice: override.originalPrice === null ? undefined : (override.originalPrice ?? product.originalPrice)
+        originalPrice: override.originalPrice === null ? undefined : (override.originalPrice ?? product.originalPrice),
+        quantity: override.quantity ?? product.quantity
       };
     });
   }
@@ -690,6 +691,26 @@ export class Product {
               : null;
             overrides[productId] = { ...overrides[productId], originalPrice };
             this.writeOverrides(overrides);
+            return of({ success: true, message: 'mock', data: this.applyOverrides([base])[0] });
+          }
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  updateProductStock(productId: number, quantity: number): Observable<ApiResponse<ProductResponse>> {
+    const url = `${this.apiUrl}/${productId}/stock`;
+    return this.http.put<ApiResponse<BackendProductPayload>>(url, { quantity }, { headers: this.getHeaders() }).pipe(
+      map(response => ({ ...response, data: this.normalizeProduct(response.data) })),
+      catchError(err => {
+        if (this.isAdminEndpointUnavailable(err)) {
+          console.warn(`[Product] Backend at ${url} is unreachable or not implemented yet — saving this edit locally for development.`);
+          const overrides = this.readOverrides();
+          overrides[productId] = { ...overrides[productId], quantity };
+          this.writeOverrides(overrides);
+          const base = MOCK_PRODUCTS.find(p => p.id === productId);
+          if (base) {
             return of({ success: true, message: 'mock', data: this.applyOverrides([base])[0] });
           }
         }

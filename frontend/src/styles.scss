@@ -46,8 +46,6 @@ html, body {
   --overlay: rgba(0, 0, 0, 0.4);
   --overlay-strong: rgba(0, 0, 0, 0.6);
   --chip-bg: rgba(33, 38, 45, 0.8);
-  // Intentionally not overridden under [data-theme="light"] — brand logo chips
-  // (Idram, Telcell) need a constant dark backdrop in both themes.
   --brand-chip-bg: #12151c;
 
   --auth-grad-1: #0f0c29;
