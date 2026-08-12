@@ -52,9 +52,7 @@ describe('AdminUsers', () => {
 
     it('renders the registration date column, with a placeholder for users with no createdAt', () => {
       const rows = fixture.nativeElement.querySelectorAll('tbody tr');
-      // First row is "Newest User" per the sort above.
       expect(rows[0].querySelector('.registered-cell').textContent).toContain('2026');
-      // Last row is "No Date User".
       expect(rows[3].querySelector('.registered-cell').textContent.trim()).toBe('—');
     });
   });
@@ -129,14 +127,12 @@ describe('AdminUsers', () => {
   describe('order status changes', () => {
     beforeEach(setup);
 
-    // Mirrors the exact transition map in techshop-common's OrderStatus enum.
     it('only offers the statuses the backend actually allows next, per current status', () => {
       expect(component.nextStatusOptions({ status: 'PENDING' } as any)).toEqual(['PAID', 'CANCELLED']);
       expect(component.nextStatusOptions({ status: 'PAID' } as any)).toEqual(['PROCESSING', 'CANCELLED', 'REFUNDED']);
       expect(component.nextStatusOptions({ status: 'PROCESSING' } as any)).toEqual(['SHIPPED', 'CANCELLED']);
       expect(component.nextStatusOptions({ status: 'SHIPPED' } as any)).toEqual(['DELIVERED']);
       expect(component.nextStatusOptions({ status: 'DELIVERED' } as any)).toEqual(['REFUNDED']);
-      // Terminal states offer nothing further.
       expect(component.nextStatusOptions({ status: 'CANCELLED' } as any)).toEqual([]);
       expect(component.nextStatusOptions({ status: 'REFUNDED' } as any)).toEqual([]);
     });
@@ -164,7 +160,6 @@ describe('AdminUsers', () => {
       const req = httpMock.expectOne(`${ordersAdminUrl}/21/status`);
       req.flush({ error: 'Error', message: 'Cannot transition order from PAID to SHIPPED', status: 409 }, { status: 409, statusText: 'Conflict' });
 
-      // The order's local status must NOT change on a rejected transition.
       expect(order.status).toBe('PAID');
       expect(component.updatingOrderStatusId).toBeNull();
     });

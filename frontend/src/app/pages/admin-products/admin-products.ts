@@ -157,9 +157,6 @@ export class AdminProducts implements OnInit {
     return Math.round((1 - product.price / product.originalPrice) * 100);
   }
 
-  // Summary stats aggregated from the same product list already loaded for
-  // the table below — no separate backend call, same pattern as the
-  // Statistics tab's top-products list.
   get totalProductsCount(): number {
     return this.products.length;
   }
@@ -198,11 +195,6 @@ export class AdminProducts implements OnInit {
     this.editingId = null;
   }
 
-  // The price/discount inputs are pre-filled with the product's current
-  // value when edit mode opens. Selecting the text on focus means the first
-  // keystroke replaces it — without this, clicking in and typing appends to
-  // the existing value instead (e.g. a pre-filled "15" plus a typed "20"
-  // becomes "1520"), which the backend correctly rejects as out of range.
   selectInputText(event: Event): void {
     (event.target as HTMLInputElement).select();
   }
@@ -211,9 +203,6 @@ export class AdminProducts implements OnInit {
     if (this.saving) return;
     const { price, discountPercent } = this.editState;
 
-    // Defense in depth: catch an out-of-range discount client-side with a
-    // clear message instead of sending it to the backend and surfacing a
-    // raw 400 as a generic "failed to update" toast.
     if (discountPercent != null && (discountPercent < 0 || discountPercent > 100)) {
       this.toastService.show(this.translateService.instant('ADMIN_DISCOUNT_OUT_OF_RANGE'), 'error');
       return;
@@ -221,12 +210,6 @@ export class AdminProducts implements OnInit {
 
     this.saving = true;
 
-    // Price and discount live on the same backend row, and each endpoint does
-    // its own read-modify-write with no locking — firing both requests in
-    // parallel (as forkJoin previously did) is a real lost-update race:
-    // whichever save() commits second overwrites the other field back to its
-    // pre-edit value. Chaining them sequentially, so the discount write only
-    // starts once the price write has fully committed, avoids that entirely.
     this.productService.updateProductPrice(product.id, price).pipe(
       switchMap(priceResponse => this.productService.updateProductDiscount(product.id, discountPercent).pipe(
         map(discountResponse => [priceResponse, discountResponse] as const)
@@ -236,25 +219,16 @@ export class AdminProducts implements OnInit {
         this.saving = false;
         this.editingId = null;
 
-        // Both calls resolving isn't enough on its own to call this a
-        // success — the API wraps every response in { success, ... }, so
-        // confirm that flag too rather than trusting a 200 status alone.
         if (!priceResponse.success || !discountResponse.success) {
           this.toastService.show(this.translateService.instant('ADMIN_SAVE_FAILED'), 'error');
           this.cdr.detectChanges();
           return;
         }
 
-        // Re-fetch from the backend rather than trusting the edit form's
-        // local state, so the success message reflects what's actually
-        // persisted, not what we optimistically assume was saved.
         this.productService.getAllProducts().subscribe({
           next: (response) => {
             this.products = response.data;
             const saved = this.products.find(p => p.id === product.id);
-            // A discount of 0 and no discount at all are equivalent — the
-            // backend only stores originalPrice-driving state for a
-            // positive percentage — so normalize both to null before comparing.
             const expectedDiscount = discountPercent || null;
             const persisted = !!saved
               && saved.price === price
@@ -267,8 +241,6 @@ export class AdminProducts implements OnInit {
             this.cdr.detectChanges();
           },
           error: () => {
-            // The edit itself already succeeded server-side; a failed refetch
-            // just means we can't confirm it from here, not that it failed.
             this.toastService.show(this.translateService.instant('ADMIN_SAVE_SUCCESS'), 'success');
             this.cdr.detectChanges();
           }

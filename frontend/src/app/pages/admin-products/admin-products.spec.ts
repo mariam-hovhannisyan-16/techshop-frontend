@@ -78,11 +78,6 @@ describe('AdminProducts', () => {
     };
 
     it('sends the discount update only after the price update has resolved, not in parallel', () => {
-      // Regression test: the two endpoints do an independent read-modify-write
-      // on the same backend row with no locking, so firing them in parallel
-      // (as forkJoin previously did) is a real lost-update race — whichever
-      // save() commits second silently reverts the other field. Confirmed
-      // against the live backend: 100% of parallel attempts lost a field.
       component.startEdit(mockProducts[0] as any);
       component.editState = { price: 1200, discountPercent: 20 };
       component.saveEdit(mockProducts[0] as any);
@@ -90,7 +85,6 @@ describe('AdminProducts', () => {
       const priceReq = httpMock.expectOne(`${productsUrl}/1/price`);
       expect(httpMock.match(`${productsUrl}/1/discount`).length).toBe(0);
 
-      // Clean up the still-pending chain so httpMock.verify() doesn't complain.
       priceReq.flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200 } });
       httpMock.expectOne(`${productsUrl}/1/discount`).flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200, discountPercentage: 20 } });
       httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: [{ ...mockProducts[0], price: 1200, discountPercentage: 20 }, mockProducts[1]] });
@@ -107,7 +101,6 @@ describe('AdminProducts', () => {
       const discountReq = httpMock.expectOne(`${productsUrl}/1/discount`);
       discountReq.flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200, discountPercentage: 20 } });
 
-      // saveEdit re-fetches the full list to confirm persistence rather than trusting local state.
       const refetchReq = httpMock.expectOne(productsUrl);
       refetchReq.flush({
         success: true,
@@ -127,15 +120,10 @@ describe('AdminProducts', () => {
       httpMock.expectOne(`${productsUrl}/1/price`).flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200 } });
       httpMock.expectOne(`${productsUrl}/1/discount`).flush({ success: true, message: 'ok', data: { ...mockProducts[0], price: 1200, discountPercentage: 20 } });
 
-      // Backend says the calls succeeded, but the refetched list shows the OLD price/no discount —
-      // i.e. it didn't actually persist. This must not be reported as a success.
       const refetchReq = httpMock.expectOne(productsUrl);
       refetchReq.flush({ success: true, message: 'ok', data: mockProducts });
       drainLeftover();
 
-      // editingId is cleared as soon as the API calls resolve (the form closes either way);
-      // what we're really asserting is that the mismatch is detected via discountPercentOf,
-      // which the toast decision is based on.
       const saved = component.products.find(p => p.id === 1)!;
       expect(component.discountPercentOf(saved)).toBeNull();
     });
@@ -156,10 +144,6 @@ describe('AdminProducts', () => {
     });
 
     it('rejects an out-of-range discount client-side instead of sending it to the backend', () => {
-      // Regression test: a pre-filled discount input (e.g. "15") without
-      // select-on-focus lets a user's keystrokes append rather than replace
-      // it (typing "20" after "15" produces "1520"). The backend correctly
-      // 400s that, but this guard catches it before the request is even sent.
       component.startEdit(mockProducts[0] as any);
       component.editState = { price: 1000, discountPercent: 1520 };
       component.saveEdit(mockProducts[0] as any);
@@ -170,13 +154,9 @@ describe('AdminProducts', () => {
 
   describe('summary stat tiles — aggregated from the already-loaded product list', () => {
     const statMockProducts = [
-      // in stock, no discount
       { id: 1, name: 'A', description: '', price: 1000, quantity: 4, category: 'Phones' },
-      // in stock, discounted (originalPrice derived from discountPercentage by normalizeProduct)
       { id: 2, name: 'B', description: '', price: 900, quantity: 2, category: 'Laptops', discountPercentage: 10 },
-      // out of stock, no discount
       { id: 3, name: 'C', description: '', price: 500, quantity: 0, category: 'Audio' },
-      // out of stock, discounted
       { id: 4, name: 'D', description: '', price: 300, quantity: 0, category: 'Games', discountPercentage: 25 },
     ];
 
