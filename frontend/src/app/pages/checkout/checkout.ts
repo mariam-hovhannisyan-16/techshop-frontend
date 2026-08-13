@@ -203,8 +203,12 @@ export class Checkout implements OnInit {
       billingAddress: addressPayload,
       notes: this.notes.trim() || undefined,
       paymentMethod: this.paymentMethod,
-      installmentPlan: this.paymentMethod === 'INSTALLMENT' && this.pendingInstallmentPlan
-        ? this.pendingInstallmentPlan
+      installmentDetails: this.paymentMethod === 'INSTALLMENT' && this.pendingInstallmentPlan
+        ? {
+            bankName: this.pendingInstallmentPlan.bank,
+            months: this.pendingInstallmentPlan.durationMonths,
+            downPayment: this.pendingInstallmentPlan.downPayment
+          }
         : undefined,
       language: this.languageService.current().toUpperCase() as CheckoutRequest['language']
     };

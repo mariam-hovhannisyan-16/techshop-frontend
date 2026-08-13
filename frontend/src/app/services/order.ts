@@ -33,11 +33,17 @@ export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 };
 
 export interface InstallmentPlanPayload {
-  bank: string;
-  annualRate: number;
+  bankName: string;
+  rate?: number;
   durationMonths: number;
   downPayment: number;
-  monthlyPayment: number;
+  monthlyPayment?: number;
+}
+
+export interface InstallmentDetailsPayload {
+  bankName: string;
+  months: number;
+  downPayment: number;
 }
 
 export interface OrderItemResponse {
@@ -78,7 +84,7 @@ export interface CheckoutRequest {
   billingAddress: AddressPayload;
   notes?: string;
   paymentMethod: PaymentMethod;
-  installmentPlan?: InstallmentPlanPayload;
+  installmentDetails?: InstallmentDetailsPayload;
   language: OrderLanguage;
 }
 
@@ -160,7 +166,13 @@ export class OrderService {
           notes: request.notes,
           paymentMethod: request.paymentMethod,
           paymentStatus: 'PAID',
-          installmentPlan: request.installmentPlan,
+          installmentPlan: request.installmentDetails
+            ? {
+                bankName: request.installmentDetails.bankName,
+                durationMonths: request.installmentDetails.months,
+                downPayment: request.installmentDetails.downPayment
+              }
+            : undefined,
           createdAt: now,
           updatedAt: now
         };
@@ -177,7 +189,7 @@ export class OrderService {
 
   checkout(userId: number, request: CheckoutRequest): Observable<ApiResponse<OrderResponse>> {
 
-    if (request.paymentMethod === 'ROKET_LINE' || request.paymentMethod === 'INSTALLMENT' || request.paymentMethod === 'CARD') {
+    if (request.paymentMethod === 'CARD') {
       console.warn(`[Order] ${request.paymentMethod} isn't supported by the backend yet — placing order locally for development.`);
       return this.createLocalOrder(userId, request);
     }
