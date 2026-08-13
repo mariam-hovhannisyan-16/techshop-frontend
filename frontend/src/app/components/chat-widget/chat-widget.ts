@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Observable, of, tap, map, shareReplay, finalize } from 'rxjs';
 import { ChatService, MessageResponse } from '../../services/chat';
 import { ChatWidgetService } from '../../services/chat-widget';
 import { Icon } from '../icon/icon';
@@ -27,6 +28,7 @@ export class ChatWidget implements OnInit, OnDestroy {
   @ViewChild('messageList') private messageListRef?: ElementRef<HTMLDivElement>;
 
   private conversationId: number | null = null;
+  private conversationReady: Observable<number> | null = null;
   private lastSeenId = 0;
   private pollHandle: ReturnType<typeof setInterval> | null = null;
   private skipInitialOpenRequest = true;
@@ -89,27 +91,49 @@ export class ChatWidget implements OnInit, OnDestroy {
 
   private initConversation(): void {
     this.loading = true;
-    this.chatService.startConversation().subscribe({
-      next: (response) => {
-        this.conversationId = response.data.id;
-        this.lastSeenId = this.readLastSeenId();
-        this.loadMessages();
-        this.startPolling();
-      },
+    this.ensureConversation().subscribe({
+      next: () => this.loadMessages(),
       error: () => {
         this.loading = false;
       }
     });
   }
 
+  // Shares one in-flight startConversation() call so openPanel()'s auto-init and send() can't race each other into creating two conversations.
+  private ensureConversation(): Observable<number> {
+    if (this.conversationId !== null) {
+      return of(this.conversationId);
+    }
+
+    if (!this.conversationReady) {
+      this.conversationReady = this.chatService.startConversation().pipe(
+        tap(response => {
+          this.conversationId = response.data.id;
+          this.lastSeenId = this.readLastSeenId();
+          this.startPolling();
+        }),
+        map(response => response.data.id),
+        shareReplay(1),
+        finalize(() => {
+          this.conversationReady = null;
+        })
+      );
+    }
+
+    return this.conversationReady;
+  }
+
   private loadMessages(): void {
     if (this.conversationId === null) return;
+    const conversationId = this.conversationId;
 
     this.loading = this.messages.length === 0;
-    this.chatService.getMessages(this.conversationId).subscribe({
+    this.chatService.getMessages(conversationId).subscribe({
       next: (response) => {
-        this.messages = response.data;
         this.loading = false;
+        if (this.conversationId !== conversationId) return;
+
+        this.messages = response.data;
 
         if (this.open) {
           this.markAllSeen();
@@ -126,6 +150,8 @@ export class ChatWidget implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.loading = false;
+        if (this.conversationId !== conversationId) return;
+
         if (this.isStaleConversation(err)) {
           this.resetConversation();
         }
@@ -141,6 +167,7 @@ export class ChatWidget implements OnInit, OnDestroy {
     this.stopPolling();
     this.chatService.clearSavedConversationId();
     this.conversationId = null;
+    this.conversationReady = null;
     this.messages = [];
     this.lastSeenId = 0;
   }
@@ -170,24 +197,16 @@ export class ChatWidget implements OnInit, OnDestroy {
     const text = this.draft.trim();
     if (!text || this.sending) return;
 
-    if (this.conversationId === null) {
-      this.sending = true;
-      this.chatService.startConversation().subscribe({
-        next: (response) => {
-          this.conversationId = response.data.id;
-          this.lastSeenId = this.readLastSeenId();
-          this.startPolling();
-          this.sending = false;
-          this.send();
-        },
-        error: () => {
-          this.sending = false;
-        }
-      });
-      return;
-    }
+    this.sending = true;
+    this.ensureConversation().subscribe({
+      next: (conversationId) => this.postMessage(conversationId, text),
+      error: () => {
+        this.sending = false;
+      }
+    });
+  }
 
-    const conversationId = this.conversationId;
+  private postMessage(conversationId: number, text: string): void {
     const optimistic: MessageResponse = {
       id: -Date.now(),
       conversationId,
@@ -198,20 +217,23 @@ export class ChatWidget implements OnInit, OnDestroy {
     };
     this.messages = [...this.messages, optimistic];
     this.draft = '';
-    this.sending = true;
     this.scrollToBottom();
 
     this.chatService.sendMessage(conversationId, text).subscribe({
       next: (response) => {
+        this.sending = false;
+        if (this.conversationId !== conversationId) return;
+
         const sent = this.messages.map(m => m === optimistic ? response.data.message : m);
         this.messages = response.data.botReply ? [...sent, response.data.botReply] : sent;
-        this.sending = false;
         this.markAllSeen();
         if (response.data.botReply) this.scrollToBottom();
       },
 
       error: (err) => {
         this.sending = false;
+        if (this.conversationId !== conversationId) return;
+
         if (this.isStaleConversation(err)) {
           this.messages = this.messages.filter(m => m !== optimistic);
           this.resetConversation();

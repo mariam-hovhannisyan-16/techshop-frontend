@@ -167,11 +167,6 @@ export class OrderService {
         const orders = this.readLocalOrders(userId);
         orders.unshift(order);
         this.writeLocalOrders(userId, orders);
-        // This order is a client-only mock (the backend doesn't support this payment
-        // method yet), but the user's real backend cart still needs to be emptied —
-        // otherwise the "purchased" items would still be sitting there on next load.
-        // The local order record above is already written either way, so a cart-clear
-        // failure here shouldn't make the checkout itself look like it failed.
         return this.cartService.clearCart(userId).pipe(
           map(() => ({ success: true, message: 'mock', data: order })),
           catchError(() => of({ success: true, message: 'mock', data: order }))
@@ -235,9 +230,6 @@ export class OrderService {
     );
   }
 
-  // Admin-only: every order placed by a specific user, regardless of who's
-  // currently logged in. Backed by GET /api/orders/admin?userId=..., which
-  // requires the ADMIN role server-side.
   getOrdersForUserAdmin(userId: number): Observable<ApiResponse<OrderResponse[]>> {
     return this.http.get<ApiResponse<OrderPage>>(`${this.apiUrl}/admin`, {
       headers: this.getHeaders(),
@@ -247,10 +239,6 @@ export class OrderService {
     );
   }
 
-  // Admin-only: PATCH /api/orders/admin/{id}/status. The backend validates
-  // the transition itself (OrderStatus.canTransitionTo in techshop-common)
-  // and rejects anything illegal with a 409 — this call doesn't attempt to
-  // replicate that server-side, only to report whatever the backend decides.
   updateOrderStatusAdmin(orderId: number, status: OrderStatus, note?: string): Observable<ApiResponse<OrderResponse>> {
     return this.http.patch<ApiResponse<OrderResponse>>(`${this.apiUrl}/admin/${orderId}/status`, { status, note }, {
       headers: this.getHeaders()
