@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { LanguageService } from './language';
 
 interface LoginRequest {
   email: string;
@@ -50,8 +51,13 @@ export class Auth {
 
   constructor(
     private http: HttpClient,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private languageService: LanguageService
   ) {
+  }
+
+  private get currentLanguage(): string {
+    return this.languageService.current().toUpperCase();
   }
 
   private isUnreachable(err: unknown): err is HttpErrorResponse {
@@ -90,7 +96,7 @@ export class Auth {
   }
 
   register(request: RegisterRequest): Observable<ApiResponse<AuthResponse>> {
-    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/register`, request).pipe(
+    return this.http.post<ApiResponse<AuthResponse>>(`${this.apiUrl}/register`, { ...request, language: this.currentLanguage }).pipe(
       catchError(err => {
         if (this.isUnreachable(err)) {
           console.warn(`[Auth] Backend unreachable at ${this.apiUrl} — using local mock registration for development.`);
@@ -102,15 +108,16 @@ export class Auth {
   }
 
   verifyEmail(token: string): Observable<ApiResponse<UserResponse>> {
-    return this.http.get<ApiResponse<UserResponse>>(`${this.apiUrl}/verify-email`, { params: { token } });
+    const params = new HttpParams().set('token', token).set('lang', this.currentLanguage);
+    return this.http.get<ApiResponse<UserResponse>>(`${this.apiUrl}/verify-email`, { params });
   }
 
   resendVerification(email: string): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.apiUrl}/resend-verification`, { email });
+    return this.http.post<ApiResponse<null>>(`${this.apiUrl}/resend-verification`, { email, language: this.currentLanguage });
   }
 
   forgotPassword(email: string): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.apiUrl}/forgot-password`, { email });
+    return this.http.post<ApiResponse<null>>(`${this.apiUrl}/forgot-password`, { email, language: this.currentLanguage });
   }
 
   resetPassword(token: string, newPassword: string): Observable<ApiResponse<null>> {

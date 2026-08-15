@@ -31,7 +31,7 @@ describe('AdminProducts', () => {
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
 
-    fixture.detectChanges(); // ngOnInit -> loadProducts()
+    fixture.detectChanges();
     httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: mockProducts });
     fixture.detectChanges();
   };

@@ -99,7 +99,7 @@ export class AdminStatsService {
   private computeOrdersByDay(orders: OrderResponse[]): OrdersByDay[] {
     const totals = new Map<string, OrdersByDay>();
     for (const order of orders) {
-      const date = order.createdAt.slice(0, 10); // YYYY-MM-DD, local to the stored timestamp
+      const date = order.createdAt.slice(0, 10);
       const existing = totals.get(date);
       if (existing) {
         existing.orderCount += 1;
