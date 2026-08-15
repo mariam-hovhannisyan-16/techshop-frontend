@@ -100,8 +100,17 @@
         <div class="form-grid">
           <div class="form-row">
             <label>{{ 'REGION' | translate }}</label>
-            <select name="city" [(ngModel)]="address.city">
+            <select name="region" [(ngModel)]="address.state">
               <option value="" disabled>{{ 'SELECT_REGION_PLACEHOLDER' | translate }}</option>
+              @for (region of regions; track region.value) {
+                <option [value]="region.value">{{ region.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-row">
+            <label>{{ 'CITY_DISTRICT' | translate }}</label>
+            <select name="city" [(ngModel)]="address.city">
+              <option value="" disabled>{{ 'SELECT_CITY_PLACEHOLDER' | translate }}</option>
               @for (city of cities; track city.value) {
                 <option [value]="city.value">{{ city.labelKey | translate }}</option>
               }
@@ -109,10 +118,6 @@
             @if (formTouched && !address.city.trim()) {
               <span class="field-error">{{ 'REQUIRED_FIELD' | translate }}</span>
             }
-          </div>
-          <div class="form-row">
-            <label>{{ 'CITY_DISTRICT' | translate }}</label>
-            <input type="text" name="cityDistrict" [(ngModel)]="address.state">
           </div>
         </div>
 

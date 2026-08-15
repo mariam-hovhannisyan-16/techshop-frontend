@@ -124,7 +124,7 @@ describe('ProductDetail — real-backend reviews with purchase gating', () => {
       stars[3].click();
       fixture.detectChanges();
       expect(component.newReviewRating).toBe(4);
-      expect(submitBtn.disabled).toBe(true); // still no comment
+      expect(submitBtn.disabled).toBe(true);
 
       const textarea = nativeElement.querySelector<HTMLTextAreaElement>('.review-comment-input')!;
       textarea.value = 'Great phone, fast delivery!';

@@ -143,7 +143,7 @@ describe('AdminProducts', () => {
     };
 
     it('toggling an in-stock product sets quantity to 0, and toggling back restores a positive default', () => {
-      component.startEdit(mockProducts[0] as any); // quantity: 1
+      component.startEdit(mockProducts[0] as any);
       expect(component.editState.quantity).toBe(1);
 
       component.toggleStock();
@@ -155,7 +155,7 @@ describe('AdminProducts', () => {
 
     it('sends the toggled quantity to PUT /api/products/{id}/stock on save', () => {
       component.startEdit(mockProducts[0] as any);
-      component.toggleStock(); // now out of stock
+      component.toggleStock();
       component.saveEdit(mockProducts[0] as any);
 
       httpMock.expectOne(`${productsUrl}/1/price`).flush({ success: true, message: 'ok', data: mockProducts[0] });
@@ -237,8 +237,8 @@ describe('AdminProducts', () => {
       const tiles = fixture.nativeElement.querySelectorAll('app-stat-tile');
       expect(tiles.length).toBe(4);
       const statsRowText = fixture.nativeElement.querySelector('.stats-row').textContent;
-      expect(statsRowText).toContain('4'); // total products
-      expect(statsRowText).toContain('2'); // out of stock / discounted
+      expect(statsRowText).toContain('4');
+      expect(statsRowText).toContain('2');
     });
   });
 });

@@ -38,6 +38,20 @@ export class Checkout implements OnInit {
   agreedToTerms = false;
   formTouched = false;
 
+  readonly regions: SelectOption[] = [
+    { value: 'Yerevan', labelKey: 'REGION_YEREVAN' },
+    { value: 'Aragatsotn', labelKey: 'REGION_ARAGATSOTN' },
+    { value: 'Ararat', labelKey: 'REGION_ARARAT' },
+    { value: 'Armavir', labelKey: 'REGION_ARMAVIR' },
+    { value: 'Gegharkunik', labelKey: 'REGION_GEGHARKUNIK' },
+    { value: 'Lori', labelKey: 'REGION_LORI' },
+    { value: 'Kotayk', labelKey: 'REGION_KOTAYK' },
+    { value: 'Shirak', labelKey: 'REGION_SHIRAK' },
+    { value: 'Syunik', labelKey: 'REGION_SYUNIK' },
+    { value: 'VayotsDzor', labelKey: 'REGION_VAYOTS_DZOR' },
+    { value: 'Tavush', labelKey: 'REGION_TAVUSH' }
+  ];
+
   readonly cities: SelectOption[] = [
     { value: 'Yerevan', labelKey: 'CITY_YEREVAN' },
     { value: 'Gyumri', labelKey: 'CITY_GYUMRI' },

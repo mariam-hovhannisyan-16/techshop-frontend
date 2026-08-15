@@ -94,8 +94,7 @@ describe('OrderConfirmation — no fake external payment redirect', () => {
 
       const openSpy = vi.spyOn(window, 'open');
 
-      fixture.detectChanges(); // ngOnInit -> straight to verifyPayment(), no redirecting interstitial
-
+      fixture.detectChanges();
       expect(component.state).toBe('verifying');
       expect(fixture.nativeElement.querySelector('.inline-loading h2').textContent).toContain('VERIFYING_PAYMENT_TITLE');
 
