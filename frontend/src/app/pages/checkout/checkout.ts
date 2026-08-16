@@ -106,6 +106,22 @@ export class Checkout implements OnInit {
     return this.cart ? formatAmd(this.cart.totalPrice) : '';
   }
 
+  get isInstallmentSelected(): boolean {
+    return this.paymentMethod === 'INSTALLMENT' && !!this.pendingInstallmentPlan;
+  }
+
+  get installmentMonthlyTotal(): number {
+    return this.pendingInstallmentPlan
+      ? this.pendingInstallmentPlan.monthlyPayment * this.pendingInstallmentPlan.durationMonths
+      : 0;
+  }
+
+  get installmentTotalCost(): number {
+    return this.pendingInstallmentPlan
+      ? this.pendingInstallmentPlan.downPayment + this.installmentMonthlyTotal
+      : 0;
+  }
+
   ngOnInit(): void {
     const savedAddress = this.checkoutService.getAddress(this.userId);
     if (savedAddress) {

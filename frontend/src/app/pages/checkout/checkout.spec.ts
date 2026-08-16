@@ -140,6 +140,71 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(component.paymentMethod).toBe('IDRAM');
   });
 
+  it('shows the installment cost breakdown in Order Summary once a plan is confirmed', () => {
+    const nativeElement: HTMLElement = fixture.nativeElement;
+    const numberFormat = new Intl.NumberFormat('en-US');
+
+    component.onInstallmentPlanConfirmed({
+      bank: 'Test Bank',
+      annualRate: 18.5,
+      durationMonths: 12,
+      downPayment: 100000,
+      monthlyPayment: 50000
+    });
+    fixture.detectChanges();
+
+    expect(component.paymentMethod).toBe('INSTALLMENT');
+
+    const rows = Array.from(nativeElement.querySelectorAll('.summary-items .summary-item'));
+    const cashPriceRow = rows.find(r => r.textContent?.includes('CHECKOUT_CASH_PRICE'));
+    const downPaymentRow = rows.find(r => r.textContent?.includes('CHECKOUT_INSTALLMENT_DOWN_PAYMENT'));
+    const monthlyRow = rows.find(r => r.textContent?.includes('CHECKOUT_INSTALLMENT_MONTHLY'));
+
+    expect(cashPriceRow).toBeTruthy();
+    const cashPricePriceEl = cashPriceRow!.querySelector('.price')!;
+    expect(cashPricePriceEl.classList.contains('strikethrough')).toBe(true);
+    expect(cashPricePriceEl.textContent).toContain(numberFormat.format(650000));
+
+    expect(downPaymentRow).toBeTruthy();
+    expect(downPaymentRow!.querySelector('.price')!.textContent).toContain(numberFormat.format(100000));
+
+    expect(monthlyRow).toBeTruthy();
+    const monthlyPriceText = monthlyRow!.querySelector('.price')!.textContent ?? '';
+    expect(monthlyPriceText).toContain(numberFormat.format(50000));
+    expect(monthlyPriceText).toContain('12');
+
+    const totalRow = nativeElement.querySelector('.summary-total')!;
+    expect(totalRow.querySelector('span')!.textContent!.trim()).toBe('CHECKOUT_INSTALLMENT_TOTAL');
+    expect(totalRow.querySelector('strong')!.textContent).toContain(numberFormat.format(700000));
+  });
+
+  it('reverts to the flat cart total when switching away from installment to another payment method', () => {
+    const nativeElement: HTMLElement = fixture.nativeElement;
+    const numberFormat = new Intl.NumberFormat('en-US');
+
+    component.onInstallmentPlanConfirmed({
+      bank: 'Test Bank',
+      annualRate: 18.5,
+      durationMonths: 12,
+      downPayment: 100000,
+      monthlyPayment: 50000
+    });
+    fixture.detectChanges();
+    expect(nativeElement.querySelector('.cash-price-row')).not.toBeNull();
+
+    const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
+    paymentButtons[1].click();
+    fixture.detectChanges();
+
+    expect(component.paymentMethod).toBe('IDRAM');
+    expect(nativeElement.querySelector('.cash-price-row')).toBeNull();
+    expect(nativeElement.querySelectorAll('.summary-items .summary-item').length).toBe(1);
+
+    const totalRow = nativeElement.querySelector('.summary-total')!;
+    expect(totalRow.querySelector('span')!.textContent!.trim()).toBe('TOTAL');
+    expect(totalRow.querySelector('strong')!.textContent).toContain(numberFormat.format(650000));
+  });
+
   it('blocks submission and surfaces validation errors when required fields are missing', () => {
     const form: HTMLFormElement = fixture.nativeElement.querySelector('form.checkout-form');
     form.dispatchEvent(new Event('submit'));

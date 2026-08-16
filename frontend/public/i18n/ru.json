@@ -454,5 +454,9 @@
   "INSTALLMENT_TOTAL_ROW": "Итого",
   "INSTALLMENT_PROCEED": "Оформить в рассрочку",
   "PAYMENT_INSTALLMENT": "ВТБ Рассрочка",
-  "INSTALLMENT_REQUIRES_PLAN": "Пожалуйста, сначала рассчитайте план рассрочки:"
+  "INSTALLMENT_REQUIRES_PLAN": "Пожалуйста, сначала рассчитайте план рассрочки:",
+  "CHECKOUT_CASH_PRICE": "Цена наличными",
+  "CHECKOUT_INSTALLMENT_DOWN_PAYMENT": "Первоначальный взнос",
+  "CHECKOUT_INSTALLMENT_MONTHLY": "Ежемесячный платёж",
+  "CHECKOUT_INSTALLMENT_TOTAL": "Итого в рассрочку"
 }

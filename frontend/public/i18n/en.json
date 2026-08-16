@@ -454,5 +454,9 @@
   "INSTALLMENT_TOTAL_ROW": "Total",
   "INSTALLMENT_PROCEED": "Proceed with installment",
   "PAYMENT_INSTALLMENT": "VTB Installment",
-  "INSTALLMENT_REQUIRES_PLAN": "Please calculate an installment plan first:"
+  "INSTALLMENT_REQUIRES_PLAN": "Please calculate an installment plan first:",
+  "CHECKOUT_CASH_PRICE": "Cash price",
+  "CHECKOUT_INSTALLMENT_DOWN_PAYMENT": "Down payment",
+  "CHECKOUT_INSTALLMENT_MONTHLY": "Monthly payment",
+  "CHECKOUT_INSTALLMENT_TOTAL": "Total with installment"
 }

@@ -454,5 +454,9 @@
   "INSTALLMENT_TOTAL_ROW": "Ընդամենը",
   "INSTALLMENT_PROCEED": "Ապառիկ ձևակերպել",
   "PAYMENT_INSTALLMENT": "ՎՏԲ Ապառիկ",
-  "INSTALLMENT_REQUIRES_PLAN": "Խնդրում ենք նախ հաշվարկել ապառիկ պլանը:"
+  "INSTALLMENT_REQUIRES_PLAN": "Խնդրում ենք նախ հաշվարկել ապառիկ պլանը:",
+  "CHECKOUT_CASH_PRICE": "Կանխիկ գին",
+  "CHECKOUT_INSTALLMENT_DOWN_PAYMENT": "Կանխավճար",
+  "CHECKOUT_INSTALLMENT_MONTHLY": "Ամսական վճար",
+  "CHECKOUT_INSTALLMENT_TOTAL": "Ընդամենը ապառիկով"
 }

@@ -164,10 +164,29 @@
                 <span class="price">{{ item.totalPrice | price }}</span>
               </div>
             }
+            @if (isInstallmentSelected) {
+              <div class="summary-item cash-price-row">
+                <span class="name">{{ 'CHECKOUT_CASH_PRICE' | translate }}</span>
+                <span class="price strikethrough">{{ cart!.totalPrice | price }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="name">{{ 'CHECKOUT_INSTALLMENT_DOWN_PAYMENT' | translate }}</span>
+                <span class="price">{{ pendingInstallmentPlan!.downPayment | price }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="name">{{ 'CHECKOUT_INSTALLMENT_MONTHLY' | translate }}</span>
+                <span class="price">{{ pendingInstallmentPlan!.monthlyPayment | price }} × {{ pendingInstallmentPlan!.durationMonths }}</span>
+              </div>
+            }
           </div>
           <div class="summary-total">
-            <span>{{ 'TOTAL' | translate }}</span>
-            <strong>{{ cart!.totalPrice | price }}</strong>
+            @if (isInstallmentSelected) {
+              <span>{{ 'CHECKOUT_INSTALLMENT_TOTAL' | translate }}</span>
+              <strong>{{ installmentTotalCost | price }}</strong>
+            } @else {
+              <span>{{ 'TOTAL' | translate }}</span>
+              <strong>{{ cart!.totalPrice | price }}</strong>
+            }
           </div>
           @if (showCurrencyNote) {
             <p class="currency-note">
