@@ -79,7 +79,7 @@
   "PAYMENT_METHOD": "Способ оплаты",
   "PAYMENT_IDRAM": "Idram",
   "PAYMENT_TELCELL": "Telcell Wallet",
-  "PAYMENT_ROKET_LINE": "Наличными",
+  "PAYMENT_ROKET_LINE": "Roket Line (наличными при доставке)",
   "CHECKOUT_CURRENCY_NOTE": "Цены показаны в {{currency}} для удобства. Idram и Telcell работают только с армянскими драмами, поэтому оплата спишется в AMD.",
   "CHECKOUT_CHARGE_IN_AMD_NOTE": "С вас будет списано {{amdTotal}} — эквивалент суммы выше в драмах.",
   "ORDER_SUMMARY": "Сводка заказа",
@@ -454,7 +454,5 @@
   "INSTALLMENT_TOTAL_ROW": "Итого",
   "INSTALLMENT_PROCEED": "Оформить в рассрочку",
   "PAYMENT_INSTALLMENT": "ВТБ Рассрочка",
-  "PAYMENT_CARD": "Карта",
-  "PAYMENT_CARD_SUBLABEL": "Visa / MasterCard / ArCa",
   "INSTALLMENT_REQUIRES_PLAN": "Пожалуйста, сначала рассчитайте план рассрочки:"
 }

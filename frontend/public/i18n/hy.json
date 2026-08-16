@@ -79,7 +79,7 @@
   "PAYMENT_METHOD": "Վճարման եղանակ",
   "PAYMENT_IDRAM": "Idram",
   "PAYMENT_TELCELL": "Telcell Wallet",
-  "PAYMENT_ROKET_LINE": "Կանխիկ",
+  "PAYMENT_ROKET_LINE": "Roket Line (կանխիկ առաքման ժամանակ)",
   "CHECKOUT_CURRENCY_NOTE": "Գները ցուցադրվում են {{currency}}-ով՝ ձեր հարմարության համար։ Idram-ը և Telcell-ը գործարքներն իրականացնում են միայն հայկական դրամով, ուստի գանձումը կկատարվի AMD-ով։",
   "CHECKOUT_CHARGE_IN_AMD_NOTE": "Ձեզանից կգանձվի {{amdTotal}}՝ վերևի գումարի համարժեքը դրամով։",
   "ORDER_SUMMARY": "Պատվերի ամփոփում",
@@ -454,7 +454,5 @@
   "INSTALLMENT_TOTAL_ROW": "Ընդամենը",
   "INSTALLMENT_PROCEED": "Ապառիկ ձևակերպել",
   "PAYMENT_INSTALLMENT": "ՎՏԲ Ապառիկ",
-  "PAYMENT_CARD": "Քարտ",
-  "PAYMENT_CARD_SUBLABEL": "Visa / MasterCard / ArCa",
   "INSTALLMENT_REQUIRES_PLAN": "Խնդրում ենք նախ հաշվարկել ապառիկ պլանը:"
 }

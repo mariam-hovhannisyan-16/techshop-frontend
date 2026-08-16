@@ -85,7 +85,7 @@ describe('OrderConfirmation — no fake external payment redirect', () => {
     vi.restoreAllMocks();
   });
 
-  const methods: PaymentMethod[] = ['IDRAM', 'TELCELL', 'ROKET_LINE', 'INSTALLMENT', 'CARD'];
+  const methods: PaymentMethod[] = ['IDRAM', 'TELCELL', 'ROKET_LINE', 'INSTALLMENT'];
 
   for (const method of methods) {
     it(`never opens an external window for ${method} — goes straight to verifying, then success`, async () => {

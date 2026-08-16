@@ -24,12 +24,12 @@ describe('Footer', () => {
     expect(component).toBeTruthy();
   });
 
-  it('shows exactly the payment methods actually offered in checkout — Cash, Card, Idram, Telcell, VTB — and nothing else (no Mir)', () => {
+  it('shows exactly the payment methods actually offered in checkout — Cash, Idram, Telcell, VTB — and nothing else (no Mir)', () => {
     fixture.detectChanges();
     const nativeElement: HTMLElement = fixture.nativeElement;
 
     const methods = nativeElement.querySelectorAll('.footer-payment-method');
-    expect(methods.length).toBe(5);
+    expect(methods.length).toBe(4);
 
     const imgSrcs = Array.from(nativeElement.querySelectorAll<HTMLImageElement>('.footer-payment-method img'))
       .map(img => img.getAttribute('src'));

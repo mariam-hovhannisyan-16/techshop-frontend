@@ -16,7 +16,7 @@ export interface AddressPayload {
   country: string;
 }
 
-export type PaymentMethod = 'IDRAM' | 'TELCELL' | 'ROKET_LINE' | 'INSTALLMENT' | 'CARD';
+export type PaymentMethod = 'IDRAM' | 'TELCELL' | 'ROKET_LINE' | 'INSTALLMENT';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 export type OrderLanguage = 'HY' | 'EN' | 'RU';
 
@@ -188,12 +188,6 @@ export class OrderService {
   }
 
   checkout(userId: number, request: CheckoutRequest): Observable<ApiResponse<OrderResponse>> {
-
-    if (request.paymentMethod === 'CARD') {
-      console.warn(`[Order] ${request.paymentMethod} isn't supported by the backend yet — placing order locally for development.`);
-      return this.createLocalOrder(userId, request);
-    }
-
     return this.http.post<ApiResponse<OrderResponse>>(`${this.apiUrl}/checkout`, request, { headers: this.getHeaders() }).pipe(
       catchError(err => {
         if (this.isUnreachable(err) || this.isCartLookupFailure(err)) {

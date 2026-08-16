@@ -79,7 +79,7 @@
   "PAYMENT_METHOD": "Payment Method",
   "PAYMENT_IDRAM": "Idram",
   "PAYMENT_TELCELL": "Telcell Wallet",
-  "PAYMENT_ROKET_LINE": "Cash",
+  "PAYMENT_ROKET_LINE": "Roket Line (cash on delivery)",
   "CHECKOUT_CURRENCY_NOTE": "Prices are shown in {{currency}} for convenience. Idram and Telcell only settle in Armenian dram, so you'll be charged in AMD at checkout.",
   "CHECKOUT_CHARGE_IN_AMD_NOTE": "You'll be charged {{amdTotal}} — the AMD equivalent of the total above.",
   "ORDER_SUMMARY": "Order Summary",
@@ -454,7 +454,5 @@
   "INSTALLMENT_TOTAL_ROW": "Total",
   "INSTALLMENT_PROCEED": "Proceed with installment",
   "PAYMENT_INSTALLMENT": "VTB Installment",
-  "PAYMENT_CARD": "Card",
-  "PAYMENT_CARD_SUBLABEL": "Visa / MasterCard / ArCa",
   "INSTALLMENT_REQUIRES_PLAN": "Please calculate an installment plan first:"
 }

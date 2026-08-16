@@ -110,35 +110,33 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(component.cart?.totalPrice).toBe(650000);
   });
 
-  it('shows the reference-matching labels/logos in Cash, Card, Idram, Telcell, VTB order, without disturbing selection behavior', () => {
+  it('shows the reference-matching labels/logos in Cash, Idram, Telcell, VTB order, without disturbing selection behavior', () => {
     const nativeElement: HTMLElement = fixture.nativeElement;
     const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
-    expect(paymentButtons.length).toBe(5);
+    expect(paymentButtons.length).toBe(4);
 
     expect(paymentButtons[0].querySelector('img')).toBeNull();
     expect(paymentButtons[0].querySelector('app-icon')).not.toBeNull();
     expect(paymentButtons[0].textContent).toContain('PAYMENT_ROKET_LINE');
 
-    expect(paymentButtons[1].querySelector('.payment-option-label')?.textContent).toContain('PAYMENT_CARD');
-
-    const idramImg = paymentButtons[2].querySelector<HTMLImageElement>('.payment-logo-chip img');
+    const idramImg = paymentButtons[1].querySelector<HTMLImageElement>('.payment-logo-chip img');
     expect(idramImg).not.toBeNull();
     expect(idramImg!.getAttribute('src')).toBe('icons/payment/idram.svg');
     expect(idramImg!.getAttribute('alt')).toBe('Idram');
 
-    const telcellImg = paymentButtons[3].querySelector<HTMLImageElement>('.payment-logo-chip img');
+    const telcellImg = paymentButtons[2].querySelector<HTMLImageElement>('.payment-logo-chip img');
     expect(telcellImg).not.toBeNull();
     expect(telcellImg!.getAttribute('src')).toBe('icons/payment/telcell.svg');
     expect(telcellImg!.getAttribute('alt')).toBe('Telcell Wallet');
 
-    const vtbImg = paymentButtons[4].querySelector<HTMLImageElement>('.payment-logo-chip img');
+    const vtbImg = paymentButtons[3].querySelector<HTMLImageElement>('.payment-logo-chip img');
     expect(vtbImg).not.toBeNull();
     expect(vtbImg!.getAttribute('src')).toBe('icons/payment/vtb.svg');
 
-    expect(paymentButtons[2].classList.contains('active')).toBe(false);
-    paymentButtons[2].click();
+    expect(paymentButtons[1].classList.contains('active')).toBe(false);
+    paymentButtons[1].click();
     fixture.detectChanges();
-    expect(paymentButtons[2].classList.contains('active')).toBe(true);
+    expect(paymentButtons[1].classList.contains('active')).toBe(true);
     expect(component.paymentMethod).toBe('IDRAM');
   });
 
@@ -159,7 +157,7 @@ describe('Checkout — single-page end-to-end submission', () => {
     const nativeElement: HTMLElement = fixture.nativeElement;
 
     const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
-    paymentButtons[2].click();
+    paymentButtons[1].click();
     fixture.detectChanges();
     expect(component.paymentMethod).toBe('IDRAM');
 
@@ -253,7 +251,7 @@ describe('Checkout — single-page end-to-end submission', () => {
     fixture.detectChanges();
 
     const paymentButtons = nativeElement.querySelectorAll<HTMLButtonElement>('.payment-option');
-    paymentButtons[2].click();
+    paymentButtons[1].click();
     setInput('firstName', 'Անի');
     setInput('lastName', 'Հակոբյան');
     setInput('phone', '77123456');
