@@ -37,7 +37,7 @@
   "TOAST_ALL_REMOVED": "All items removed",
   "WISHLIST_SUBTITLE": "Save your favorite products and buy them later",
   "PRICE_NOTIFY_TITLE": "Notify me of price changes",
-  "PRICE_NOTIFY_DESC": "Enable notifications and receive alerts when wishlist item prices drop",
+  "PRICE_NOTIFY_DESC": "Enable notifications and receive alerts when prices drop on items saved in your wishlist",
   "TOAST_PRICE_NOTIFY_ON": "Price notifications enabled",
   "TOAST_PRICE_NOTIFY_OFF": "Price notifications disabled",
   "TOAST_PRICE_NOTIFY_FAILED": "Failed to save preference. Please try again.",
