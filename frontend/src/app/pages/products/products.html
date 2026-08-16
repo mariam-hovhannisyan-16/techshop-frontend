@@ -2,9 +2,23 @@
   <app-header [subtitle]="'STORE_TAGLINE' | translate" brandRoute="/" [showFiltersToggle]="true">
     <form header-search class="search-bar" (ngSubmit)="onSearch(searchQuery)">
       <input type="text" name="search" [placeholder]="'SEARCH' | translate"
+             autocomplete="off"
              [value]="searchQuery"
-             (input)="onSearch($any($event.target).value)">
+             (input)="onSearch($any($event.target).value)"
+             (focus)="onSearchFocus()"
+             (blur)="onSearchBlur()"
+             (keydown)="onSearchKeydown($event)">
       <button type="submit" class="search-submit-btn"><app-icon name="search" /> {{ 'SEARCH_ACTION' | translate }}</button>
+
+      @if (searchSuggestions.length > 0) {
+        <div class="search-suggestions">
+          @for (suggestion of searchSuggestions; track suggestion.id) {
+            <button type="button" class="suggestion-item" (mousedown)="selectSearchSuggestion(suggestion.id)">
+              {{ suggestion.name }}
+            </button>
+          }
+        </div>
+      }
     </form>
   </app-header>
 

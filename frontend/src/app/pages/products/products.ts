@@ -33,9 +33,12 @@ export class Products implements OnInit {
   loading = true;
   hasError = false;
   searchQuery = '';
+  searchFocused = false;
+  private searchBlurTimeout?: ReturnType<typeof setTimeout>;
   selectedCategory = 'all';
   userId: number = 1;
   highlightedProductId: number | null = null;
+  private static readonly MAX_SEARCH_SUGGESTIONS = 6;
 
   readonly categoryPills: CategoryNavItem[] = CATEGORY_NAV_ITEMS;
 
@@ -145,6 +148,60 @@ export class Products implements OnInit {
     this.applyFilters();
   }
 
+  onSearchFocus(): void {
+    if (this.searchBlurTimeout) {
+      clearTimeout(this.searchBlurTimeout);
+      this.searchBlurTimeout = undefined;
+    }
+    this.searchFocused = true;
+  }
+
+  onSearchBlur(): void {
+    this.searchBlurTimeout = setTimeout(() => {
+      this.searchFocused = false;
+      this.cdr.detectChanges();
+    }, 150);
+  }
+
+  onSearchKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.closeSearchSuggestions();
+      (event.target as HTMLInputElement).blur();
+    }
+  }
+
+  closeSearchSuggestions(): void {
+    if (this.searchBlurTimeout) {
+      clearTimeout(this.searchBlurTimeout);
+      this.searchBlurTimeout = undefined;
+    }
+    this.searchFocused = false;
+  }
+
+  selectSearchSuggestion(productId: number): void {
+    this.closeSearchSuggestions();
+    this.viewProduct(productId);
+  }
+
+  private matchesName(p: { name: string }, query: string): boolean {
+    return p.name.toLowerCase().includes(query);
+  }
+
+  get searchSuggestions(): any[] {
+    const query = this.searchQuery.trim().toLowerCase();
+    if (!query || !this.searchFocused) return [];
+
+    return this.products
+      .filter(p => this.matchesName(p, query))
+      .sort((a, b) => {
+        const aStarts = a.name.toLowerCase().startsWith(query);
+        const bStarts = b.name.toLowerCase().startsWith(query);
+        if (aStarts === bStarts) return 0;
+        return aStarts ? -1 : 1;
+      })
+      .slice(0, Products.MAX_SEARCH_SUGGESTIONS);
+  }
+
   clearFilters(): void {
     this.searchQuery = '';
     this.selectedCategory = 'all';
@@ -169,7 +226,7 @@ export class Products implements OnInit {
     this.filteredProducts = this.products
       .filter(p =>
         matchesCategory(p, this.selectedCategory) &&
-        (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)) &&
+        (this.matchesName(p, query) || p.description.toLowerCase().includes(query)) &&
         this.matchesPriceRange(p)
       )
       .sort((a, b) => {

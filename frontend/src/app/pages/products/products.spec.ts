@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
+import { vi } from 'vitest';
 import { environment } from '../../../environments/environment';
 import { ProductFiltersPanelService } from '../../services/product-filters-panel';
 
@@ -235,5 +236,107 @@ describe('Products — new arrivals surface on the first page', () => {
     const ids = component.pagedProducts.map(p => p.id);
     expect(ids).toContain(7);
     expect(ids).toContain(8);
+  });
+});
+
+describe('Products — search suggestions dropdown', () => {
+  let fixture: ComponentFixture<Products>;
+  let component: Products;
+  let httpMock: HttpTestingController;
+  let router: Router;
+
+  const productsUrl = `${environment.productApiUrl}/api/products`;
+
+  const mockProducts = [
+    { id: 1, name: 'iPhone 15, 128GB', description: 'apple smartphone', price: 500000, quantity: 5 },
+    { id: 2, name: 'iPhone 17 Pro', description: 'apple flagship', price: 900000, quantity: 5 },
+    { id: 3, name: 'Samsung Galaxy S24', description: 'android smartphone', price: 400000, quantity: 5 },
+  ];
+
+  const drainLeftover = () => {
+    let leftover = httpMock.match(() => true);
+    while (leftover.length) {
+      leftover.forEach(req => req.flush({ success: true, message: 'ok', data: [] }));
+      leftover = httpMock.match(() => true);
+    }
+  };
+
+  const nativeElement = (): HTMLElement => fixture.nativeElement;
+  const searchInput = () => nativeElement().querySelector<HTMLInputElement>('input[name="search"]');
+
+  const typeAndFocus = (value: string) => {
+    const input = searchInput()!;
+    input.dispatchEvent(new Event('focus'));
+    input.value = value;
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+
+    await TestBed.configureTestingModule({
+      imports: [Products],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), provideTranslateService()],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Products);
+    component = fixture.componentInstance;
+    httpMock = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
+
+    fixture.detectChanges();
+    httpMock.expectOne(productsUrl).flush({ success: true, message: 'ok', data: mockProducts });
+    drainLeftover();
+    fixture.detectChanges();
+  });
+
+  afterEach(() => httpMock.verify());
+
+  it('shows matching suggestions (by name) when the focused input has a matching query', () => {
+    typeAndFocus('iphone');
+
+    expect(component.searchSuggestions.map(p => p.id)).toEqual([1, 2]);
+    const items = nativeElement().querySelectorAll<HTMLElement>('.suggestion-item');
+    expect(items.length).toBe(2);
+    expect(items[0].textContent?.trim()).toContain('iPhone 15, 128GB');
+    expect(items[1].textContent?.trim()).toContain('iPhone 17 Pro');
+  });
+
+  it('shows nothing when the query is empty', () => {
+    typeAndFocus('');
+    expect(component.searchSuggestions).toEqual([]);
+    expect(nativeElement().querySelector('.search-suggestions')).toBeNull();
+  });
+
+  it('shows nothing when there are zero matches', () => {
+    typeAndFocus('nonexistent product xyz');
+    expect(component.searchSuggestions).toEqual([]);
+    expect(nativeElement().querySelector('.search-suggestions')).toBeNull();
+  });
+
+  it('navigates to the matching product and closes the dropdown when a suggestion is clicked', () => {
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    typeAndFocus('iphone 15');
+
+    const item = nativeElement().querySelector<HTMLButtonElement>('.suggestion-item');
+    expect(item).not.toBeNull();
+    item!.dispatchEvent(new Event('mousedown'));
+    fixture.detectChanges();
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/product', 1]);
+    expect(component.searchFocused).toBe(false);
+    expect(nativeElement().querySelector('.search-suggestions')).toBeNull();
+  });
+
+  it('closes the dropdown when Escape is pressed', () => {
+    typeAndFocus('iphone');
+    expect(nativeElement().querySelector('.search-suggestions')).not.toBeNull();
+
+    searchInput()!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    fixture.detectChanges();
+
+    expect(component.searchFocused).toBe(false);
+    expect(nativeElement().querySelector('.search-suggestions')).toBeNull();
   });
 });
