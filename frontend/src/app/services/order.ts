@@ -217,6 +217,24 @@ export class OrderService {
     );
   }
 
+  cancelOrder(orderId: number): Observable<ApiResponse<OrderResponse>> {
+    return this.http.patch<ApiResponse<OrderResponse>>(`${this.apiUrl}/${orderId}/cancel`, {}, { headers: this.getHeaders() }).pipe(
+      catchError(err => {
+        const localOrder = this.findLocalOrder(orderId);
+        if (localOrder && (this.isUnreachable(err) || this.isOrderNotFound(err))) {
+          const cancelledOrder: OrderResponse = { ...localOrder, status: 'CANCELLED', updatedAt: new Date().toISOString() };
+          const userId = this.authService.getUserId();
+          if (userId) {
+            const orders = this.readLocalOrders(userId).map(order => order.id === orderId ? cancelledOrder : order);
+            this.writeLocalOrders(userId, orders);
+          }
+          return of({ success: true, message: 'mock', data: cancelledOrder });
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
   getUserOrders(userId: number): Observable<ApiResponse<OrderResponse[]>> {
     return this.http.get<ApiResponse<OrderResponse[]>>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       catchError(err => {

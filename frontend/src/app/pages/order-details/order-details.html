@@ -56,6 +56,14 @@
           <h3>{{ 'ORDER_TRACKING' | translate }}</h3>
           <app-order-tracking [status]="order.status" [createdAt]="order.createdAt" />
         </div>
+
+        @if (canCancel) {
+          <div class="cancel-order-section">
+            <button type="button" class="cancel-order-btn" [disabled]="cancelling" (click)="cancelOrder()">
+              {{ 'CANCEL_ORDER' | translate }}
+            </button>
+          </div>
+        }
       </div>
     }
   </div>

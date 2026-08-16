@@ -23,7 +23,7 @@ interface AmortizationTotals {
 }
 
 const DURATION_OPTIONS_MONTHS = [3, 6, 12, 24];
-export const DEFAULT_INSTALLMENT_DURATION_MONTHS = DURATION_OPTIONS_MONTHS[2];
+const DEFAULT_INSTALLMENT_DURATION_MONTHS = DURATION_OPTIONS_MONTHS[2];
 const INSTALLMENT_BANK_NAME = 'ՎՏԲ (Հայաստան) Բանկ';
 const DEFAULT_ANNUAL_RATE = 18.5;
 const NUMBER_FORMAT = new Intl.NumberFormat('en-US');
