@@ -24,7 +24,7 @@ interface AmortizationTotals {
 
 const DURATION_OPTIONS_MONTHS = [3, 6, 12, 24];
 export const DEFAULT_INSTALLMENT_DURATION_MONTHS = DURATION_OPTIONS_MONTHS[2];
-const BANK_OPTIONS = ['Յունիբանկ', 'Ամերիաբանկ', 'Արցախբանկ'];
+const INSTALLMENT_BANK_NAME = 'ՎՏԲ (Հայաստան) Բանկ';
 const DEFAULT_ANNUAL_RATE = 18.5;
 const NUMBER_FORMAT = new Intl.NumberFormat('en-US');
 
@@ -41,7 +41,6 @@ export class InstallmentModal {
   @Output() planConfirmed = new EventEmitter<PendingInstallmentPlan>();
 
   readonly durationOptions = DURATION_OPTIONS_MONTHS;
-  readonly bankOptions = BANK_OPTIONS;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -59,7 +58,7 @@ export class InstallmentModal {
 
   annualRate = DEFAULT_ANNUAL_RATE;
   durationMonths = DEFAULT_INSTALLMENT_DURATION_MONTHS;
-  bank = BANK_OPTIONS[0];
+  bank = INSTALLMENT_BANK_NAME;
   downPayment: number | null = null;
 
   schedule: AmortizationRow[] = [];

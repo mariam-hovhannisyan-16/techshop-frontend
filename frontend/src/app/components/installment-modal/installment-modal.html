@@ -25,14 +25,10 @@
           </select>
         </label>
 
-        <label class="form-field">
+        <div class="form-field">
           <span>{{ 'INSTALLMENT_BANK' | translate }}</span>
-          <select name="bank" [(ngModel)]="bank" required>
-            @for (opt of bankOptions; track opt) {
-              <option [ngValue]="opt">{{ opt }}</option>
-            }
-          </select>
-        </label>
+          <span class="bank-name">{{ bank }}</span>
+        </div>
 
         <label class="form-field">
           <span>{{ 'INSTALLMENT_DOWN_PAYMENT' | translate }}</span>
