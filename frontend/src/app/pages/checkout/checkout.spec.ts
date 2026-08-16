@@ -180,8 +180,8 @@ describe('Checkout — single-page end-to-end submission', () => {
     setInput('lastName', 'Հակոբյան');
     setInput('phone', '77123456');
     setInput('email', 'ani@example.com');
-    setSelect('city', 'Yerevan');
-    setInput('cityDistrict', 'Kentron');
+    setSelect('city', 'Gyumri');
+    setSelect('region', 'Shirak');
     setInput('addressLine', 'Mashtots 1');
     setInput('postalCode', '0001');
     setInput('notes', 'Please call before delivery');
@@ -207,8 +207,8 @@ describe('Checkout — single-page end-to-end submission', () => {
     expect(checkoutReq.request.body.shippingAddress.fullName).toBe('Անի Հակոբյան');
     expect(checkoutReq.request.body.shippingAddress.country).toBe('Armenia');
     expect(checkoutReq.request.body.shippingAddress.phone).toBe('+37477123456');
-    expect(checkoutReq.request.body.shippingAddress.city).toBe('Yerevan');
-    expect(checkoutReq.request.body.shippingAddress.state).toBe('Kentron');
+    expect(checkoutReq.request.body.shippingAddress.city).toBe('Gyumri');
+    expect(checkoutReq.request.body.shippingAddress.state).toBe('Shirak');
     expect(checkoutReq.request.body.notes).toBe('Please call before delivery');
     expect(checkoutReq.request.body.language).toBe('HY');
 
@@ -259,7 +259,7 @@ describe('Checkout — single-page end-to-end submission', () => {
     setInput('phone', '77123456');
     setInput('email', 'ani@example.com');
     setSelect('city', 'Yerevan');
-    setInput('cityDistrict', 'Kentron');
+    setSelect('region', 'Yerevan');
     setInput('addressLine', 'Mashtots 1');
     setInput('postalCode', '0001');
     fixture.detectChanges();
