@@ -1,0 +1,47 @@
+name: Frontend CI
+
+# Runs on every push and PR targeting main. deploy.yml watches this workflow
+# via workflow_run and only fires after a run of this exact workflow name
+# succeeds on main - no deploy logic lives here.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository so npm has the source to build.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Node 22, matching the version the root Dockerfile builds with.
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      # Install exact, lockfile-pinned dependencies.
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      # Run the test suite once (no watch mode) so the job actually exits.
+      # Vitest exits non-zero on any test failure, which automatically fails
+      # this workflow step/job.
+      - name: Run tests
+        working-directory: frontend
+        run: npm test -- --watch=false
+
+      # Production build - catches compile/build errors before they'd
+      # otherwise only surface during the server-side Docker build in deploy.yml.
+      - name: Build (production)
+        working-directory: frontend
+        run: npm run build -- --configuration production

@@ -100,7 +100,6 @@ describe('AuthDrawer — registration always requests a regular user account', (
     expect(req.request.body.role).toBe('CUSTOMER');
     req.flush({ success: true, message: 'ok', data: { token: 't', user: { id: 1, name: 'Test User', email: 'test@example.com', role: 'CUSTOMER', createdAt: '2026-01-01' } } });
 
-    // onAuthSuccess eagerly refreshes the wishlist badge count — irrelevant here, just drain it.
     let leftover = httpMock.match(() => true);
     while (leftover.length) {
       leftover.forEach(r => r.flush({ success: true, message: 'ok', data: [] }));

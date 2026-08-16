@@ -1,61 +1,27 @@
-name: Build, Test, and Deploy
+name: Deploy to EC2
 
-# Run on every push and pull request to any branch, so the test suite guards
-# all feature branches; the deploy job below further restricts itself to
-# pushes on main only.
+# Fires after "Frontend CI" (ci.yml) completes on main, so a deploy only ever
+# follows a green build-and-test run - the guard below still double-checks
+# the conclusion in case this ever gets triggered another way. workflow_dispatch
+# is included so a deploy can be re-run manually without needing a new commit
+# (e.g. to retry after a transient SSH failure, or to redeploy unchanged code).
 on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-    branches:
-      - '**'
+  workflow_run:
+    workflows: ["Frontend CI"]
+    branches: [main]
+    types:
+      - completed
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
-    steps:
-      # Check out the repository so npm has the source to build.
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # Install Node 22, matching the version the root Dockerfile builds with.
-      - name: Set up Node 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      # Install exact, lockfile-pinned dependencies.
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
-
-      # Run the test suite. Vitest exits non-zero on any test failure, which
-      # automatically fails this workflow step/job.
-      - name: Run tests
-        working-directory: frontend
-        run: npm test
-
-      # Production build as a sanity check - catches compile/build errors
-      # before they'd otherwise only surface during the server-side Docker
-      # build in the deploy job.
-      - name: Build
-        working-directory: frontend
-        run: npm run build
-
   deploy:
     name: Deploy to EC2
-    # Only deploy on a push to main, and only once build-and-test has passed.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build-and-test
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       # Deploy over SSH by replicating the exact manual sequence this app has
-      # always been deployed with: pull latest source, rebuild the Docker
-      # image from the root Dockerfile, and swap the running container.
+      # always been deployed with: sync to the latest main, rebuild the
+      # Docker image from the root Dockerfile, and swap the running container.
       # The frontend isn't part of the backend's docker-compose stack, so
       # this is a standalone container rather than `docker compose up`.
       - name: Deploy over SSH
@@ -67,8 +33,18 @@ jobs:
           script: |
             set -e
             cd ~/techshop-frontend
-            git pull
+
+            # git reset --hard instead of git pull: robust if the server's
+            # working tree ever drifts (a plain pull can fail on conflicts;
+            # reset --hard can't).
+            git fetch origin main
+            git reset --hard origin/main
+
             docker build -t techshop-frontend .
             docker stop techshop-frontend
             docker rm techshop-frontend
             docker run -d --name techshop-frontend -p 80:80 --restart unless-stopped techshop-frontend
+
+            # Clean up the now-dangling previous image so disk usage doesn't
+            # slowly grow with every deploy.
+            docker image prune -f

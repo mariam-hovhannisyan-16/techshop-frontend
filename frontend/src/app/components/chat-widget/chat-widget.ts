@@ -99,7 +99,6 @@ export class ChatWidget implements OnInit, OnDestroy {
     });
   }
 
-  // Shares one in-flight startConversation() call so openPanel()'s auto-init and send() can't race each other into creating two conversations.
   private ensureConversation(): Observable<number> {
     if (this.conversationId !== null) {
       return of(this.conversationId);

@@ -201,7 +201,7 @@ describe('ProductDetail — real-backend reviews with purchase gating', () => {
       httpMock.expectOne(productUrl).flush(productResponse);
       httpMock.expectOne(allProductsUrl).flush({ success: true, message: 'ok', data: [] });
       flushBothReviewRequests(httpMock);
-      httpMock.expectOne(ordersUrl).flush({ success: true, message: 'ok', data: [] }); // no orders at all
+      httpMock.expectOne(ordersUrl).flush({ success: true, message: 'ok', data: [] });
       drainLeftover(httpMock);
       fixture.detectChanges();
     });
