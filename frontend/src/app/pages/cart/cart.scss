@@ -79,29 +79,6 @@
     min-width: 0;
   }
 
-  .cart-items-header {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
-
-    .refresh-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      background: var(--text-primary);
-      color: var(--bg-panel);
-      border: none;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s;
-
-      &:hover { opacity: 0.85; }
-    }
-  }
-
   .cart-items-list {
     display: flex;
     flex-direction: column;

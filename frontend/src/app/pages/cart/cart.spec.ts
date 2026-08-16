@@ -195,17 +195,6 @@ describe('Cart — card layout quantity, removal and wishlist', () => {
     expect(fixture.nativeElement.querySelector('.empty-cart')).not.toBeNull();
   });
 
-  it('refreshes the cart from the server when "Update cart" is clicked', () => {
-    const refreshBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.refresh-btn');
-    refreshBtn.click();
-
-    httpMock.expectOne(cartUrl).flush(cartWith(5));
-    httpMock.expectOne(productsUrl).flush(productsResponse);
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.querySelector('.qty-stepper input').value).toBe('5');
-  });
-
   it('toggles the wishlist heart button for the item', () => {
     const wishlistBtn: HTMLButtonElement = fixture.nativeElement.querySelector('app-wishlist-button .wishlist-btn');
     expect(wishlistBtn.classList.contains('active')).toBe(false);

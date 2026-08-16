@@ -22,12 +22,6 @@
 
       <div class="cart-layout">
         <div class="cart-items-col">
-          <div class="cart-items-header">
-            <button type="button" class="refresh-btn" (click)="loadCart()">
-              <app-icon name="refresh" /> {{ 'UPDATE_CART' | translate }}
-            </button>
-          </div>
-
           <div class="cart-items-list">
             @for (item of cart.items; track item.productId; let idx = $index) {
               <div class="cart-item-card" [style.animationDelay.ms]="idx * 60">
